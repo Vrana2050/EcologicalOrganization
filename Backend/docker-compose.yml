@@ -1,0 +1,312 @@
+version: '3.8'
+
+services:
+  eureka-server:
+    build:
+      context: ./EurekaService
+      dockerfile: Dockerfile
+    image: eureka-server:latest
+    ports:
+      - "8761:8761"
+
+  gateway-api:
+    build:
+      context: ./GatewayService
+      dockerfile: Dockerfile
+    image: gateway-api:latest
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+    depends_on:
+      - eureka-server
+      # - elastic-search-service
+      # - relational-service
+      # - document-service
+      #- graph-service
+      #- timeseries-service
+      # - columnar-key-value-service
+      - standalone
+      - vector-database-service
+    ports:
+      - "9003:9000"
+
+  # relational-service:
+  #   build:
+  #     context: ./RelationalDatabaseService
+  #     dockerfile: Dockerfile
+  #   image: relational-service:latest
+  #   depends_on:
+  #     - postgresdb
+  #     - eureka-server
+  #   environment:
+  #     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+  #     SPRING_DATASOURCE_URL: "jdbc:postgresql://postgresdb:5432/nais"
+  #     SPRING_DATASOURCE_USERNAME: nais
+  #     SPRING_DATASOURCE_PASSWORD: nais
+  #   ports:
+  #     - "9030:9030"
+
+  # document-service:
+  #   build:
+  #     context: ./DocumentDatabaseService
+  #     dockerfile: Dockerfile
+  #   image: document-service:latest
+  #   depends_on:
+  #     - eureka-server
+  #     - mongodb
+  #   environment:
+  #     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+  #     SPRING_DATASOURCE_URL: "mongodb://mongodb:27017/nais"
+  #   ports:
+  #     - "9040:9040"
+
+  # columnar-key-value-service:
+  #   build:
+  #     context: ./ColumnarDatabaseService
+  #     dockerfile: Dockerfile
+  #   image: columnar-key-value-service:latest
+  #   depends_on:
+  #     - cassandradb
+  #     - redisdb
+  #     - eureka-server
+  #   restart: always
+  #   environment:
+  #     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+  #     SPRING_DATA_CASSANDRA_CONTACT_POINTS: cassandradb
+  #     SPRING_DATA_CASSANDRA_PORT: 9042
+  #     REDIS_HOST: redisdb
+  #     REDIS_PORT: 6379
+  #   ports:
+  #     - "9050:9050"
+
+  # postgresdb:
+  #   image: postgres:latest
+  #   environment:
+  #     POSTGRES_USER: "nais"
+  #     POSTGRES_PASSWORD: "nais"
+  #   volumes:
+  #     - data:/var/lib/postgres
+
+  # cassandradb:
+  #   image: cassandra:latest
+  #   ports:
+  #     - "9042:9042"
+  #   volumes:
+  #     - data:/var/lib/cassandra
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "[ $$(nodetool statusgossip) = running ]"]
+  #     interval: 30s
+  #     timeout: 10s
+
+  # mongodb:
+  #   image: mongo:latest
+  #   ports:
+  #     - "27017:27017"
+
+  #graph-service:
+   # build:
+     # context: ./GraphDatabaseService
+     # dockerfile: Dockerfile
+    #image: graph-spring-example:latest
+   # depends_on:
+   #   - eureka-server
+    #  - neo4j
+   # environment:
+   #   EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+   #   SPRING_NEO4J_URI: "bolt://neo4j:7687"
+   #   SPRING_NEO4J_USERNAME: neo4j
+   #   SPRING_NEO4J_PASSWORD: password
+
+  # elastic-search-service:
+  #   build:
+  #     context: ./ElasticSearchDatabaseService
+  #     dockerfile: Dockerfile
+  #   image: elastic-spring-example:latest
+  #   restart: on-failure
+  #   depends_on:
+  #     - eureka-server
+  #     - elasticsearch
+  #     #- kafka
+  #   environment:
+  #     SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
+  #     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+
+#  timeseries-service:
+#    build:
+#      context: ./TimeseriesDatabaseService
+#      dockerfile: Dockerfile
+#    image: timeseries-example:latest
+#    restart: on-failure
+#    depends_on:
+#      - eureka-server
+#      - influxdb
+#    environment:
+#      SPRING_INFLUX_URL: http://influxdb:8086
+#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+
+#  influxdb:
+#    image: influxdb:2.7.6
+#    ports:
+#      - '8086:8086'
+#    volumes:
+#      - influxdb-storage:/var/lib/influxdb
+#    environment:
+#      - DOCKER_INFLUXDB_INIT_MODE=setup
+#      - DOCKER_INFLUXDB_INIT_USERNAME=nais
+#      - DOCKER_INFLUXDB_INIT_PASSWORD=password
+#      - DOCKER_INFLUXDB_INIT_ORG=nais_org
+#      - DOCKER_INFLUXDB_INIT_BUCKET=nais_bucket
+#      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token
+
+  #neo4j:
+   # image: neo4j
+   # container_name: neo4j
+   # ports:
+   #   - "7474:7474"
+   #   - "7687:7687"
+   # environment:
+   #   NEO4J_AUTH: neo4j/password
+   # volumes:
+   #   - ./data:/data
+
+  # elasticsearch:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
+  #   container_name: elasticsearch
+  #   restart: always
+  #   ports:
+  #     - ${ELASTICSEARCH_PORT}:${ELASTICSEARCH_PORT}
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     - xpack.security.enabled=false
+  #     - discovery.type=single-node
+  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  #   ulimits:
+  #     memlock:
+  #       soft: -1
+  #       hard: -1
+
+  # etcd:
+  #   container_name: milvus-etcd
+  #   image: quay.io/coreos/etcd:v3.5.5
+  #   environment:
+  #     - ETCD_AUTO_COMPACTION_MODE=revision
+  #     - ETCD_AUTO_COMPACTION_RETENTION=1000
+  #     - ETCD_QUOTA_BACKEND_BYTES=4294967296
+  #     - ETCD_SNAPSHOT_COUNT=50000
+  #   volumes:
+  #     - ${DOCKER_VOLUME_DIRECTORY:-.}/VectorDatabaseService/volumes/etcd:/etcd
+  #   command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+  #   healthcheck:
+  #     test: ["CMD", "etcdctl", "endpoint", "health"]
+  #     interval: 30s
+  #     timeout: 20s
+  #     retries: 3
+
+  # minio:
+  #   container_name: milvus-minio
+  #   image: minio/minio:RELEASE.2023-03-20T20-16-18Z
+  #   environment:
+  #     MINIO_ACCESS_KEY: minioadmin
+  #     MINIO_SECRET_KEY: minioadmin
+  #   ports:
+  #     - "9001:9001"
+  #     - "9000:9000"
+  #   volumes:
+  #     - ${DOCKER_VOLUME_DIRECTORY:-.}/VectorDatabaseService/volumes/minio:/minio_data
+  #   command: minio server /minio_data --console-address ":9001"
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+  #     interval: 30s
+  #     timeout: 20s
+  #     retries: 3
+
+  # standalone:
+  #   container_name: milvus-standalone
+  #   image: milvusdb/milvus:v2.4.0
+  #   command: ["milvus", "run", "standalone"]
+  #   security_opt:
+  #   - seccomp:unconfined
+  #   environment:
+  #     ETCD_ENDPOINTS: etcd:2379
+  #     MINIO_ADDRESS: minio:9000
+  #   volumes:
+  #     - ${DOCKER_VOLUME_DIRECTORY:-.}/VectorDatabaseService/volumes/milvus:/var/lib/milvus
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+  #     interval: 30s
+  #     start_period: 90s
+  #     timeout: 20s
+  #     retries: 3
+  #   ports:
+  #     - "19530:19530"
+  #     - "9091:9091"
+  #   depends_on:
+  #     - "etcd"
+  #     - "minio"
+
+  # vector-database-service:
+  #  image: vector-database-service3
+  #  build:
+  #    context: ./VectorDatabaseService
+  #    dockerfile: Dockerfile
+  #  restart: on-failure
+  #  environment:
+  #    EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+  #  ports:
+  #    - "8000:8000"
+  # #  command: uvicorn metodi:app --host 127.0.0.1 --port 8000
+  #  depends_on:
+  #    - eureka-server
+  #    - etcd
+  #    - minio
+  #    - standalone
+
+#  kibana:
+#    image: docker.elastic.co/kibana/kibana:8.11.1
+#    container_name: kibana
+#    restart: always
+#    ports:
+#      - "5601:5601"
+#    env_file:
+#      - .env
+#    environment:
+#      - ELASTICSEARCH_URL=http://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
+#      - ELASTICSEARCH_HOSTS=http://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
+#    depends_on:
+#      - elasticsearch
+
+#  grafana:
+#    image: grafana/grafana-enterprise
+#    container_name: grafana
+#    restart: unless-stopped
+#    environment:
+#      - GF_SERVER_ROOT_URL=http://my.grafana.server/
+#      - GF_INSTALL_PLUGINS=grafana-clock-panel
+#    ports:
+#      - '3000:3000'
+#    volumes:
+#      - 'grafana_storage:/var/lib/grafana'
+
+
+  # redisdb:
+  #   image: redis:latest
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - data:/var/lib/redis
+
+  # redis-insight:
+  #   image: redislabs/redisinsight:latest
+  #   ports:
+  #     - "5540:5540"
+  #   depends_on:
+  #     - redisdb
+  #   environment:
+  #     REDIS_HOST: redisdb
+  #     REDIS_PORT: 6379
+
+
+volumes:
+  # data:
+  # influxdb-storage:
+  # grafana_storage: { }
