@@ -26,4 +26,7 @@ services:
     ports:
       - "1521:1521"
     volumes:
-      - ./db:/opt/oracle/scripts/startup
+      - oracle-data:/opt/oracle/oradata
+
+volumes:
+  oracle-data: {}

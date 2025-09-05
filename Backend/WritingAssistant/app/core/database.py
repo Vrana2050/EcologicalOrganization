@@ -1,4 +1,3 @@
-# app/core/database.py
 from contextlib import contextmanager
 from typing import Any, Generator
 
