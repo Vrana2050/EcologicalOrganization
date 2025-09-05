@@ -1,4 +1,3 @@
-# app/schema/session_overview_schema.py
 from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel
