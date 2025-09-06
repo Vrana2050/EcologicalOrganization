@@ -1,0 +1,196 @@
+package DocumentPreparationService.mapper;
+
+import DocumentPreparationService.dto.*;
+import DocumentPreparationService.mapper.interfaces.IDokumentConverter;
+import DocumentPreparationService.model.Dokument;
+import DocumentPreparationService.model.Projekat;
+import org.hibernate.Hibernate;
+import org.springframework.stereotype.Component;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+@Component
+public class DokumentConverter extends BaseMapper<Dokument, DokumentDto> implements IDokumentConverter {
+
+    private ProjekatConverter projekatConverter;
+    private FajlConverter fajlConverter;
+    private KorisnikProjekatConverter korisnikConverter;
+    private TokConverter tokConverter;
+    private TokStatusConverter tokStatusConverter;
+    private DokumentRevizijaConverter dokumentRevizijaConverter;
+
+
+    private ProjekatConverter getProjekatConverter() {
+        if (projekatConverter == null) projekatConverter = new ProjekatConverter();
+        return projekatConverter;
+    }
+
+    private FajlConverter getFajlConverter() {
+        if (fajlConverter == null) fajlConverter = new FajlConverter();
+        return fajlConverter;
+    }
+
+    private KorisnikProjekatConverter getKorisnikConverter() {
+        if (korisnikConverter == null) korisnikConverter = new KorisnikProjekatConverter();
+        return korisnikConverter;
+    }
+
+    private TokConverter getTokConverter() {
+        if (tokConverter == null) tokConverter = new TokConverter();
+        return tokConverter;
+    }
+
+    private DokumentRevizijaConverter getDokumentRevizijaConverter() {
+        if (dokumentRevizijaConverter == null) dokumentRevizijaConverter = new DokumentRevizijaConverter();
+        return dokumentRevizijaConverter;
+    }
+    private TokStatusConverter getTokStatusConverter() {
+        if (tokStatusConverter == null) tokStatusConverter = new TokStatusConverter();
+        return tokStatusConverter;
+    }
+
+    @Override
+    public Dokument ToEntity(DokumentDto dto) {
+        if (dto == null) return null;
+
+        Dokument dokument = new Dokument();
+        dokument.setId(dto.getId());
+        dokument.setNaziv(dto.getNaziv());
+        dokument.setOpis(dto.getOpis());
+        dokument.setPrioritet(dto.getPrioritet());
+
+        if (dto.getProjekat() != null) {
+            dokument.setProjekat(getProjekatConverter().ToEntity(dto.getProjekat()));
+        }
+
+        if (dto.getTokIzradeDokumenta() != null) {
+            dokument.setTokIzradeDokumenta(getTokConverter().ToEntity(dto.getTokIzradeDokumenta()));
+        }
+
+        if (dto.getStatus() != null) {
+            dokument.setStatus(getTokStatusConverter().ToEntity(dto.getStatus()));
+        }
+
+        if (dto.getRoditeljDokument() != null) {
+            dokument.setRoditeljDokument(ToEntity(dto.getRoditeljDokument()));
+        }
+
+        if (dto.getVlasnik() != null) {
+            dokument.setVlasnik(getKorisnikConverter().ToEntity(dto.getVlasnik()));
+        }
+
+        if (dto.getGlavniFajl() != null) {
+            dokument.setGlavniFajl(getFajlConverter().ToEntity(dto.getGlavniFajl()));
+        }
+
+        if (dto.getAktivniFajlovi() != null) {
+            dokument.setAktivniFajlovi(getFajlConverter().ToEntities(dto.getAktivniFajlovi()));
+        }
+
+        if (dto.getSviFajlovi() != null) {
+            dokument.setSviFajlovi(getFajlConverter().ToEntities(dto.getSviFajlovi()));
+        }
+
+        if (dto.getZavisiOd() != null) {
+            dokument.setZavisiOd(ToEntities(dto.getZavisiOd()));
+        }
+
+        if (dto.getZavisnici() != null) {
+            dokument.setZavisnici(ToEntities(dto.getZavisnici()));
+        }
+
+        if (dto.getDodeljeniKorisnici() != null) {
+            dokument.setDodeljeniKorisnici(getKorisnikConverter().ToEntities(dto.getDodeljeniKorisnici()));
+        }
+
+        return dokument;
+    }
+
+    @Override
+    public DokumentDto ToDto(Dokument dokument) {
+        if (dokument == null) return null;
+
+        DokumentDto dto = new DokumentDto();
+        dto.setId(dokument.getId());
+        dto.setNaziv(dokument.getNaziv());
+        dto.setOpis(dokument.getOpis());
+        dto.setPrioritet(dokument.getPrioritet());
+
+        if (Hibernate.isInitialized(dokument.getProjekat())) {
+            dto.setProjekat(getProjekatConverter().ToDto(dokument.getProjekat()));
+        }
+        else if(dokument.getProjekat() != null) {
+            ProjekatDto projekatDto = new ProjekatDto();
+            projekatDto.setId(dokument.getProjekat().getId());
+            dto.setProjekat(projekatDto);
+        }
+
+        if (Hibernate.isInitialized(dokument.getTokIzradeDokumenta())) {
+            dto.setTokIzradeDokumenta(getTokConverter().ToDto(dokument.getTokIzradeDokumenta()));
+        }
+        else if (dokument.getTokIzradeDokumenta() != null) {
+            TokDto tokDto = new TokDto();
+            tokDto.setId(dokument.getTokIzradeDokumenta().getId());
+            dto.setTokIzradeDokumenta(tokDto);
+        }
+
+        if (Hibernate.isInitialized(dokument.getStatus())) {
+            dto.setStatus(getTokStatusConverter().ToDto(dokument.getStatus()));
+        } else if (dokument.getStatus() != null) {
+            TokStatusDto statusDto = new TokStatusDto();
+            statusDto.setId(dokument.getStatus().getId());
+            dto.setStatus(statusDto);
+        }
+
+        if (Hibernate.isInitialized(dokument.getRoditeljDokument())) {
+            dto.setRoditeljDokument(ToDto(dokument.getRoditeljDokument()));
+        } else if (dokument.getRoditeljDokument() != null) {
+            DokumentDto roditelj = new DokumentDto();
+            roditelj.setId(dokument.getRoditeljDokument().getId());
+            dto.setRoditeljDokument(roditelj);
+        }
+
+        if (Hibernate.isInitialized(dokument.getVlasnik())) {
+            dto.setVlasnik(getKorisnikConverter().ToDto(dokument.getVlasnik()));
+        } else if (dokument.getVlasnik() != null) {
+            KorisnikProjekatDto vlasnikDto = new KorisnikProjekatDto();
+            vlasnikDto.setId(dokument.getVlasnik().getId());
+            dto.setVlasnik(vlasnikDto);
+        }
+
+        if (Hibernate.isInitialized(dokument.getGlavniFajl())) {
+            dto.setGlavniFajl(getFajlConverter().ToDto(dokument.getGlavniFajl()));
+        } else if (dokument.getGlavniFajl() != null) {
+            FajlDto fajlDto = new FajlDto();
+            fajlDto.setId(dokument.getGlavniFajl().getId());
+            dto.setGlavniFajl(fajlDto);
+        }
+
+        if (Hibernate.isInitialized(dokument.getAktivniFajlovi())) {
+            dto.setAktivniFajlovi(getFajlConverter().ToDtos(dokument.getAktivniFajlovi()));
+        }
+
+        if (Hibernate.isInitialized(dokument.getSviFajlovi())) {
+            dto.setSviFajlovi(getFajlConverter().ToDtos(dokument.getSviFajlovi()));
+        }
+
+        if (Hibernate.isInitialized(dokument.getZavisiOd())) {
+            dto.setZavisiOd(ToDtos(dokument.getZavisiOd()));
+        }
+
+        if (Hibernate.isInitialized(dokument.getZavisnici())) {
+            dto.setZavisnici(ToDtos(dokument.getZavisnici()));
+        }
+
+        if (Hibernate.isInitialized(dokument.getDodeljeniKorisnici())) {
+            dto.setDodeljeniKorisnici(getKorisnikConverter().ToDtos(dokument.getDodeljeniKorisnici()));
+        }
+        if (Hibernate.isInitialized(dokument.getRevizije())) {
+            dto.setRevizije(getDokumentRevizijaConverter().ToDtos(dokument.getRevizije()));
+        }
+
+        return dto;
+    }
+}

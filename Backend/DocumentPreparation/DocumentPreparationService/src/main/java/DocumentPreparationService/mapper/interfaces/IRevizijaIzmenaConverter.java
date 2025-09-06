@@ -1,0 +1,9 @@
+package DocumentPreparationService.mapper.interfaces;
+
+import DocumentPreparationService.dto.DokumentRevizijaDto;
+import DocumentPreparationService.dto.RevizijaIzmenaDto;
+import DocumentPreparationService.model.DokumentRevizija;
+import DocumentPreparationService.model.RevizijaIzmena;
+
+public interface IRevizijaIzmenaConverter extends IBaseConverter<RevizijaIzmena, RevizijaIzmenaDto>{
+}
