@@ -33,7 +33,7 @@ class ChatSessionService(BaseService):
 
         session = self.chat_session_repository.read_by_id(chat_session_id)
         if session.created_by != user_id:
-            raise AuthError(detail="Forbidden.")
+            raise AuthError(detail="Forbidden")
 
 
         deleted_obj = self.chat_session_repository.delete_by_id(chat_session_id)

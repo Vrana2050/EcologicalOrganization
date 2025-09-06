@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import PrimaryKeyConstraint, VARCHAR, text
+from sqlalchemy import PrimaryKeyConstraint, VARCHAR, text, BigInteger, Integer
 from sqlalchemy.dialects.oracle import NUMBER
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
@@ -12,8 +12,8 @@ class Role(Base):
         PrimaryKeyConstraint('id', name='sys_c008284'),
     )
 
-    id: Mapped[float] = mapped_column(NUMBER(asdecimal=False), primary_key=True)
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     name: Mapped[str] = mapped_column(VARCHAR(255), nullable=False)
-    deleted: Mapped[float] = mapped_column(NUMBER(1, 0, False), nullable=False, server_default=text('0 '))
+    deleted: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0 '))
 
     user_role: Mapped[list['UserRole']] = relationship('UserRole', back_populates='role')

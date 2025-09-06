@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import ForeignKeyConstraint, PrimaryKeyConstraint, text
+from sqlalchemy import ForeignKeyConstraint, PrimaryKeyConstraint, text, BigInteger, Integer
 from sqlalchemy.dialects.oracle import NUMBER
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
@@ -14,10 +14,10 @@ class UserRole(Base):
         PrimaryKeyConstraint('id', name='sys_c008292')
     )
 
-    id: Mapped[float] = mapped_column(NUMBER(asdecimal=False), primary_key=True)
-    role_id: Mapped[float] = mapped_column(NUMBER(19, 0, False), nullable=False)
-    user_id: Mapped[float] = mapped_column(NUMBER(19, 0, False), nullable=False)
-    deleted: Mapped[float] = mapped_column(NUMBER(1, 0, False), nullable=False, server_default=text('0 '))
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    role_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    user_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    deleted: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0 '))
 
     role: Mapped['Role'] = relationship('Role', back_populates='user_role')
     user: Mapped['User'] = relationship('User', back_populates='user_role')

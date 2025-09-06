@@ -3,7 +3,7 @@ from typing import Optional
 import datetime
 import decimal
 
-from sqlalchemy import PrimaryKeyConstraint, TIMESTAMP, VARCHAR, text
+from sqlalchemy import PrimaryKeyConstraint, TIMESTAMP, VARCHAR, text, BigInteger, Integer
 from sqlalchemy.dialects.oracle import NUMBER
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
@@ -15,8 +15,8 @@ class ModelPricing(Base):
         PrimaryKeyConstraint('id', name='sys_c008272'),
     )
 
-    id: Mapped[float] = mapped_column(NUMBER(asdecimal=False), primary_key=True)
-    deleted: Mapped[float] = mapped_column(NUMBER(1, 0, False), nullable=False, server_default=text('0 '))
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    deleted: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0 '))
     provider: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
     model: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
     prompt_token_usd: Mapped[Optional[decimal.Decimal]] = mapped_column(NUMBER(10, 6, True))

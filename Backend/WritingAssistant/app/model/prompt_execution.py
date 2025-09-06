@@ -3,7 +3,7 @@ from typing import Optional
 import datetime
 import decimal
 
-from sqlalchemy import Enum, ForeignKeyConstraint, PrimaryKeyConstraint, TIMESTAMP, Text, VARCHAR, text
+from sqlalchemy import Enum, ForeignKeyConstraint, PrimaryKeyConstraint, TIMESTAMP, Text, VARCHAR, text, BigInteger, Integer
 from sqlalchemy.dialects.oracle import NUMBER
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
@@ -21,24 +21,24 @@ class PromptExecution(Base):
         PrimaryKeyConstraint('id', name='sys_c008270')
     )
 
-    id: Mapped[float] = mapped_column(NUMBER(asdecimal=False), primary_key=True)
-    prompt_version_id: Mapped[float] = mapped_column(NUMBER(19, 0, False), nullable=False)
-    session_id: Mapped[float] = mapped_column(NUMBER(19, 0, False), nullable=False)
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    prompt_version_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    session_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     status: Mapped[str] = mapped_column(Enum('ok', 'failed'), nullable=False)
-    created_by: Mapped[float] = mapped_column(NUMBER(19, 0, False), nullable=False)
-    deleted: Mapped[float] = mapped_column(NUMBER(1, 0, False), nullable=False, server_default=text('0 '))
-    section_instruction_id: Mapped[Optional[float]] = mapped_column(NUMBER(19, 0, False))
-    global_instruction_id: Mapped[Optional[float]] = mapped_column(NUMBER(19, 0, False))
+    created_by: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    deleted: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0 '))
+    section_instruction_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    global_instruction_id: Mapped[Optional[int]] = mapped_column(BigInteger)
     final_prompt: Mapped[Optional[str]] = mapped_column(Text)
     error_code: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
     error_message: Mapped[Optional[str]] = mapped_column(Text)
-    prompt_tokens: Mapped[Optional[float]] = mapped_column(NUMBER(10, 0, False))
-    output_tokens: Mapped[Optional[float]] = mapped_column(NUMBER(10, 0, False))
+    prompt_tokens: Mapped[Optional[int]] = mapped_column(Integer)
+    output_tokens: Mapped[Optional[int]] = mapped_column(Integer)
     cost_usd: Mapped[Optional[decimal.Decimal]] = mapped_column(NUMBER(10, 4, True))
-    pricing_id: Mapped[Optional[float]] = mapped_column(NUMBER(19, 0, False))
+    pricing_id: Mapped[Optional[int]] = mapped_column(BigInteger)
     started_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(True))
     finished_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(True))
-    duration_ms: Mapped[Optional[float]] = mapped_column(NUMBER(10, 0, False))
+    duration_ms: Mapped[Optional[int]] = mapped_column(Integer)
 
     user: Mapped['User'] = relationship('User', back_populates='prompt_execution')
     global_instruction: Mapped[Optional['GlobalInstruction']] = relationship('GlobalInstruction', back_populates='prompt_execution')

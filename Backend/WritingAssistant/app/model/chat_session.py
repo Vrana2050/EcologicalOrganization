@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Optional
 import datetime
 
-from sqlalchemy import ForeignKeyConstraint, PrimaryKeyConstraint, TIMESTAMP, VARCHAR, text, Identity
+from sqlalchemy import ForeignKeyConstraint, PrimaryKeyConstraint, TIMESTAMP, VARCHAR, text, Identity, BigInteger, Integer
 from sqlalchemy.dialects.oracle import NUMBER
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
@@ -16,10 +16,10 @@ class ChatSession(Base):
         PrimaryKeyConstraint('id', name='sys_c008250')
     )
 
-    id: Mapped[float] = mapped_column(NUMBER(asdecimal=False), Identity(always=False), primary_key=True)
-    template_id: Mapped[float] = mapped_column(NUMBER(19, 0, False), nullable=False)
-    created_by: Mapped[float] = mapped_column(NUMBER(19, 0, False), nullable=False)
-    deleted: Mapped[float] = mapped_column(NUMBER(1, 0, False), nullable=False, server_default=text('0 '))
+    id: Mapped[int] = mapped_column(BigInteger, Identity(always=False), primary_key=True)
+    template_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    created_by: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    deleted: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0 '))
     title: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
     created_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(True), server_default=text('CURRENT_TIMESTAMP'))
     updated_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(True))

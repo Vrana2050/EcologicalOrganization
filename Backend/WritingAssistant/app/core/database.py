@@ -4,7 +4,7 @@ from typing import Any, Generator
 from sqlalchemy import create_engine, orm
 from sqlalchemy.orm import Session
 
-from app.model import Base  # Base iz sqlacodegen (samo da zna o modelima)
+from app.model import Base  
 
 DATABASE_URL = "oracle+oracledb://writing_assistant:Assistant123@oracle-db:1521/?service_name=XEPDB1"
 
@@ -22,7 +22,6 @@ class Database:
 
     @contextmanager
     def session(self) -> Generator[Session, Any, None]:
-        """Context manager za otvaranje/zatvaranje sesije"""
         session: Session = self._session_factory()
         try:
             yield session
@@ -32,12 +31,8 @@ class Database:
         finally:
             session.close()
 
-
-# Singleton instanca baze
 db = Database()
 
-
-# Dependency za FastAPI
 def get_db() -> Generator[Session, Any, None]:
     with db.session() as session:
         yield session

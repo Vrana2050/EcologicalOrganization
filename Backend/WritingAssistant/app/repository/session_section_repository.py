@@ -1,4 +1,3 @@
-# app/repository/session_section_repository.py
 from contextlib import AbstractContextManager
 from typing import Callable, Tuple, List, Dict
 from sqlalchemy import func, and_
@@ -15,7 +14,6 @@ class SessionSectionRepository(BaseRepository):
 
     def list_with_latest_iteration(self, session_id: int) -> Tuple[List[SessionSection], Dict[int, SectionIteration]]:
         with self.session_factory() as session:
-            # 1) sve sekcije (neobrisane) za session, sortirane po position
             sections = (
                 session.query(SessionSection)
                 .filter(SessionSection.session_id == session_id, SessionSection.deleted == 0)

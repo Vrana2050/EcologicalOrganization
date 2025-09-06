@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Optional
 import datetime
 
-from sqlalchemy import ForeignKeyConstraint, PrimaryKeyConstraint, TIMESTAMP, VARCHAR, text
+from sqlalchemy import ForeignKeyConstraint, PrimaryKeyConstraint, TIMESTAMP, VARCHAR, text, BigInteger, Integer
 from sqlalchemy.dialects.oracle import NUMBER
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
@@ -15,14 +15,14 @@ class User(Base):
         PrimaryKeyConstraint('id', name='sys_c008288')
     )
 
-    id: Mapped[float] = mapped_column(NUMBER(asdecimal=False), primary_key=True)
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     email: Mapped[str] = mapped_column(VARCHAR(255), nullable=False)
     password: Mapped[str] = mapped_column(VARCHAR(255), nullable=False)
-    deleted: Mapped[float] = mapped_column(NUMBER(1, 0, False), nullable=False, server_default=text('0 '))
+    deleted: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0 '))
     first_name: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
     last_name: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
     created_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(True), server_default=text('CURRENT_TIMESTAMP'))
-    created_by: Mapped[Optional[float]] = mapped_column(NUMBER(19, 0, False))
+    created_by: Mapped[Optional[int]] = mapped_column(BigInteger)
     updated_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(True))
 
     user: Mapped[Optional['User']] = relationship('User', remote_side=[id], back_populates='user_reverse')

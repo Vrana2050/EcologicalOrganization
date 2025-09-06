@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Optional
 import datetime
 
-from sqlalchemy import ForeignKeyConstraint, PrimaryKeyConstraint, TIMESTAMP, Text, text
+from sqlalchemy import ForeignKeyConstraint, PrimaryKeyConstraint, TIMESTAMP, Text, text, BigInteger, Integer
 from sqlalchemy.dialects.oracle import NUMBER
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
@@ -15,9 +15,9 @@ class SectionInstruction(Base):
         PrimaryKeyConstraint('id', name='sys_c008264')
     )
 
-    id: Mapped[float] = mapped_column(NUMBER(asdecimal=False), primary_key=True)
-    session_section_id: Mapped[float] = mapped_column(NUMBER(19, 0, False), nullable=False)
-    deleted: Mapped[float] = mapped_column(NUMBER(1, 0, False), nullable=False, server_default=text('0 '))
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    session_section_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    deleted: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0 '))
     text_: Mapped[Optional[str]] = mapped_column('text', Text)
     created_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(True), server_default=text('CURRENT_TIMESTAMP\n'))
 
