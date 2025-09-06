@@ -1,11 +1,13 @@
 from fastapi import Request, HTTPException, status
 from pydantic import BaseModel
 
+
 class CurrentUser(BaseModel):
     id: int
     email: str | None = None
     first_name: str | None = None
     last_name: str | None = None
+    role: str | None = None
 
 async def get_user_id_from_headers(request: Request) -> int:
     user_id = request.headers.get("x-user-id")
@@ -27,10 +29,12 @@ async def get_user_from_headers(request: Request) -> CurrentUser:
     email = request.headers.get("x-user-email")
     first_name = request.headers.get("x-user-first-name")
     last_name = request.headers.get("x-user-last-name")
+    role = request.headers.get("x-user-role")
 
     return CurrentUser(
         id=user_id,
         email=email,
         first_name=first_name,
         last_name=last_name,
+        role=role,   
     )

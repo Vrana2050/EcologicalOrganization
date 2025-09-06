@@ -65,9 +65,9 @@ class BaseRepository:
             }
 
     def read_by_id(
-        self, 
-        id: int, 
-        eager: bool = False, 
+        self,
+        id: int,
+        eager: bool = False,
         eagers: Sequence[Union[str, InstrumentedAttribute]] = ()
     ):
         with self.session_factory() as session:
@@ -76,6 +76,11 @@ class BaseRepository:
             for target in targets:
                 attr = target if not isinstance(target, str) else getattr(self.model, target)
                 query = query.options(joinedload(attr))
+
+            
+            if hasattr(self.model, "deleted"):
+                query = query.filter(self.model.deleted == 0)
+
             obj = query.filter(self.model.id == id).first()
             if not obj:
                 raise NotFoundError(detail=f"not found id : {id}")

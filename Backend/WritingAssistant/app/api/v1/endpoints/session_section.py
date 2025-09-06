@@ -19,14 +19,16 @@ def create_session_section(
     return service.add(payload)
 
 
-@router.delete("/{id}", response_model=SessionSectionOut)
+@router.delete("/{id}", status_code=204)
 @inject
 def delete_session_section(
     id: int,
     user_id: int = Depends(get_current_user_id),
     service: SessionSectionService = Depends(Provide[Container.session_section_service]),
 ):
-    return service.remove_by_id(id, user_id)
+    service.remove_by_id(id, user_id)
+    return
+
 
 
 @router.get("/{section_id}/iterations/{seq_no}", response_model=SectionIterationOut)

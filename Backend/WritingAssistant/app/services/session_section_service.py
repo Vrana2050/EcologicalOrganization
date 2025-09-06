@@ -2,7 +2,7 @@ from typing import List
 from app.repository.session_section_repository import SessionSectionRepository
 from app.repository.chat_session_repository import ChatSessionRepository
 from app.services.base_service import BaseService
-from app.core.exceptions import NotFoundError
+from app.core.exceptions import NotFoundError, AuthError
 from app.schema.session_overview_schema import SessionSectionWithLatestOut
 
 from app.schema.section_iteration_schema import (
@@ -27,9 +27,9 @@ class SessionSectionService(BaseService):
         chat_session = self.chat_session_repository.read_by_id(section.session_id)
 
         if chat_session.created_by != user_id:
-            raise NotFoundError(detail="You are not allowed to delete this section")
+            raise AuthError(detail="You are not allowed to delete this section")  
 
-        return self.session_section_repository.delete_by_id(id)
+        self.session_section_repository.delete_by_id(id)
     
     def list_with_latest_for_session(self, session_id: int, user_id: int) -> List[SessionSectionWithLatestOut]:
         session_obj = self.chat_session_repository.read_by_id(session_id)

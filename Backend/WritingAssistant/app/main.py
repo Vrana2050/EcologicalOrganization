@@ -42,7 +42,13 @@ class AppCreator:
                 "name": "x-user-id",
                 "in": "header",
             }
-            openapi_schema["security"] = [{"XUserId": []}]  
+            security_schemes["XUserRole"] = {
+                "type": "apiKey",
+                "name": "x-user-role",
+                "in": "header",
+            }
+
+            openapi_schema["security"] = [{"XUserId": [], "XUserRole": []}]
             self.app.openapi_schema = openapi_schema
             return self.app.openapi_schema
 
