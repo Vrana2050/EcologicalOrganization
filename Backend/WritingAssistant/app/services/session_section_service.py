@@ -3,9 +3,10 @@ from app.repository.session_section_repository import SessionSectionRepository
 from app.repository.chat_session_repository import ChatSessionRepository
 from app.services.base_service import BaseService
 from app.core.exceptions import NotFoundError
-from app.schema.session_overview_schema import (
-    SessionSectionWithLatestOut,
-    SectionIterationBrief,
+from app.schema.session_overview_schema import SessionSectionWithLatestOut
+
+from app.schema.section_iteration_schema import (
+    SectionIterationOut,
     SectionInstructionOut,
     ModelOutputOut,
 )
@@ -43,7 +44,7 @@ class SessionSectionService(BaseService):
             it = iter_map.get(sec.id)
             latest = None
             if it:
-                latest = SectionIterationBrief(
+                latest = SectionIterationOut(
                     id=int(it.id),
                     seq_no=int(it.seq_no),
 

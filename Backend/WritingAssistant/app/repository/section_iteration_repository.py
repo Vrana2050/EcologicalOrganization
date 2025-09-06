@@ -3,6 +3,7 @@ from typing import Callable, Optional
 from sqlalchemy.orm import Session, joinedload
 from app.repository.base_repository import BaseRepository
 from app.model.section_iteration import SectionIteration
+from sqlalchemy import func
 
 class SectionIterationRepository(BaseRepository):
     DEFAULT_ORDERING = "-seq_no"
@@ -25,3 +26,10 @@ class SectionIterationRepository(BaseRepository):
                  )
                  .first()
             )
+
+    def next_seq_for_section(self, section_id: int) -> int:
+        with self.session_factory() as s:
+            mx = s.query(func.max(SectionIteration.seq_no)).filter(
+                SectionIteration.session_section_id == section_id
+            ).scalar()
+            return int(mx or 0) + 1    

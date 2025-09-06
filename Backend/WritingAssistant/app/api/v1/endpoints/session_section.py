@@ -6,8 +6,7 @@ from app.core.dependencies import get_current_user_id
 from app.schema.session_section_schema import CreateSessionSection, SessionSectionOut
 from app.services.session_section_service import SessionSectionService
 from app.services.section_iteration_service import SectionIterationService
-from app.schema.session_iteration_schema import SectionIterationOut
-
+from app.schema.section_iteration_schema import SectionIterationOut, GenerateIterationIn
 router = APIRouter(prefix="/session-section")
 
 
@@ -39,3 +38,14 @@ def iteration_by_seq(
     service: SectionIterationService = Depends(Provide[Container.section_iteration_service]),
 ):
     return service.get_by_seq(section_id, seq_no, user_id)
+
+
+@router.post("/{section_id}/iterations", response_model=SectionIterationOut)
+@inject
+def generate_iteration(
+    section_id: int,
+    payload: GenerateIterationIn,
+    user_id: int = Depends(get_current_user_id),
+    service: SectionIterationService = Depends(Provide[Container.section_iteration_service]),
+):
+    return service.generate(section_id, payload, user_id)
