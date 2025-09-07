@@ -43,6 +43,7 @@ class ChatSessionPageOut(BaseModel):
 
 class PatchChatSessionTitle(BaseModel):
     title: str = Field(..., min_length=1, max_length=255)
-    updated_at: datetime 
+    updated_at: Optional[datetime] = None
+
 
 

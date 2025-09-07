@@ -1,6 +1,26 @@
 <section class="wa-card">
   <div class="wa-header-top">
-    <h2 class="wa-title">{{ title }}</h2>
+    <div class="wa-title-wrap">
+      <ng-container *ngIf="!editingTitle; else editTpl">
+        <h2 class="wa-title">{{ title }}</h2>
+        <button class="wa-btn icon small" (click)="startEdit()">✎</button>
+      </ng-container>
+
+      <ng-template #editTpl>
+        <div class="wa-edit-wrap">
+          <input
+            class="wa-input small"
+            type="text"
+            [(ngModel)]="titleDraft"
+            (keyup.enter)="trySave()"
+            (blur)="trySave()"
+            [class.invalid]="invalidTitle"
+          />
+          <button class="wa-btn small" (click)="trySave()">✔</button>
+          <button class="wa-btn danger small" (click)="cancelEdit()">✕</button>
+        </div>
+      </ng-template>
+    </div>
   </div>
 
   <div class="wa-stack">
@@ -16,7 +36,7 @@
 
     <div class="wa-actions">
       <button class="wa-btn" (click)="addSection.emit()">
-        + Dodaj sekciju
+        ＋ Dodaj sekciju
       </button>
       <button class="wa-btn">Pogledaj ceo dokument</button>
     </div>

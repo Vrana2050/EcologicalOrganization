@@ -52,6 +52,8 @@ class SessionSectionService(BaseService):
         gi = self.global_instruction_repository.get_latest_for_session(session_id)
         gi_text = gi.text_ if gi and getattr(gi, "text_", None) else ""
 
+        title = session_obj.title
+
         out_sections: List[SessionSectionWithLatestOut] = []
         for sec in sections:
             it = iter_map.get(sec.id)
@@ -83,6 +85,7 @@ class SessionSectionService(BaseService):
             )
 
         return SessionOverviewOut(
+            title=title,
             latest_global_instruction_text=gi_text,
             sections=out_sections,
         )

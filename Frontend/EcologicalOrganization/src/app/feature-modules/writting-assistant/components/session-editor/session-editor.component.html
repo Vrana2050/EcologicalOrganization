@@ -1,11 +1,12 @@
 <div class="wa-editor">
   <div class="wa-editor-inner" *ngIf="!loading && !error; else stateTpl">
     <wa-session-header
-      [title]="session?.title || 'Dokument'"
+      [title]="overview?.title || session?.title || ''"
       [globalInstruction]="overview?.latestGlobalInstructionText || ''"
-      (generateAll)="onGenerateAll()"
+      (saveTitle)="onSaveSessionTitle($event)"
       (addSection)="onAddSection()"
-    ></wa-session-header>
+    >
+    </wa-session-header>
 
     <div class="wa-sections">
       <wa-session-section

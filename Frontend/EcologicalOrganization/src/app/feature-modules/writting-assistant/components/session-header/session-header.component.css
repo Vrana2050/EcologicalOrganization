@@ -9,13 +9,26 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
   margin-bottom: 10px;
+}
+
+.wa-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
 }
 
 .wa-title {
   margin: 0;
   font-size: 18px;
+}
+
+.wa-edit-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
 }
 
 .wa-stack {
@@ -31,17 +44,39 @@
 }
 
 .wa-input {
-  width: 100%;
+  width: 98%;
   background: var(--wa-panel-2);
   color: var(--wa-text);
   border: 1px solid var(--wa-line);
   border-radius: 10px;
   padding: 10px;
   resize: vertical;
-  min-height: 80px;
+}
+
+.wa-input.small {
+  flex: 0 0 auto;
+  max-width: 180px;
+}
+
+.wa-input.invalid {
+  border-color: #d32f2f;
 }
 
 .wa-actions {
   display: flex;
-  gap: 20px;
+  gap: 12px;
+}
+
+.wa-btn.small {
+  min-width: auto;
+  padding: 4px 8px;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.wa-btn.icon {
+  padding: 4px 6px;
+  font-size: 14px;
+  min-width: auto;
+  line-height: 1;
 }

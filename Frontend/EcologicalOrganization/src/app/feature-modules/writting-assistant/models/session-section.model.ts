@@ -26,6 +26,7 @@ export interface SessionSectionWithLatest {
 }
 
 export interface SessionOverview {
+  title: string;
   latestGlobalInstructionText: string;
   sections: SessionSectionWithLatest[];
 }

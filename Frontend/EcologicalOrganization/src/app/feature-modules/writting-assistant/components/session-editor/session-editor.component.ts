@@ -1,4 +1,11 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  Output,
+  EventEmitter,
+} from '@angular/core';
 import { ChatSession } from '../../models/chat-session.model';
 import {
   SessionOverview,
@@ -17,6 +24,11 @@ import { SessionSectionService } from '../../services/session-section.service';
 })
 export class SessionEditorComponent implements OnChanges {
   @Input() session?: ChatSession;
+
+  @Output() sessionTitleChanged = new EventEmitter<{
+    id: number;
+    title: string;
+  }>();
 
   loading = false;
   error?: string;
@@ -55,7 +67,6 @@ export class SessionEditorComponent implements OnChanges {
     });
   }
 
-  // Header events
   onGlobalInstructionChange(text: string) {
     if (!this.overview) return;
     this.overview = { ...this.overview, latestGlobalInstructionText: text };
@@ -69,7 +80,6 @@ export class SessionEditorComponent implements OnChanges {
     );
   }
 
-  // --- NEW: Add section flow ---
   onAddSection() {
     if (!this.overview || !this.session) return;
 
@@ -81,7 +91,7 @@ export class SessionEditorComponent implements OnChanges {
     const newPos = maxPos + 1;
 
     const tmp: SessionSectionWithLatest & { _isNew: boolean; _key: string } = {
-      id: 0, // još nije sačuvano
+      id: 0,
       sessionId: this.session.id,
       name: '',
       position: newPos,
@@ -126,7 +136,6 @@ export class SessionEditorComponent implements OnChanges {
     const { section, name } = ev;
     const position = section.position ?? 1;
 
-    // ako je nova (nema id ili ima _isNew flag)
     if (!section.id || section._isNew) {
       this.sectionService
         .create({
@@ -157,5 +166,24 @@ export class SessionEditorComponent implements OnChanges {
         },
       });
     }
+  }
+
+  onSaveSessionTitle(newTitle: string) {
+    if (!this.session) return;
+
+    this.chatSessionService
+      .updateTitle(this.session.id, newTitle)
+      .subscribe((updated) => {
+        this.session!.title = updated.title ?? '';
+
+        if (this.overview) {
+          this.overview = { ...this.overview, title: updated.title ?? '' };
+        }
+
+        this.sessionTitleChanged.emit({
+          id: this.session!.id,
+          title: updated.title ?? '',
+        });
+      });
   }
 }

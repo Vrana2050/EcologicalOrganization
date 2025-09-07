@@ -17,4 +17,5 @@ class SessionSectionWithLatestOut(BaseModel):
 
 class SessionOverviewOut(BaseModel):
     latest_global_instruction_text: str
+    title: str
     sections: List[SessionSectionWithLatestOut]

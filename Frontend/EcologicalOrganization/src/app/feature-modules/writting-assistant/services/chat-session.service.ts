@@ -67,6 +67,26 @@ export class ChatSessionService {
       );
   }
 
+  updateTitle(sessionId: number, title: string): Observable<ChatSession> {
+    return this.http
+      .patch<any>(
+        `${this.baseUrl}/${sessionId}/title`,
+        { title },
+        { headers: this.headers }
+      )
+      .pipe(
+        map(
+          (raw): ChatSession => ({
+            id: raw.id,
+            templateId: raw.template_id,
+            createdBy: raw.created_by,
+            title: raw.title,
+            updatedAt: raw.updated_at,
+          })
+        )
+      );
+  }
+
   getOverview(sessionId: number): Observable<SessionOverview> {
     return this.http
       .get<any>(`${this.baseUrl}/${sessionId}/overview`, {
@@ -75,6 +95,7 @@ export class ChatSessionService {
       .pipe(
         map(
           (raw): SessionOverview => ({
+            title: raw.title,
             latestGlobalInstructionText:
               raw.latest_global_instruction_text ?? '',
             sections: (raw.sections || []).map(
@@ -113,7 +134,11 @@ export class ChatSessionService {
         ),
         catchError((err) => {
           this.router.navigate(['/writing-assistant']);
-          return of({ latestGlobalInstructionText: '', sections: [] });
+          return of({
+            title: '',
+            latestGlobalInstructionText: '',
+            sections: [],
+          });
         })
       );
   }

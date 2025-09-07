@@ -92,4 +92,17 @@ export class WritingAssistantPageComponent implements OnInit {
         console.error('Error loading session overview for', sessionId, err),
     });
   }
+
+  onSessionTitleChanged(ev: { id: number; title: string }) {
+    const idx = this.conversations.findIndex((c) => c.id === ev.id);
+    if (idx > -1) {
+      this.conversations[idx] = {
+        ...this.conversations[idx],
+        title: ev.title,
+      };
+    }
+    if (this.activeSession?.id === ev.id) {
+      this.activeSession = { ...this.activeSession, title: ev.title };
+    }
+  }
 }
