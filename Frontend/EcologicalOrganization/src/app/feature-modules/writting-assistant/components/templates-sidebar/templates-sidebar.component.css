@@ -1,4 +1,4 @@
-/* Koren – kao conversations sidebar, ali sa panel-2 pozadinom */
+/* Koren – slično conversations sidebar, ali sa panel-2 pozadinom */
 .sidebar2 {
   background: var(--wa-panel-2);
   border-right: 1px solid var(--wa-line);
@@ -18,14 +18,27 @@
   padding: 6px 4px;
 }
 
-/* Loading */
+/* Dugme za zatvaranje (❌) */
+.wa-btn.ghost.smallbtn {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  line-height: 1;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
 .loading {
   color: var(--wa-muted);
   font-size: 13px;
   padding: 4px 6px;
 }
 
-/* Lista kartica – zauzmi prostor između headera i footer-a */
 .template-list {
   display: flex;
   flex-direction: column;
@@ -34,7 +47,6 @@
   flex: 1;
 }
 
-/* Kartica je <button> radi1111 pristupačnosti i fokusa */
 .t-card {
   appearance: none;
   border: 1px solid var(--wa-line);
@@ -45,6 +57,7 @@
   cursor: pointer;
   text-align: left;
   width: 100%;
+  transition: background 0.2s, border-color 0.2s;
 }
 .t-card:hover {
   background: var(--wa-hover);
@@ -60,14 +73,11 @@
   color: var(--wa-muted);
 }
 
-/* Footer */
 .footer-actions {
   margin-top: auto;
   display: flex;
-  gap: 8px;
 }
 
-/* Minimalni "ghost" override (po želji možeš prebaciti u globalni styles.css) */
-.wa-btn.ghost {
-  background: transparent;
+.wa-btn.full {
+  width: 100%;
 }

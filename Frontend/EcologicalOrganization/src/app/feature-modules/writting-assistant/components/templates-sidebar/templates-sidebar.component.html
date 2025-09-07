@@ -2,7 +2,7 @@
   <div class="templates-head">
     <strong>Šabloni</strong>
     <button
-      class="wa-btn ghost"
+      class="wa-btn ghost smallbtn"
       type="button"
       (click)="onHide()"
       title="Sakrij"
@@ -11,9 +11,8 @@
     </button>
   </div>
 
-  <div class="footer-actions">
-    <button class="wa-btn" type="button">+ Kreiraj novi šablon</button>
-    <button class="wa-btn ghost" type="button">Upravljanje</button>
+  <div class="actions">
+    <button class="wa-btn full" type="button">+ Kreiraj novi šablon</button>
   </div>
 
   <div *ngIf="loading" class="loading">Učitavanje…</div>

@@ -1,5 +1,5 @@
 .wa-editor {
-  width: 100%;
+  max-width: 100%;
   padding: 16px;
 }
 
@@ -8,22 +8,6 @@
   margin: 0 auto;
   display: grid;
   gap: 16px;
-}
-
-.wa-sections {
-  display: grid;
-  gap: 12px;
-}
-
-.wa-state {
-  background: var(--wa-panel);
-  border: 1px solid var(--wa-line);
-  border-radius: 14px;
-  padding: 16px;
-}
-
-.wa-state.error {
-  color: #b00020;
 }
 
 .wa-sections {

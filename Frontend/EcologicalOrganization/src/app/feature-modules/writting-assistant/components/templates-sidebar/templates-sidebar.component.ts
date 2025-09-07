@@ -1,4 +1,3 @@
-// src/app/components/templates-sidebar/templates-sidebar.component.ts
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { TemplateService } from '../../services/template.service';
 import { Template } from '../../models/template.model';
