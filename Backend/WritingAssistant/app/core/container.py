@@ -13,6 +13,7 @@ from app.repository.model_output_repository import ModelOutputRepository
 from app.repository.prompt_repository import PromptRepository
 from app.repository.document_type_repository import DocumentTypeRepository
 from app.repository.prompt_version_repository import PromptVersionRepository
+from app.repository.template_repository import TemplateRepository
 
 from app.services.chat_session_service import ChatSessionService
 from app.services.session_section_service import SessionSectionService
@@ -21,6 +22,7 @@ from app.services.section_iteration_service import SectionIterationService
 from app.services.llm_service import LLMService
 from app.services.prompt_service import PromptService
 from app.services.prompt_version_service import PromptVersionService
+from app.services.template_service import TemplateService
 
 
 class Container(containers.DeclarativeContainer):
@@ -29,7 +31,8 @@ class Container(containers.DeclarativeContainer):
             "app.api.v1.endpoints.chat_session",
             "app.api.v1.endpoints.session_section",   
             "app.api.v1.endpoints.prompt",
-            "app.api.v1.endpoints.prompt_version"
+            "app.api.v1.endpoints.prompt_version",
+            "app.api.v1.endpoints.template"
         ]
     )
 
@@ -47,6 +50,8 @@ class Container(containers.DeclarativeContainer):
     prompt_repository = providers.Factory(PromptRepository, session_factory=db.provided.session)
     document_type_repository = providers.Factory(DocumentTypeRepository, session_factory=db.provided.session)
     prompt_version_repository = providers.Factory(PromptVersionRepository, session_factory=db.provided.session)   
+    template_repository = providers.Factory(TemplateRepository, session_factory=db.provided.session)
+    
 
 
     chat_session_service = providers.Factory(ChatSessionService, repository=chat_session_repository)
@@ -84,4 +89,9 @@ class Container(containers.DeclarativeContainer):
         repository=prompt_version_repository,
         prompt_repo=prompt_repository,
         pah_repo=prompt_active_history_repository
+    )
+
+    template_service = providers.Factory(
+        TemplateService,
+        repository=template_repository,
     )

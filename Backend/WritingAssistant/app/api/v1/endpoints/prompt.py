@@ -40,7 +40,6 @@ def list_prompts(
     per_page: int = 20,
     service: PromptService = Depends(Provide[Container.prompt_service]),
     _: int = Depends(require_admin),  
-    user_id: int = Depends(get_current_user_id),
 ):
     return service.list_with_active_versions(page=page, per_page=per_page)
 

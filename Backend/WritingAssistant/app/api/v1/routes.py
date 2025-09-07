@@ -4,10 +4,11 @@ from app.api.v1.endpoints.chat_session import router as chat_session_router
 from app.api.v1.endpoints.session_section import router as session_section_router
 from app.api.v1.endpoints.prompt import router as prompt_router
 from app.api.v1.endpoints.prompt_version import router as prompt_version_router
+from app.api.v1.endpoints.template import router as template_router
 
 
 routers = APIRouter()
-router_list = [chat_session_router, session_section_router, prompt_router, prompt_version_router]
+router_list = [chat_session_router, session_section_router, prompt_router, prompt_version_router, template_router]
 
 for router in router_list:
     router.tags = ["v1"]
