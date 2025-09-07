@@ -21,16 +21,19 @@
       <div class="avatar" (click)="onSelectPrompt(p)">📄</div>
 
       <div class="meta" (click)="onSelectPrompt(p)">
-        <div class="title">{{ p.title || "(bez naslova)" }}</div>
+        <div class="title">
+          {{ p.title || "(bez naslova)" }}
+          <span *ngIf="p.isActive" class="badge">aktivan</span>
+        </div>
         <div class="sub">
-          {{ p.updatedAt ? p.updatedAt : "" }}
+          {{ p.updatedAt ? (p.updatedAt | date : "short") : "" }}
         </div>
       </div>
 
       <div class="menu-wrap" (click)="$event.stopPropagation()">
         <button class="menu-btn" (click)="toggleMenu(p.id)">⋮</button>
         <div class="menu" *ngIf="menuOpenId === p.id">
-          <button class="menu-item" (click)="onDelete(p)">Obriši</button>
+          <button class="menu-item" (click)="onDelete(p.id)">Obriši</button>
         </div>
       </div>
     </div>

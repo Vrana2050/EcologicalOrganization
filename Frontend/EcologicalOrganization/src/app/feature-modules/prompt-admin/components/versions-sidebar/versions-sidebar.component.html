@@ -1,14 +1,6 @@
 <aside class="sidebar2">
   <div class="templates-head">
     <strong>Verzije</strong>
-    <button
-      class="wa-btn ghost smallbtn"
-      type="button"
-      (click)="onHide()"
-      title="Sakrij"
-    >
-      ❌
-    </button>
   </div>
 
   <div class="actions">
@@ -23,6 +15,7 @@
       type="button"
       *ngFor="let v of versions"
       (click)="onSelectVersion(v)"
+      [class.selected]="v.id === selectedId"
     >
       <div class="t-name">
         {{ v.name || "v" + v.id }}

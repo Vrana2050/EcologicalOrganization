@@ -19,7 +19,7 @@ export class PromptsSidebarComponent {
 
   @Output() createNew = new EventEmitter<void>();
   @Output() selectPrompt = new EventEmitter<Prompt>();
-  @Output() deletePrompt = new EventEmitter<Prompt>();
+  @Output() deletePrompt = new EventEmitter<number>();
 
   menuOpenId: number | null = null;
 
@@ -32,8 +32,8 @@ export class PromptsSidebarComponent {
   toggleMenu(id: number): void {
     this.menuOpenId = this.menuOpenId === id ? null : id;
   }
-  onDelete(p: Prompt): void {
-    this.deletePrompt.emit(p);
+  onDelete(promptId: number): void {
+    this.deletePrompt.emit(promptId);
     this.menuOpenId = null;
   }
 

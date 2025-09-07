@@ -1,91 +1,78 @@
 .sidebar2 {
-  background: var(--wa-panel-2);
+  width: 260px;
   border-right: 1px solid var(--wa-line);
+  background: var(--wa-panel);
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 12px;
-  min-width: 280px;
+  background-color: var(--wa-panel-2);
   height: 100%;
 }
-/* Header */
+
 .templates-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 4px;
-}
-
-/* Dugme za zatvaranje (❌) */
-.wa-btn.ghost.smallbtn {
-  width: 30px;
-  height: 30px;
-  min-width: 30px;
-  padding: 0;
-  display: grid;
-  place-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--wa-line);
   font-size: 14px;
-  line-height: 1;
-  background: transparent;
-  border: none;
-  cursor: pointer;
+  font-weight: 600;
 }
 
-/* Akcije */
-.wa-btn.full {
-  width: 100%;
+.actions {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--wa-line);
 }
 
-/* State */
 .loading {
-  color: var(--wa-muted);
+  padding: 16px;
   font-size: 13px;
-  padding: 4px 6px;
+  color: var(--wa-muted);
 }
 
-/* Lista kartica */
 .template-list {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  overflow: auto;
-  flex: 1;
+  padding: 8px;
 }
 
 .t-card {
-  appearance: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   border: 1px solid var(--wa-line);
-  background: var(--wa-panel);
-  color: var(--wa-text);
-  padding: 10px;
-  border-radius: 10px;
+  background: var(--wa-panel-2);
+  border-radius: var(--wa-radius);
+  padding: 10px 12px;
   cursor: pointer;
   text-align: left;
-  width: 100%;
   transition: background 0.2s, border-color 0.2s;
 }
+
 .t-card:hover {
   background: var(--wa-hover);
-  border-color: var(--wa-line);
+}
+
+.t-card.selected {
+  background: var(--wa-selected);
+  border-color: var(--wa-accent);
 }
 
 .t-name {
-  font-size: 13px;
-  margin-bottom: 4px;
+  font-size: 14px;
+  font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
+
 .t-desc {
   font-size: 12px;
   color: var(--wa-muted);
+  margin-top: 2px;
 }
 
-/* Badge za aktivnu */
 .badge {
-  font-size: 10px;
+  font-size: 11px;
   padding: 2px 6px;
-  border-radius: 999px;
-  border: 1px solid var(--wa-line);
-  color: var(--wa-muted);
+  border-radius: 8px;
+  background: var(--wa-accent);
+  color: #fff;
 }

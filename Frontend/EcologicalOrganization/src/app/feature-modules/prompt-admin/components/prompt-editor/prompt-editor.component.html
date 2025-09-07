@@ -1,0 +1,26 @@
+<div class="wa-editor">
+  <div class="wa-editor-inner" *ngIf="!loading && !error; else stateTpl">
+    <!-- Header sa podacima o promptu -->
+    <pa-prompt-header
+      [prompt]="prompt"
+      [documentTypeName]="documentTypeName || null"
+      (save)="onHeaderSavePrompt($event)"
+      (deletePrompt)="onHeaderDeletePrompt()"
+    >
+    </pa-prompt-header>
+
+    <xp-prompt-version
+      *ngIf="selectedVersion"
+      [version]="selectedVersion"
+      (save)="onVersionSave($event)"
+      (setActive)="onVersionSetActive()"
+      (deletePrompt)="onHeaderDeletePromptVersion()"
+    >
+    </xp-prompt-version>
+  </div>
+
+  <ng-template #stateTpl>
+    <div class="wa-state" *ngIf="loading">Učitavam…</div>
+    <div class="wa-state error" *ngIf="!loading && error">{{ error }}</div>
+  </ng-template>
+</div>

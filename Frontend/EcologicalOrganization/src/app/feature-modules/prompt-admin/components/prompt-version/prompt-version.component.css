@@ -1,0 +1,178 @@
+.wa-card {
+  background: var(--wa-panel);
+  border: 1px solid var(--wa-line);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.wa-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.wa-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.wa-title {
+  margin: 0;
+  font-size: 18px;
+}
+
+.wa-edit-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.wa-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.wa-label {
+  font-size: 12px;
+  color: var(--wa-muted);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.wa-input {
+  width: 98%;
+  background: var(--wa-panel-2);
+  color: var(--wa-text);
+  border: 1px solid var(--wa-line);
+  border-radius: 10px;
+  padding: 10px;
+  resize: vertical;
+}
+
+.wa-input.name {
+  max-width: 300px;
+}
+
+.wa-input.small {
+  flex: 0 0 auto;
+  max-width: 180px;
+}
+
+.wa-input.invalid {
+  border-color: #d32f2f;
+}
+
+.wa-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.wa-btn.small {
+  min-width: auto;
+  padding: 4px 8px;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.wa-btn.icon {
+  padding: 4px 6px;
+  font-size: 14px;
+  min-width: auto;
+  line-height: 1;
+}
+/* Kartica */
+
+.pa-card {
+  border: 1px solid var(--wa-line);
+  background: var(--wa-panel);
+  border-radius: var(--wa-radius);
+  padding: 16px;
+}
+
+/* Naslov sekcije */
+.pa-card-title {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+}
+
+/* Grid za Naziv + Tip izveštaja */
+.pa-grid-2 {
+  display: flex;
+  gap: 50px;
+  align-items: start;
+  margin-bottom: 12px;
+}
+
+.pa-field .wa-input[disabled] {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+.pa-doc-type {
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  border-radius: 999px;
+  background-color: #a0a0a5;
+  color: var(--wa-text);
+  border: 1px solid var(--wa-line);
+  user-select: none;
+  width: 200px;
+}
+
+/* Donje akcije */
+.pa-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.pa-actions-right {
+  display: flex;
+  gap: 8px;
+}
+
+/* Zelena (success) varijanta dugmeta lokalno u komponenti */
+.wa-btn.success {
+  border-color: #2e7d32;
+  color: #2e7d32;
+  background: var(--wa-panel-2);
+}
+.wa-btn.success:hover {
+  border-color: #1b5e20;
+  color: #1b5e20;
+  background: var(--wa-hover);
+}
+.wa-btn.success.solid {
+  border-color: transparent;
+  background: #2e7d32;
+  color: #fff;
+}
+.wa-btn.success.solid:hover {
+  background: #1b5e20;
+}
+
+.pa-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.pa-actions-right {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.pa-card + .pa-card {
+  margin-top: 16px;
+}

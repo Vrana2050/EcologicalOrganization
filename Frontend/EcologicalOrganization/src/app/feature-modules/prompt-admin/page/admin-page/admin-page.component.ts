@@ -44,6 +44,15 @@ export class PromptAdminPageComponent implements OnInit {
       next: (page) => {
         this.prompts = page.items;
         this.loading = false;
+
+        if (!this.activePrompt && this.prompts.length > 0) {
+          const active = this.prompts.find((p) => p.isActive);
+
+          const toOpen = active ?? this.prompts[0] ?? '';
+
+          this.openPrompt(toOpen.id);
+          this.router.navigate(['/prompt-admin', toOpen.id]);
+        }
       },
       error: (err) => {
         console.error('Error loading prompts:', err);
@@ -56,7 +65,6 @@ export class PromptAdminPageComponent implements OnInit {
     const found = this.prompts.find((x) => x.id === id);
     this.activePrompt = found ?? null;
 
-    // po želji: automatski otvori sidebar sa verzijama kad izabereš prompt
     this.showVersionsSidebar = !!this.activePrompt;
   }
 
@@ -69,9 +77,8 @@ export class PromptAdminPageComponent implements OnInit {
     this.router.navigate(['/prompt-admin', p.id]);
     this.showVersionsSidebar = true;
   }
-
-  onDeletePrompt(p: Prompt): void {
-    console.log('TODO: delete prompt', p);
+  onDeletePrompt(promptId: number): void {
+    console.log('TODO: delete prompt', promptId);
   }
 
   openVersions(): void {
@@ -83,7 +90,6 @@ export class PromptAdminPageComponent implements OnInit {
 
   onVersionSelected(v: PromptVersion): void {
     if (!this.activePrompt) return;
-    // UI preview aktivne verzije – ne menja status u bazi
     this.activePrompt = {
       ...this.activePrompt,
       activeVersion: {
@@ -92,5 +98,27 @@ export class PromptAdminPageComponent implements OnInit {
           this.activePrompt.activeVersion?.id === v.id ? true : v.isActive,
       },
     };
+  }
+
+  onSetActiveVersion(versionId: number): void {
+    console.log('Set active version', versionId);
+  }
+
+  onSaveVersion(ev: {
+    versionId: number;
+    name: string;
+    description: string;
+    promptText: string;
+  }): void {
+    console.log('Save existing version', ev);
+  }
+
+  onSaveAsNewVersion(ev: {
+    promptId: number;
+    name: string;
+    description: string;
+    promptText: string;
+  }): void {
+    console.log('Save as new version', ev);
   }
 }

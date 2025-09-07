@@ -1,0 +1,81 @@
+<section class="wa-card pa-card">
+  <h3 class="pa-card-title">Osnovni podaci prompta</h3>
+
+  <div class="pa-grid-2">
+    <div class="pa-field">
+      <label class="wa-label">Naziv</label>
+      <input
+        class="wa-input name"
+        type="text"
+        [disabled]="isDisabled"
+        [(ngModel)]="nameDraft"
+        placeholder="npr. v3 - Neutral"
+      />
+    </div>
+  </div>
+
+  <div class="pa-field">
+    <textarea
+      class="wa-input"
+      rows="4"
+      [disabled]="isDisabled"
+      [(ngModel)]="descriptionDraft"
+      placeholder="Kratak opis ove verzije…"
+    ></textarea>
+  </div>
+
+  <div class="pa-actions">
+    <div class="pa-actions-left">
+      <button
+        *ngIf="!isActive; else activeTpl"
+        class="wa-btn success"
+        type="button"
+        [disabled]="isDisabled"
+        (click)="onSetActive()"
+      >
+        Postavi kao aktivnu
+      </button>
+
+      <ng-template #activeTpl>
+        <button class="wa-btn success solid" type="button" disabled>
+          Aktivna verzija
+        </button>
+      </ng-template>
+    </div>
+
+    <div class="pa-actions-right">
+      <button
+        class="wa-btn"
+        type="button"
+        [disabled]="isDisabled"
+        (click)="onSave()"
+      >
+        Sačuvaj
+      </button>
+
+      <button class="wa-btn danger" type="button" (click)="onDeletePrompt()">
+        Obriši prompt
+      </button>
+    </div>
+  </div>
+</section>
+<section class="wa-card pa-card prompt-text">
+  <h3 class="pa-card-title">Prompt tekst</h3>
+
+  <div class="pa-field">
+    <textarea
+      class="wa-input mono"
+      rows="10"
+      [disabled]="isDisabled"
+      [(ngModel)]="promptTextDraft"
+      placeholder="Ovde unesi tekst prompta…"
+    ></textarea>
+  </div>
+
+  <div class="pa-actions pa-actions-right">
+    <button class="wa-btn" type="button">Sačuvaj</button>
+    <button class="wa-btn" type="button">
+      Idi na stranicu za testiranje prompta ↗
+    </button>
+  </div>
+</section>

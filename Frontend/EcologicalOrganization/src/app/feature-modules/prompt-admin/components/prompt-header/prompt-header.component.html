@@ -1,0 +1,60 @@
+<section class="wa-card pa-card">
+  <h3 class="pa-card-title">Osnovni podaci prompta</h3>
+
+  <div class="pa-grid-3">
+    <div class="left">
+      <!-- Naziv prompta -->
+      <div class="pa-field">
+        <label class="wa-label">Naziv prompta</label>
+
+        <ng-container *ngIf="!editingName; else editNameTpl">
+          <div class="wa-title-wrap">
+            <h2 class="wa-title">{{ nameDraft || "(bez naziva)" }}</h2>
+            <button
+              class="wa-btn icon small"
+              type="button"
+              (click)="startEditName()"
+            >
+              ✎
+            </button>
+          </div>
+        </ng-container>
+
+        <ng-template #editNameTpl>
+          <div class="wa-edit-wrap">
+            <input
+              class="wa-input small"
+              type="text"
+              [(ngModel)]="nameDraft"
+              (keyup.enter)="trySaveName()"
+              (blur)="trySaveName()"
+              [class.invalid]="invalidName"
+            />
+            <button class="wa-btn small" (click)="trySaveName()">✔</button>
+            <button class="wa-btn danger small" (click)="cancelEditName()">
+              ✕
+            </button>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Tip dokumenta -->
+      <div class="pa-field">
+        <label class="wa-label">Tip dokumenta</label>
+        <div class="pa-doc-type" [title]="docTypeLabel">{{ docTypeLabel }}</div>
+      </div>
+    </div>
+
+    <!-- Dugme za brisanje -->
+    <div class="pa-field pa-delete">
+      <label class="wa-label">&nbsp;</label>
+      <button
+        class="wa-btn danger full"
+        type="button"
+        (click)="onDeletePrompt()"
+      >
+        Obriši prompt
+      </button>
+    </div>
+  </div>
+</section>
