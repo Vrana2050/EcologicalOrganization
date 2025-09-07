@@ -3,7 +3,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { map, filter, distinctUntilChanged } from 'rxjs/operators';
 import { ChatSession } from '../../models/chat-session.model';
 import { ChatSessionService } from '../../services/chat-session.service';
-import { SessionSectionWithLatest } from '../../models/session-section.model';
+import {
+  SessionOverview,
+  SessionSectionWithLatest,
+} from '../../models/session-section.model';
 
 @Component({
   selector: 'xp-writing-assistant-page',
@@ -16,7 +19,7 @@ export class WritingAssistantPageComponent implements OnInit {
 
   showTemplatesSidebar = false;
   activeSession: ChatSession | null = null;
-  sessionOverview: SessionSectionWithLatest[] = [];
+  sessionOverview: SessionOverview | null = null;
 
   constructor(
     private chatSessionService: ChatSessionService,

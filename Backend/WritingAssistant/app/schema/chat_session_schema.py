@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 from app.schema.pagination_schema import PaginationMeta
 
 
+
 class CreateChatSession(BaseModel):
     template_id: int
     created_by: Optional[int] = None
@@ -33,15 +34,11 @@ class ChatSessionQuery(BaseModel):
     ordering: str = "-updated_at"
 
 
-class PageMeta(BaseModel):
-    page: int
-    per_page: int
-    total_count: int
 
 
 class ChatSessionPageOut(BaseModel):
     items: List[ChatSessionOut]
-    meta: PageMeta
+    meta: PaginationMeta
 
 
 class PatchChatSessionTitle(BaseModel):
@@ -49,7 +46,3 @@ class PatchChatSessionTitle(BaseModel):
     updated_at: datetime 
 
 
-
-class ChatSessionPageOut(BaseModel):
-    items: List[ChatSessionOut]
-    meta: PaginationMeta

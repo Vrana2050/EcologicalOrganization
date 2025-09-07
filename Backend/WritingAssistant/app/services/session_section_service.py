@@ -4,7 +4,7 @@ from app.repository.chat_session_repository import ChatSessionRepository
 from app.repository.global_instruction_repository import GlobalInstructionRepository
 from app.services.base_service import BaseService
 from app.core.exceptions import NotFoundError, AuthError
-from app.schema.session_overview_schema import SessionSectionWithLatestOut
+from app.schema.session_overview_schema import SessionSectionWithLatestOut, SessionOverviewOut
 
 from app.schema.section_iteration_schema import (
     SectionIterationOut,
@@ -33,18 +33,16 @@ class SessionSectionService(BaseService):
 
         self.session_section_repository.delete_by_id(id)
     
-    def list_with_latest_for_session(self, session_id: int, user_id: int) -> List[SessionSectionWithLatestOut]:
+    def list_with_latest_for_session(self, session_id: int, user_id: int) -> SessionOverviewOut:
         session_obj = self.chat_session_repository.read_by_id(session_id)
         if session_obj.created_by != user_id:
             raise NotFoundError(detail="Session not found")
 
-
         sections, iter_map = self.session_section_repository.list_with_latest_iteration(session_id)
-
         gi = self.global_instruction_repository.get_latest_for_session(session_id)
         gi_text = gi.text_ if gi and getattr(gi, "text_", None) else ""
 
-        out: List[SessionSectionWithLatestOut] = []
+        out_sections: List[SessionSectionWithLatestOut] = []
         for sec in sections:
             it = iter_map.get(sec.id)
             latest = None
@@ -52,8 +50,7 @@ class SessionSectionService(BaseService):
                 latest = SectionIterationOut(
                     id=int(it.id),
                     seq_no=int(it.seq_no),
-
-                    session_section_id = int(it.session_section_id),
+                    session_section_id=int(it.session_section_id),
                     section_instruction=(
                         SectionInstructionOut.model_validate(it.section_instruction)
                         if it.section_instruction and it.section_instruction.deleted == 0
@@ -65,14 +62,17 @@ class SessionSectionService(BaseService):
                         else None
                     ),
                 )
-            out.append(
+            out_sections.append(
                 SessionSectionWithLatestOut(
                     id=int(sec.id),
                     session_id=int(sec.session_id),
                     name=sec.name,
                     position=int(sec.position) if sec.position is not None else None,
                     latest_iteration=latest,
-                    latest_global_instruction_text=gi_text,
                 )
             )
-        return out
+
+        return SessionOverviewOut(
+            latest_global_instruction_text=gi_text,
+            sections=out_sections,
+        )

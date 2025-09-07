@@ -1,7 +1,7 @@
 from dependency_injector.wiring import Provide
 from fastapi import APIRouter, Depends
 from typing import List
-from app.schema.session_overview_schema import SessionSectionWithLatestOut
+from app.schema.session_overview_schema import SessionOverviewOut
 
 from app.core.container import Container
 from app.core.dependencies import get_current_user_id
@@ -35,7 +35,7 @@ def list_chat_session(
     return service.list(page=page, per_page=per_page, user_id=user_id)
 
 
-@router.get("/{session_id}/overview", response_model=List[SessionSectionWithLatestOut])
+@router.get("/{session_id}/overview", response_model=SessionOverviewOut)
 @inject
 def list_sections_with_latest_iteration(
     session_id: int,

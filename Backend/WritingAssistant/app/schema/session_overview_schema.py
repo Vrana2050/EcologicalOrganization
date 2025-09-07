@@ -11,6 +11,10 @@ class SessionSectionWithLatestOut(BaseModel):
     name: Optional[str] = None
     position: Optional[int] = None
     latest_iteration: Optional[SectionIterationOut] = None
-    latest_global_instruction_text: Optional[str] = None
     class Config:
         from_attributes = True
+
+
+class SessionOverviewOut(BaseModel):
+    latest_global_instruction_text: str
+    sections: List[SessionSectionWithLatestOut]

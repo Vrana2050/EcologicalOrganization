@@ -24,3 +24,8 @@ export interface SessionSectionWithLatest {
   position?: number | null;
   latestIteration?: SectionIteration | null;
 }
+
+export interface SessionOverview {
+  latestGlobalInstructionText: string;
+  sections: SessionSectionWithLatest[];
+}
