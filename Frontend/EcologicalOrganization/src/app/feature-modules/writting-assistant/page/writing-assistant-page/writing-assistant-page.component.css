@@ -1,7 +1,11 @@
 .app {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: 320px 1fr; /* default: samo sidebar + main */
   height: 100vh;
+}
+
+.app.show-templates {
+  grid-template-columns: 320px 280px 1fr;
 }
 
 .main {
@@ -36,7 +40,8 @@
   padding: 24px;
 }
 
-.empty {
+/* Welcome screen */
+.welcome {
   max-width: 720px;
   margin: 32px auto;
   border: 1px dashed var(--wa-line);
@@ -46,12 +51,12 @@
   background: var(--wa-panel);
 }
 
-.empty h2 {
+.welcome h2 {
   margin: 0 0 6px;
   font-size: 20px;
 }
 
-.empty p {
+.welcome p {
   margin: 0 0 16px;
   color: var(--wa-muted);
 }

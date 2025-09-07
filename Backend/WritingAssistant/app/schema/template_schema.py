@@ -9,6 +9,7 @@ class TemplateOut(BaseModel):
     name: str
     document_type_id: int
     updated_at: Optional[datetime] = None
+    document_type_name: Optional[str]
 
     class Config:
         from_attributes = True

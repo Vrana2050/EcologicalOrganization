@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { ChatSessionService } from '../../services/chat-session.service';
 import { ChatSession } from '../../models/chat-session.model';
 
@@ -11,13 +11,11 @@ export class ConversationsSidebarComponent implements OnInit {
   conversations: ChatSession[] = [];
   loading = true;
 
+  @Output() createNew = new EventEmitter<void>();
+
   constructor(private chatSessionService: ChatSessionService) {}
 
   ngOnInit(): void {
-    this.loadConversations();
-  }
-
-  loadConversations(): void {
     this.chatSessionService.list().subscribe({
       next: (page) => {
         this.conversations = page.items;
@@ -31,7 +29,7 @@ export class ConversationsSidebarComponent implements OnInit {
   }
 
   onCreateNew(): void {
-    console.log('Klik na kreiranje novog dokumenta');
+    this.createNew.emit();
   }
 
   onSelectConversation(c: ChatSession): void {

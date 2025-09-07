@@ -23,7 +23,12 @@ class BaseRepository:
         self.session_factory = session_factory
         self.model = model
 
-    def read_by_options(self, schema: T, eager: bool = False) -> dict:
+    def read_by_options(
+        self, 
+        schema: T, 
+        eager: bool = False, 
+        eagers: Sequence[Union[str, InstrumentedAttribute]] = ()
+    ) -> dict:
         with self.session_factory() as session:
             schema_as_dict: dict = schema.dict(exclude_none=True)
 
@@ -41,9 +46,11 @@ class BaseRepository:
             )
 
             query = session.query(self.model)
-            if eager:
-                for eager in getattr(self.model, "eagers", []):
-                    query = query.options(joinedload(getattr(self.model, eager)))
+
+            targets = list(eagers) or (getattr(self.model, "eagers", []) if eager else [])
+            for target in targets:
+                attr = target if not isinstance(target, str) else getattr(self.model, target)
+                query = query.options(joinedload(attr))
 
             filtered_query = query.filter(filter_options)
             query = filtered_query.order_by(order_query)
