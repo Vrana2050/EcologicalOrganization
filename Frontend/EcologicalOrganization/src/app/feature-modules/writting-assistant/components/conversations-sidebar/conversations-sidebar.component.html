@@ -17,6 +17,7 @@
       class="item"
       *ngFor="let c of conversations"
       (click)="onSelectConversation(c)"
+      [class.selected]="c.id === selectedId"
     >
       <div class="avatar">💬</div>
       <div class="meta">

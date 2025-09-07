@@ -59,6 +59,7 @@ class Container(containers.DeclarativeContainer):
         SessionSectionService,
         repository=session_section_repository,
         chat_session_repository=chat_session_repository,  
+        global_instruction_repository=global_instruction_repository,
     )
     section_instruction_service = providers.Factory(
         SectionInstructionService,

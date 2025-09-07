@@ -52,9 +52,15 @@
   cursor: pointer;
   border: 1px solid transparent;
 }
+
 .item:hover {
   background: var(--wa-hover);
   border-color: var(--wa-line);
+}
+
+.item.selected {
+  background: var(--wa-selected);
+  border-color: var(--wa-accent);
 }
 
 .avatar {

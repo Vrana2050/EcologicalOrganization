@@ -32,22 +32,7 @@ def list_chat_session(
     service: ChatSessionService = Depends(Provide[Container.chat_session_service]),
     user_id: int = Depends(get_current_user_id),
 ):
-    query = ChatSessionQuery(
-        created_by=user_id,
-        page=page,
-        per_page=per_page,    
-        deleted=0,
-        ordering="-updated_at",
-    )
-    result = service.get_list(query)
-    return {
-        "items": result["founds"],
-        "meta": {
-            "page": result["search_options"]["page"],
-            "per_page": result["search_options"]["per_page"],
-            "total_count": result["search_options"]["total_count"],
-        },
-    }
+    return service.list(page=page, per_page=per_page, user_id=user_id)
 
 
 @router.get("/{session_id}/overview", response_model=List[SessionSectionWithLatestOut])

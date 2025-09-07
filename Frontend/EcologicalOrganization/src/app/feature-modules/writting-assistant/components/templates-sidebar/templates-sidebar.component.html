@@ -1,5 +1,4 @@
 <aside class="sidebar2">
-  <!-- Header -->
   <div class="templates-head">
     <strong>Šabloni</strong>
     <button
@@ -13,11 +12,11 @@
   </div>
 
   <div class="footer-actions">
-    <button class="wa-btn" type="button">＋ Kreiraj novi šablon</button>
+    <button class="wa-btn" type="button">+ Kreiraj novi šablon</button>
     <button class="wa-btn ghost" type="button">Upravljanje</button>
   </div>
 
-  <div *ngif="loading" class="loading">Učitavanje…</div>
+  <div *ngIf="loading" class="loading">Učitavanje…</div>
 
   <div class="template-list" *ngIf="!loading">
     <button
@@ -28,7 +27,7 @@
     >
       <div class="t-name">{{ t.name }}</div>
       <div class="t-desc">
-        {{ t.documentTypeName || "Dokument tip #" + t.documentTypeName }}
+        {{ t.documentTypeName || "Dokument tip #" + t.documentTypeId }}
       </div>
     </button>
   </div>

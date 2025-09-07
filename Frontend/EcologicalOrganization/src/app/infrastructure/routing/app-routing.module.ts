@@ -16,11 +16,10 @@ const routes: Routes = [
     data: { roles: ['ADMIN'] },
   },
 
+  { path: 'writing-assistant', component: WritingAssistantPageComponent },
   {
-    path: 'writing-assistant',
+    path: 'writing-assistant/:sessionId',
     component: WritingAssistantPageComponent,
-    // canActivate: [AuthGuard],
-    // data: { roles: ['ADMIN', 'EMPLOYEE'] },
   },
 ];
 

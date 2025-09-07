@@ -2,6 +2,8 @@ from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel, Field
 
+from app.schema.pagination_schema import PaginationMeta
+
 
 class CreateChatSession(BaseModel):
     template_id: int
@@ -45,3 +47,9 @@ class ChatSessionPageOut(BaseModel):
 class PatchChatSessionTitle(BaseModel):
     title: str = Field(..., min_length=1, max_length=255)
     updated_at: datetime 
+
+
+
+class ChatSessionPageOut(BaseModel):
+    items: List[ChatSessionOut]
+    meta: PaginationMeta

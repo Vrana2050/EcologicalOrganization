@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, map, catchError, of } from 'rxjs';
 import { ChatSession, ChatSessionPage } from '../models/chat-session.model';
+import { SessionSectionWithLatest } from '../models/session-section.model';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -9,17 +11,17 @@ import { ChatSession, ChatSessionPage } from '../models/chat-session.model';
 export class ChatSessionService {
   private readonly baseUrl = 'http://localhost:8000/api/v1/chat-session';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) {}
+
+  private get headers(): HttpHeaders {
+    return new HttpHeaders({ 'x-user-id': '2' });
+  }
 
   list(page = 1, perPage = 20): Observable<ChatSessionPage> {
-    const headers = new HttpHeaders({
-      'x-user-id': '2',
-    });
-
     return this.http
       .get<any>(this.baseUrl, {
         params: { page, per_page: perPage },
-        headers,
+        headers: this.headers,
       })
       .pipe(
         map(
@@ -40,6 +42,74 @@ export class ChatSessionService {
             },
           })
         )
+      );
+  }
+
+  create(templateId: number, title?: string): Observable<ChatSession> {
+    const payload: any = { template_id: templateId };
+    if (title && title.trim()) payload.title = title.trim();
+
+    return this.http
+      .post<any>(this.baseUrl, payload, { headers: this.headers })
+      .pipe(
+        map(
+          (raw): ChatSession => ({
+            id: raw.id,
+            templateId: raw.template_id,
+            createdBy: raw.created_by,
+            title: raw.title,
+            updatedAt: raw.updated_at,
+          })
+        )
+      );
+  }
+
+  getOverview(sessionId: number): Observable<SessionSectionWithLatest[]> {
+    return this.http
+      .get<any[]>(`${this.baseUrl}/${sessionId}/overview`, {
+        headers: this.headers,
+      })
+      .pipe(
+        map((arr) =>
+          arr.map(
+            (x): SessionSectionWithLatest => ({
+              id: x.id,
+              sessionId: x.session_id,
+              name: x.name ?? null,
+              position: x.position ?? null,
+              latestIteration: x.latest_iteration
+                ? {
+                    id: x.latest_iteration.id,
+                    seqNo: x.latest_iteration.seq_no,
+                    sessionSectionId: x.latest_iteration.session_section_id,
+                    sectionInstruction: x.latest_iteration.section_instruction
+                      ? {
+                          id: x.latest_iteration.section_instruction.id,
+                          text: x.latest_iteration.section_instruction.text_,
+                          createdAt:
+                            x.latest_iteration.section_instruction.created_at ??
+                            null,
+                        }
+                      : null,
+                    modelOutput: x.latest_iteration.model_output
+                      ? {
+                          id: x.latest_iteration.model_output.id,
+                          generatedText:
+                            x.latest_iteration.model_output.generated_text ??
+                            null,
+                        }
+                      : null,
+                  }
+                : null,
+            })
+          )
+        ),
+        catchError((err) => {
+          // redirect ako nije 200
+          this.router.navigate(['/writing-assistant']);
+          // vrati prazan niz da observable ne pukne
+          return of([]);
+        })
       );
   }
 }

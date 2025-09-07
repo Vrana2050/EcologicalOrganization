@@ -1,6 +1,7 @@
 from typing import List
 from app.repository.session_section_repository import SessionSectionRepository
 from app.repository.chat_session_repository import ChatSessionRepository
+from app.repository.global_instruction_repository import GlobalInstructionRepository
 from app.services.base_service import BaseService
 from app.core.exceptions import NotFoundError, AuthError
 from app.schema.session_overview_schema import SessionSectionWithLatestOut
@@ -14,9 +15,10 @@ from app.schema.section_iteration_schema import (
 
 
 class SessionSectionService(BaseService):
-    def __init__(self, repository: SessionSectionRepository, chat_session_repository: ChatSessionRepository):
+    def __init__(self, repository: SessionSectionRepository, chat_session_repository: ChatSessionRepository, global_instruction_repository: GlobalInstructionRepository,):
         self.session_section_repository = repository
         self.chat_session_repository = chat_session_repository
+        self.global_instruction_repository = global_instruction_repository
         super().__init__(repository)
 
     def add(self, schema):
@@ -38,6 +40,9 @@ class SessionSectionService(BaseService):
 
 
         sections, iter_map = self.session_section_repository.list_with_latest_iteration(session_id)
+
+        gi = self.global_instruction_repository.get_latest_for_session(session_id)
+        gi_text = gi.text_ if gi and getattr(gi, "text_", None) else ""
 
         out: List[SessionSectionWithLatestOut] = []
         for sec in sections:
@@ -67,6 +72,7 @@ class SessionSectionService(BaseService):
                     name=sec.name,
                     position=int(sec.position) if sec.position is not None else None,
                     latest_iteration=latest,
+                    latest_global_instruction_text=gi_text,
                 )
             )
         return out
