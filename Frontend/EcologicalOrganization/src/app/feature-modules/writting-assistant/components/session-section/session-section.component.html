@@ -26,8 +26,8 @@
     </div>
 
     <div class="wa-section-actions">
-      <button class="wa-btn">Rezultati</button>
-      <button class="wa-btn" (click)="trySaveTitle()">Sačuvaj</button>
+      <!-- <button class="wa-btn">Rezultati</button> -->
+      <!-- <button class="wa-btn" (click)="trySaveTitle()">Sačuvaj</button> -->
       <button class="wa-btn" (click)="onGenerate()">
         ⚡ Generiši sadržaj sekcije
       </button>
@@ -40,7 +40,7 @@
       <label class="wa-label">Instrukcije</label>
       <textarea
         class="wa-input"
-        [(ngModel)]="instrDraft"
+        [(ngModel)]="instructionText"
         rows="4"
         placeholder="Specifične instrukcije za ovu sekciju…"
       ></textarea>

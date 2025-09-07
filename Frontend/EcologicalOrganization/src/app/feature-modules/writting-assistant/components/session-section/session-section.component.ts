@@ -21,9 +21,13 @@ export class SessionSectionComponent {
     name: string;
   }>();
   @Output() remove = new EventEmitter<SessionSectionWithLatest>();
-  @Output() generate = new EventEmitter<SessionSectionWithLatest>();
 
-  instrDraft = '';
+  @Output() generate = new EventEmitter<{
+    section: SessionSectionWithLatest;
+    instructionText: string;
+  }>();
+
+  instructionText = '';
   editingTitle = false;
   titleDraft = '';
   invalidTitle = false;
@@ -31,7 +35,7 @@ export class SessionSectionComponent {
   ngOnInit(): void {
     const latestInstr =
       this.section?.latestIteration?.sectionInstruction?.text ?? '';
-    this.instrDraft = latestInstr;
+    this.instructionText = latestInstr;
 
     this.editingTitle = this.isNew || !!(this.section as any)._isNew;
     this.titleDraft = this.section?.name ?? '';
@@ -70,6 +74,9 @@ export class SessionSectionComponent {
   }
 
   onGenerate() {
-    this.generate.emit(this.section);
+    this.generate.emit({
+      section: this.section,
+      instructionText: this.instructionText,
+    });
   }
 }

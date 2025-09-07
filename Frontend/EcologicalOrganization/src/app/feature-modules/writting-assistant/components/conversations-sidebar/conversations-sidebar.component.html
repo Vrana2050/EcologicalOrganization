@@ -16,14 +16,23 @@
     <div
       class="item"
       *ngFor="let c of conversations"
-      (click)="onSelectConversation(c)"
       [class.selected]="c.id === selectedId"
     >
-      <div class="avatar">💬</div>
-      <div class="meta">
+      <div class="avatar" (click)="onSelectConversation(c)">
+        {{ "💬" }}
+      </div>
+
+      <div class="meta" (click)="onSelectConversation(c)">
         <div class="title">{{ c.title || "(bez naslova)" }}</div>
         <div class="sub">
           {{ c.updatedAt ? (c.updatedAt | date : "short") : "" }}
+        </div>
+      </div>
+
+      <div class="menu-wrap" (click)="$event.stopPropagation()">
+        <button class="menu-btn" (click)="toggleMenu(c.id)">⋮</button>
+        <div class="menu" *ngIf="menuOpenId === c.id">
+          <button class="menu-item" (click)="onDelete(c)">Obriši</button>
         </div>
       </div>
     </div>

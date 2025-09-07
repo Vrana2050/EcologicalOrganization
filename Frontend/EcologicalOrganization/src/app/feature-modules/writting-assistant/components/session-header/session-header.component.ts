@@ -11,6 +11,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 export class SessionHeaderComponent {
   @Output() addSection = new EventEmitter<void>();
   @Output() saveTitle = new EventEmitter<string>();
+  @Output() globalInstructionChange = new EventEmitter<string>(); // 👈 fali ti ovo
 
   @Input() title = 'Dokument';
   @Input() globalInstruction = '';
@@ -40,5 +41,9 @@ export class SessionHeaderComponent {
     this.editingTitle = false;
     this.invalidTitle = false;
     this.titleDraft = this.title;
+  }
+
+  onGlobalInstructionInput(val: string) {
+    this.globalInstructionChange.emit(val);
   }
 }

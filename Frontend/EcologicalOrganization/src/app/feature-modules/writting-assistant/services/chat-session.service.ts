@@ -67,6 +67,12 @@ export class ChatSessionService {
       );
   }
 
+  delete(sessionId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${sessionId}`, {
+      headers: this.headers,
+    });
+  }
+
   updateTitle(sessionId: number, title: string): Observable<ChatSession> {
     return this.http
       .patch<any>(

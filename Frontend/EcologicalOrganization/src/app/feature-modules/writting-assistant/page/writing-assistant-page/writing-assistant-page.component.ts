@@ -105,4 +105,18 @@ export class WritingAssistantPageComponent implements OnInit {
       this.activeSession = { ...this.activeSession, title: ev.title };
     }
   }
+
+  onDeleteConversation(c: ChatSession): void {
+    this.chatSessionService.delete(c.id).subscribe({
+      next: () => {
+        this.conversations = this.conversations.filter((x) => x.id !== c.id);
+        if (this.activeSession?.id === c.id) {
+          this.activeSession = null;
+          this.sessionOverview = null;
+          this.router.navigate(['/writing-assistant']);
+        }
+      },
+      error: (err) => console.error('Error deleting conversation:', err),
+    });
+  }
 }

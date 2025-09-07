@@ -1,4 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  HostListener,
+} from '@angular/core';
 import { ChatSession } from '../../models/chat-session.model';
 
 @Component({
@@ -13,6 +19,9 @@ export class ConversationsSidebarComponent {
 
   @Output() createNew = new EventEmitter<void>();
   @Output() selectConversation = new EventEmitter<ChatSession>();
+  @Output() deleteConversation = new EventEmitter<ChatSession>();
+
+  menuOpenId: number | null = null;
 
   onCreateNew(): void {
     this.createNew.emit();
@@ -20,5 +29,22 @@ export class ConversationsSidebarComponent {
 
   onSelectConversation(c: ChatSession): void {
     this.selectConversation.emit(c);
+  }
+
+  toggleMenu(id: number): void {
+    this.menuOpenId = this.menuOpenId === id ? null : id;
+  }
+
+  onDelete(c: ChatSession): void {
+    this.deleteConversation.emit(c);
+    this.menuOpenId = null;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.menu-wrap')) {
+      this.menuOpenId = null;
+    }
   }
 }

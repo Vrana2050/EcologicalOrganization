@@ -67,17 +67,13 @@ export class SessionEditorComponent implements OnChanges {
     });
   }
 
-  onGlobalInstructionChange(text: string) {
+  onGlobalInstructionChange(newText: string) {
     if (!this.overview) return;
-    this.overview = { ...this.overview, latestGlobalInstructionText: text };
-  }
-  onGenerateAll() {
-    if (!this.session) return;
-    console.log(
-      'Generate ALL for session',
-      this.session.id,
-      this.overview?.latestGlobalInstructionText
-    );
+
+    this.overview = {
+      ...this.overview,
+      latestGlobalInstructionText: newText,
+    };
   }
 
   onAddSection() {
@@ -125,9 +121,53 @@ export class SessionEditorComponent implements OnChanges {
     });
   }
 
-  onGenerateSection(section: SessionSectionWithLatest) {
-    console.log('Generate SECTION', section.id);
-    // this.sectionService.generateIteration(section.id, { instruction_text: '...' }).subscribe(...)
+  onGenerateSection(ev: {
+    section: SessionSectionWithLatest;
+    instructionText: string;
+  }) {
+    if (!this.overview) return;
+
+    this.sectionService
+      .generateIteration(ev.section.id, {
+        sectionInstruction: ev.instructionText,
+        globalInstruction: this.overview.latestGlobalInstructionText,
+      })
+      .subscribe({
+        next: (iteration) => {
+          const updatedSection: SessionSectionWithLatest = {
+            ...ev.section,
+            latestIteration: {
+              id: iteration.id,
+              seqNo: iteration.seq_no,
+              sessionSectionId: iteration.session_section_id,
+              sectionInstruction: iteration.section_instruction
+                ? {
+                    id: iteration.section_instruction.id,
+                    text: iteration.section_instruction.text_,
+                    createdAt: iteration.section_instruction.created_at ?? null,
+                  }
+                : null,
+              modelOutput: iteration.model_output
+                ? {
+                    id: iteration.model_output.id,
+                    generatedText:
+                      iteration.model_output.generated_text ?? null,
+                  }
+                : null,
+            },
+          };
+
+          this.overview = {
+            ...this.overview!,
+            sections: this.overview!.sections.map((s) =>
+              s.id === ev.section.id ? updatedSection : s
+            ),
+          };
+        },
+        error: (err) => {
+          console.error('Greška pri generisanju sadržaja', err);
+        },
+      });
   }
 
   onSaveSection(ev: { section: SessionSectionWithLatest & any; name: string }) {

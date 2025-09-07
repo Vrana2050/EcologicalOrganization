@@ -1,12 +1,11 @@
 <div class="app" [class.show-templates]="showTemplatesSidebar">
   <wa-conversations-sidebar
     [conversations]="conversations"
-    [loading]="loading"
     [selectedId]="activeSession?.id"
     (createNew)="openTemplates()"
     (selectConversation)="onSelectConversation($event)"
-  >
-  </wa-conversations-sidebar>
+    (deleteConversation)="onDeleteConversation($event)"
+  ></wa-conversations-sidebar>
 
   <wa-templates-sidebar
     *ngIf="showTemplatesSidebar"

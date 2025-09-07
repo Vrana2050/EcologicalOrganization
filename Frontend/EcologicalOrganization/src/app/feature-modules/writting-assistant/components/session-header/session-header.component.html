@@ -29,6 +29,7 @@
       <textarea
         class="wa-input"
         [ngModel]="globalInstruction"
+        (ngModelChange)="onGlobalInstructionInput($event)"
         rows="4"
         placeholder="Npr: Koristi stručan i koncizan ton…"
       ></textarea>

@@ -53,11 +53,16 @@ export class SessionSectionService {
 
   generateIteration(
     sectionId: number,
-    payload: { instruction_text: string }
+    payload: { sectionInstruction?: string; globalInstruction?: string }
   ): Observable<any> {
+    const body = {
+      section_instruction: payload.sectionInstruction ?? null,
+      global_instruction: payload.globalInstruction ?? null,
+    };
+
     return this.http.post<any>(
       `${this.baseUrl}/${sectionId}/iterations`,
-      payload,
+      body,
       { headers: this.headers }
     );
   }
