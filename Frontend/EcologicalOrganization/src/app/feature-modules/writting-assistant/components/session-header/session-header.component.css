@@ -1,0 +1,47 @@
+.wa-card {
+  background: var(--wa-panel);
+  border: 1px solid var(--wa-line);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.wa-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.wa-title {
+  margin: 0;
+  font-size: 18px;
+}
+
+.wa-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.wa-label {
+  font-size: 12px;
+  color: var(--wa-muted);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.wa-input {
+  width: 100%;
+  background: var(--wa-panel-2);
+  color: var(--wa-text);
+  border: 1px solid var(--wa-line);
+  border-radius: 10px;
+  padding: 10px;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.wa-actions {
+  display: flex;
+  gap: 20px;
+}

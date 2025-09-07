@@ -3,10 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { map, filter, distinctUntilChanged } from 'rxjs/operators';
 import { ChatSession } from '../../models/chat-session.model';
 import { ChatSessionService } from '../../services/chat-session.service';
-import {
-  SessionOverview,
-  SessionSectionWithLatest,
-} from '../../models/session-section.model';
+import { SessionOverview } from '../../models/session-section.model';
 
 @Component({
   selector: 'xp-writing-assistant-page',

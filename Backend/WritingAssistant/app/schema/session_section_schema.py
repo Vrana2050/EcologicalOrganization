@@ -19,3 +19,8 @@ class SessionSectionOut(BaseModel):
 
     class Config:
         from_attributes = True  
+
+
+class PatchSessionSectionTitle(BaseModel):
+    name: str
+

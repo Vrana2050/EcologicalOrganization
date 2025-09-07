@@ -3,10 +3,11 @@ from fastapi import APIRouter, Depends
 
 from app.core.container import Container
 from app.core.dependencies import get_current_user_id
-from app.schema.session_section_schema import CreateSessionSection, SessionSectionOut
+from app.schema.session_section_schema import CreateSessionSection, SessionSectionOut, PatchSessionSectionTitle
 from app.services.session_section_service import SessionSectionService
 from app.services.section_iteration_service import SectionIterationService
 from app.schema.section_iteration_schema import SectionIterationOut, GenerateIterationIn
+
 router = APIRouter(prefix="/session-section")
 
 
@@ -51,3 +52,14 @@ def generate_iteration(
     service: SectionIterationService = Depends(Provide[Container.section_iteration_service]),
 ):
     return service.generate(section_id, payload, user_id)
+
+
+@router.patch("/{session_section_id}/title", response_model=SessionSectionOut)
+@inject
+def patch_chat_session_title(
+    session_section_id: int,
+    payload: PatchSessionSectionTitle,
+    user_id: int = Depends(get_current_user_id),
+    service: SessionSectionService = Depends(Provide[Container.session_section_service]),
+):
+    return service.update_title(session_section_id, payload.name, user_id)

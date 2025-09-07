@@ -29,3 +29,27 @@ export interface SessionOverview {
   latestGlobalInstructionText: string;
   sections: SessionSectionWithLatest[];
 }
+
+export interface CreateSessionSectionIn {
+  sessionId: number;
+  name: string;
+  position: number;
+  templateSectionId?: number | null;
+}
+
+export interface SessionSectionOut {
+  id: number;
+  sessionId: number;
+  templateSectionId?: number | null;
+  name: string;
+  position: number;
+}
+
+export type TempEditable = {
+  _isNew?: boolean;
+  _key?: string;
+};
+
+export interface PatchSessionSectionTitleIn {
+  name: string;
+}

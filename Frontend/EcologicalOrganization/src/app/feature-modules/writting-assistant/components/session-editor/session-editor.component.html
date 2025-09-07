@@ -1,0 +1,26 @@
+<div class="wa-editor">
+  <div class="wa-editor-inner" *ngIf="!loading && !error; else stateTpl">
+    <wa-session-header
+      [title]="session?.title || 'Dokument'"
+      [globalInstruction]="overview?.latestGlobalInstructionText || ''"
+      (generateAll)="onGenerateAll()"
+      (addSection)="onAddSection()"
+    ></wa-session-header>
+
+    <div class="wa-sections">
+      <wa-session-section
+        *ngFor="let s of overview?.sections; trackBy: trackBySection"
+        [section]="s"
+        [isNew]="isNewSection(s)"
+        (save)="onSaveSection($event)"
+        (remove)="onRemoveSection($event)"
+        (generate)="onGenerateSection($event)"
+      ></wa-session-section>
+    </div>
+  </div>
+
+  <ng-template #stateTpl>
+    <div class="wa-state" *ngIf="loading">Učitavam…</div>
+    <div class="wa-state error" *ngIf="!loading && error">{{ error }}</div>
+  </ng-template>
+</div>

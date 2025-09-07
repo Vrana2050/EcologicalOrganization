@@ -6,11 +6,13 @@ from app.services.base_service import BaseService
 from app.core.exceptions import NotFoundError, AuthError
 from app.schema.session_overview_schema import SessionSectionWithLatestOut, SessionOverviewOut
 
-from app.schema.section_iteration_schema import (
-    SectionIterationOut,
-    SectionInstructionOut,
-    ModelOutputOut,
-)
+from app.schema.section_iteration_schema import SectionIterationOut, SectionInstructionOut, ModelOutputOut
+from app.schema.session_section_schema import PatchSessionSectionTitle
+
+from datetime import datetime, timezone
+
+from app.model.session_section import SessionSection
+
 
 
 
@@ -32,6 +34,14 @@ class SessionSectionService(BaseService):
             raise AuthError(detail="You are not allowed to delete this section")  
 
         self.session_section_repository.delete_by_id(id)
+
+    def update_title(self, session_section_id: int, name: str, user_id: int):
+        section = self.session_section_repository.read_by_id(session_section_id, eagers=([SessionSection.session]))
+        if section.session.created_by != user_id:
+            raise AuthError(detail="You can rename only your conversations!")
+
+        patch = PatchSessionSectionTitle(name=name, updated_at=datetime.now(timezone.utc))
+        return self.session_section_repository.update(session_section_id, patch)
     
     def list_with_latest_for_session(self, session_id: int, user_id: int) -> SessionOverviewOut:
         session_obj = self.chat_session_repository.read_by_id(session_id)

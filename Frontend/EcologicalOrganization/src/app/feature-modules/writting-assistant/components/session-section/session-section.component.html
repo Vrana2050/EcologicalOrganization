@@ -1,0 +1,60 @@
+<section class="wa-card">
+  <div class="wa-section-head">
+    <div class="wa-title-wrap">
+      <ng-container *ngIf="!editingTitle; else editTitleTpl">
+        <h3 class="wa-section-title">{{ section.name || "Sekcija" }}</h3>
+        <div class="wa-edit-icon" (click)="startEditTitle()">✎</div>
+      </ng-container>
+
+      <ng-template #editTitleTpl>
+        <div class="wa-edit-wrap">
+          <input
+            class="wa-input"
+            type="text"
+            [(ngModel)]="titleDraft"
+            placeholder="Naziv sekcije"
+            (keyup.enter)="trySaveTitle()"
+            (blur)="trySaveTitle()"
+            [class.invalid]="invalidTitle"
+          />
+          <button class="wa-btn small" (click)="trySaveTitle()">✔</button>
+          <button class="wa-btn danger small" (click)="cancelEditTitle()">
+            ✕
+          </button>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="wa-section-actions">
+      <button class="wa-btn">Rezultati</button>
+      <button class="wa-btn" (click)="trySaveTitle()">Sačuvaj</button>
+      <button class="wa-btn" (click)="onGenerate()">
+        ⚡ Generiši sadržaj sekcije
+      </button>
+      <button class="wa-btn danger" (click)="onRemove()">Ukloni sekciju</button>
+    </div>
+  </div>
+
+  <div class="wa-container">
+    <div class="wa-col">
+      <label class="wa-label">Instrukcije</label>
+      <textarea
+        class="wa-input"
+        [(ngModel)]="instrDraft"
+        rows="4"
+        placeholder="Specifične instrukcije za ovu sekciju…"
+      ></textarea>
+    </div>
+
+    <div class="wa-col">
+      <label class="wa-label">Rezultat</label>
+      <textarea
+        class="wa-input"
+        [value]="section.latestIteration?.modelOutput?.generatedText || ''"
+        rows="6"
+        readonly
+        placeholder="Još uvek nema rezultata…"
+      ></textarea>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,24 @@
+<section class="wa-card">
+  <div class="wa-header-top">
+    <h2 class="wa-title">{{ title }}</h2>
+  </div>
+
+  <div class="wa-stack">
+    <div>
+      <label class="wa-label">Globalne instrukcije</label>
+      <textarea
+        class="wa-input"
+        [ngModel]="globalInstruction"
+        rows="4"
+        placeholder="Npr: Koristi stručan i koncizan ton…"
+      ></textarea>
+    </div>
+
+    <div class="wa-actions">
+      <button class="wa-btn" (click)="addSection.emit()">
+        + Dodaj sekciju
+      </button>
+      <button class="wa-btn">Pogledaj ceo dokument</button>
+    </div>
+  </div>
+</section>
