@@ -4,6 +4,7 @@ from app.api.v1.routes import routers as v1_routers
 from app.core.container import Container
 from app.util.class_object import singleton
 from app.core.dependencies import get_current_user
+from fastapi.middleware.cors import CORSMiddleware
 
 @singleton
 class AppCreator:
@@ -14,6 +15,14 @@ class AppCreator:
             openapi_url="/api/openapi.json",
             version="0.0.1",
             dependencies=[Depends(get_current_user)],  
+        )
+
+        self.app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["http://localhost:4200"],  
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
         )
 
         self.container = Container()

@@ -1,0 +1,30 @@
+<aside class="sidebar">
+  <div class="brand">
+    <div class="dot"></div>
+    <h1>Asistirano pisanje</h1>
+  </div>
+
+  <button class="wa-btn primary" (click)="onCreateNew()">
+    + Kreiraj novi dokument
+  </button>
+
+  <div class="section-title">Konverzacije</div>
+
+  <div *ngIf="loading">Učitavanje...</div>
+
+  <div class="list" *ngIf="!loading">
+    <div
+      class="item"
+      *ngFor="let c of conversations"
+      (click)="onSelectConversation(c)"
+    >
+      <div class="avatar">💬</div>
+      <div class="meta">
+        <div class="title">{{ c.title || "(bez naslova)" }}</div>
+        <div class="sub">
+          {{ c.updatedAt ? (c.updatedAt | date : "short") : "" }}
+        </div>
+      </div>
+    </div>
+  </div>
+</aside>

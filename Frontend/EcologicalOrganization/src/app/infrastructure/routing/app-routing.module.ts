@@ -4,6 +4,7 @@ import { HomeComponent } from 'src/app/feature-modules/layout/home/home.componen
 import { LoginComponent } from '../auth/login/login.component';
 import { AuthGuard } from '../auth/auth.guard';
 import { RegistrationComponent } from '../auth/registration/registration.component';
+import { WritingAssistantPageComponent } from 'src/app/feature-modules/writting-assistant/page/writing-assistant-page/writing-assistant-page.component';
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
@@ -13,6 +14,13 @@ const routes: Routes = [
     component: RegistrationComponent,
     canActivate: [AuthGuard],
     data: { roles: ['ADMIN'] },
+  },
+
+  {
+    path: 'writing-assistant',
+    component: WritingAssistantPageComponent,
+    // canActivate: [AuthGuard],
+    // data: { roles: ['ADMIN', 'EMPLOYEE'] },
   },
 ];
 
