@@ -1,0 +1,70 @@
+<div class="app" [class.show-versions]="showVersionsSidebar">
+  <pa-prompts-sidebar
+    [prompts]="prompts"
+    [selectedId]="activePrompt?.id"
+    [loading]="loading"
+    (createNew)="onCreateNew()"
+    (selectPrompt)="onSelectPrompt($event)"
+    (deletePrompt)="onDeletePrompt($event)"
+  ></pa-prompts-sidebar>
+
+  <pa-versions-sidebar
+    *ngIf="showVersionsSidebar"
+    [promptId]="activePrompt?.id || null"
+    (hide)="closeVersions()"
+    (selected)="onVersionSelected($event)"
+  ></pa-versions-sidebar>
+
+  <main class="main">
+    <div class="workspace" *ngIf="!activePrompt">
+      <h2>Prompt admin</h2>
+      <p>Odaberite prompt sa leve strane ili kreirajte novi.</p>
+    </div>
+
+    <div class="workspace" *ngIf="activePrompt as prompt">
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        "
+      >
+        <h2>{{ prompt.title }}</h2>
+        <button class="wa-btn" type="button" (click)="openVersions()">
+          Sve verzije
+        </button>
+      </div>
+      <p><strong>ID:</strong> {{ prompt.id }}</p>
+      <p><strong>Dokument tip:</strong> {{ prompt.documentTypeId }}</p>
+      <p>
+        <strong>Ažurirano:</strong>
+        {{ prompt.updatedAt ? (prompt.updatedAt | date : "short") : "—" }}
+      </p>
+
+      <h3>Aktivna verzija</h3>
+      <div *ngIf="prompt.activeVersion; else noActive">
+        <div class="muted" style="margin-bottom: 6px">
+          <strong>{{
+            prompt.activeVersion?.name || "v" + prompt.activeVersion?.id
+          }}</strong>
+          ·
+          {{
+            prompt.activeVersion?.createdAt
+              ? (prompt.activeVersion?.createdAt | date : "short")
+              : "—"
+          }}
+          <span
+            *ngIf="prompt.activeVersion?.isActive"
+            class="badge"
+            style="margin-left: 8px"
+            >aktivna</span
+          >
+        </div>
+        <pre class="prompt-text">{{ prompt.activeVersion?.promptText }}</pre>
+      </div>
+      <ng-template #noActive>
+        <div class="muted">Nema aktivne verzije</div>
+      </ng-template>
+    </div>
+  </main>
+</div>

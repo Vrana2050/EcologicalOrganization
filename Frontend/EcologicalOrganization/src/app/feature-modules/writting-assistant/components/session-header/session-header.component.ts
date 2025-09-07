@@ -11,7 +11,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 export class SessionHeaderComponent {
   @Output() addSection = new EventEmitter<void>();
   @Output() saveTitle = new EventEmitter<string>();
-  @Output() globalInstructionChange = new EventEmitter<string>(); // 👈 fali ti ovo
+  @Output() globalInstructionChange = new EventEmitter<string>();
 
   @Input() title = 'Dokument';
   @Input() globalInstruction = '';

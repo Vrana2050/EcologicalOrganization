@@ -5,6 +5,8 @@ import { LoginComponent } from '../auth/login/login.component';
 import { AuthGuard } from '../auth/auth.guard';
 import { RegistrationComponent } from '../auth/registration/registration.component';
 import { WritingAssistantPageComponent } from 'src/app/feature-modules/writting-assistant/page/writing-assistant-page/writing-assistant-page.component';
+import { PromptAdminModule } from 'src/app/feature-modules/prompt-admin/prompt-admin.module';
+import { PromptAdminPageComponent } from 'src/app/feature-modules/prompt-admin/page/admin-page/admin-page.component';
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
@@ -20,6 +22,10 @@ const routes: Routes = [
   {
     path: 'writing-assistant/:sessionId',
     component: WritingAssistantPageComponent,
+  },
+  {
+    path: 'dashboard',
+    component: PromptAdminPageComponent,
   },
 ];
 

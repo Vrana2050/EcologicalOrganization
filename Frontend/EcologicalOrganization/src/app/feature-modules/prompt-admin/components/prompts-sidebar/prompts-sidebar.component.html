@@ -1,0 +1,38 @@
+<aside class="sidebar">
+  <div class="brand">
+    <div class="dot"></div>
+    <h1>Prompt Admin</h1>
+  </div>
+
+  <button class="wa-btn primary" (click)="onCreateNew()">
+    + Kreiraj novi prompt
+  </button>
+
+  <div class="section-title">Prompti</div>
+
+  <div *ngIf="loading">Učitavanje...</div>
+
+  <div class="list" *ngIf="!loading">
+    <div
+      class="item"
+      *ngFor="let p of prompts"
+      [class.selected]="p.id === selectedId"
+    >
+      <div class="avatar" (click)="onSelectPrompt(p)">📄</div>
+
+      <div class="meta" (click)="onSelectPrompt(p)">
+        <div class="title">{{ p.title || "(bez naslova)" }}</div>
+        <div class="sub">
+          {{ p.updatedAt ? p.updatedAt : "" }}
+        </div>
+      </div>
+
+      <div class="menu-wrap" (click)="$event.stopPropagation()">
+        <button class="menu-btn" (click)="toggleMenu(p.id)">⋮</button>
+        <div class="menu" *ngIf="menuOpenId === p.id">
+          <button class="menu-item" (click)="onDelete(p)">Obriši</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</aside>
