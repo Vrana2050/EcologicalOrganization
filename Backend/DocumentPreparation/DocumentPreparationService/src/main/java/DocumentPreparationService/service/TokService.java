@@ -1,6 +1,10 @@
 package DocumentPreparationService.service;
 
+import DocumentPreparationService.exception.ForbiddenException;
+import DocumentPreparationService.exception.InvalidRequestDataException;
+import DocumentPreparationService.exception.NotFoundException;
 import DocumentPreparationService.model.DokumentRevizija;
+import DocumentPreparationService.model.Projekat;
 import DocumentPreparationService.model.Tok;
 import DocumentPreparationService.model.TokStatus;
 import DocumentPreparationService.repository.ICrudRepository;
@@ -9,14 +13,20 @@ import DocumentPreparationService.service.interfaces.IStatusService;
 import DocumentPreparationService.service.interfaces.ITokService;
 import DocumentPreparationService.service.interfaces.ITokStatusService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class TokService extends CrudService<Tok,Long> implements ITokService {
     @Autowired
     private IStatusService statusService;
+    @Autowired
+    private ITokRepository tokRepository;
     protected TokService(ITokRepository repository) {
         super(repository);
     }
@@ -24,24 +34,19 @@ public class TokService extends CrudService<Tok,Long> implements ITokService {
     @Transactional
     public Tok create(Tok newTok) {
         newTok.validate();
-        for(TokStatus tokStatus : newTok.getStatusi()){
-            tokStatus.setTrenutnoStanje(statusService.create(tokStatus.getTrenutnoStanje()));
-        }
-        for(TokStatus tokStatus : newTok.getStatusi()){
-            if(tokStatus.getPrethodnoStanje() != null){
-                tokStatus.setPrethodnoStanje(newTok.getStatusi().stream().filter(ts-> ts.getSledeceStanje().getNaziv().equals(tokStatus.getTrenutnoStanje().getNaziv())).findFirst().get().getTrenutnoStanje());
-            }
-            if(tokStatus.getSledeceStanje() != null){
-                tokStatus.setSledeceStanje(newTok.getStatusi().stream().filter(ts-> ts.getTrenutnoStanje().getNaziv().equals(tokStatus.getSledeceStanje().getNaziv())).findFirst().get().getTrenutnoStanje());
-            }
-            if(tokStatus.getStatusNakonOdbijanja() != null){
-                tokStatus.setStatusNakonOdbijanja(newTok.getStatusi().stream().filter(ts-> ts.getTrenutnoStanje().getNaziv().equals(tokStatus.getStatusNakonOdbijanja().getNaziv())).findFirst().get().getTrenutnoStanje());
-            }
-        }
         return  super.create(newTok);
     }
     @Override
     public Tok update(Tok newTok) {
+        try {
+            Tok oldTok = tokRepository.findById(newTok.getId()).orElseThrow(() -> new NotFoundException("Project not found"));
 
+            oldTok.update(newTok);
+
+            return super.update(oldTok);
+
+        } catch (DataIntegrityViolationException e) {
+            throw new InvalidRequestDataException("Invalid request");
+        }
     }
 }

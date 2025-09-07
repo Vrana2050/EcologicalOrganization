@@ -31,25 +31,18 @@ public class TokStatusConverter extends BaseMapper<TokStatus, TokStatusDto> impl
 
         TokStatus entity = new TokStatus();
         entity.setId(dto.getId());
-
-        if (dto.getTok() != null) {
-            entity.setTok(getTokConverter().ToEntity(dto.getTok()));
-        }
+        entity.setRefId(dto.getRefId());
 
         if (dto.getTrenutnoStanje() != null) {
             entity.setTrenutnoStanje(getStatusConverter().ToEntity(dto.getTrenutnoStanje()));
         }
 
         if (dto.getSledeceStanje() != null) {
-            entity.setSledeceStanje(getStatusConverter().ToEntity(dto.getSledeceStanje()));
-        }
-
-        if (dto.getPrethodnoStanje() != null) {
-            entity.setPrethodnoStanje(getStatusConverter().ToEntity(dto.getPrethodnoStanje()));
+            entity.setSledeceStanje(ToEntity(dto.getSledeceStanje()));
         }
 
         if (dto.getStatusNakonOdbijanja() != null) {
-            entity.setStatusNakonOdbijanja(getStatusConverter().ToEntity(dto.getStatusNakonOdbijanja()));
+            entity.setStatusNakonOdbijanja(ToEntity(dto.getStatusNakonOdbijanja()));
         }
 
         return entity;
@@ -61,14 +54,7 @@ public class TokStatusConverter extends BaseMapper<TokStatus, TokStatusDto> impl
 
         TokStatusDto dto = new TokStatusDto();
         dto.setId(entity.getId());
-
-        if (Hibernate.isInitialized(entity.getTok()) && entity.getTok() != null) {
-            dto.setTok(getTokConverter().ToDto(entity.getTok()));
-        } else if (entity.getTok() != null) {
-            TokDto tokDto = new TokDto();
-            tokDto.setId(entity.getTok().getId());
-            dto.setTok(tokDto);
-        }
+        dto.setTokId(entity.getTok().getId());
 
         if (Hibernate.isInitialized(entity.getTrenutnoStanje()) && entity.getTrenutnoStanje() != null) {
             dto.setTrenutnoStanje(getStatusConverter().ToDto(entity.getTrenutnoStanje()));
@@ -77,29 +63,15 @@ public class TokStatusConverter extends BaseMapper<TokStatus, TokStatusDto> impl
             statusDto.setId(entity.getTrenutnoStanje().getId());
             dto.setTrenutnoStanje(statusDto);
         }
-
-        if (Hibernate.isInitialized(entity.getSledeceStanje()) && entity.getSledeceStanje() != null) {
-            dto.setSledeceStanje(getStatusConverter().ToDto(entity.getSledeceStanje()));
-        } else if (entity.getSledeceStanje() != null) {
-            StatusDto statusDto = new StatusDto();
-            statusDto.setId(entity.getSledeceStanje().getId());
-            dto.setSledeceStanje(statusDto);
+        if(entity.getSledeceStanje() != null) {
+            TokStatusDto sledeceStanje = new TokStatusDto();
+            sledeceStanje.setId(entity.getSledeceStanje().getId());
+            dto.setSledeceStanje(sledeceStanje);
         }
-
-        if (Hibernate.isInitialized(entity.getPrethodnoStanje()) && entity.getPrethodnoStanje() != null) {
-            dto.setPrethodnoStanje(getStatusConverter().ToDto(entity.getPrethodnoStanje()));
-        } else if (entity.getPrethodnoStanje() != null) {
-            StatusDto statusDto = new StatusDto();
-            statusDto.setId(entity.getPrethodnoStanje().getId());
-            dto.setPrethodnoStanje(statusDto);
-        }
-
-        if (Hibernate.isInitialized(entity.getStatusNakonOdbijanja()) && entity.getStatusNakonOdbijanja() != null) {
-            dto.setStatusNakonOdbijanja(getStatusConverter().ToDto(entity.getStatusNakonOdbijanja()));
-        } else if (entity.getStatusNakonOdbijanja() != null) {
-            StatusDto statusDto = new StatusDto();
-            statusDto.setId(entity.getStatusNakonOdbijanja().getId());
-            dto.setStatusNakonOdbijanja(statusDto);
+        if(entity.getStatusNakonOdbijanja() != null) {
+            TokStatusDto stanjeNakonOdbijanja = new TokStatusDto();
+            stanjeNakonOdbijanja.setId(entity.getStatusNakonOdbijanja().getId());
+            dto.setStatusNakonOdbijanja(stanjeNakonOdbijanja);
         }
 
         return dto;

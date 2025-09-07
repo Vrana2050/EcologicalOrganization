@@ -64,25 +64,37 @@ INSERT INTO status(id, naziv, potrebno_odobrenje_za_prelazak, dozvola_menjanja_z
                      dozvola_citanja_za_zaduzenog)
 VALUES (1004, 'Done', 0, 1, 1, 0, 1, 1, 0, 0, 1);
 
+INSERT INTO tok_status(id, tok_id, trenutno_stanje, sledece_stanje, status_nakon_odbijanja)
+VALUES (1001, 1001, 1001, NULL, NULL);
 
-INSERT INTO tok_status(id, tok_id, trenutno_stanje, sledece_stanje, prethodno_stanje, status_nakon_odbijanja)
-VALUES (1001, 1001, 1001, 1002, NULL, NULL);
+INSERT INTO tok_status(id, tok_id, trenutno_stanje, sledece_stanje, status_nakon_odbijanja)
+VALUES (1002, 1001, 1002, NULL, NULL);
 
-INSERT INTO tok_status(id, tok_id, trenutno_stanje, sledece_stanje, prethodno_stanje, status_nakon_odbijanja)
-VALUES (1002, 1001, 1002, 1003, 1001, NULL);
+INSERT INTO tok_status(id, tok_id, trenutno_stanje, sledece_stanje, status_nakon_odbijanja)
+VALUES (1003, 1001, 1003, NULL, NULL);
 
-INSERT INTO tok_status(id, tok_id, trenutno_stanje, sledece_stanje, prethodno_stanje, status_nakon_odbijanja)
-VALUES (1003, 1001, 1003, 1004, 1002, 1002);
+INSERT INTO tok_status(id, tok_id, trenutno_stanje, sledece_stanje, status_nakon_odbijanja)
+VALUES (1004, 1001, 1004, NULL, NULL);
 
-INSERT INTO tok_status(id, tok_id, trenutno_stanje, sledece_stanje, prethodno_stanje, status_nakon_odbijanja)
-VALUES (1004, 1001, 1004, NULL, 1003, NULL);
+INSERT INTO tok_status(id, tok_id, trenutno_stanje, sledece_stanje, status_nakon_odbijanja)
+VALUES (1005, 1002, 1001, NULL, NULL);
 
-INSERT INTO tok_status(id, tok_id, trenutno_stanje, sledece_stanje, prethodno_stanje, status_nakon_odbijanja)
-VALUES (1005, 1002, 1001, 1002, NULL, NULL);
+INSERT INTO tok_status(id, tok_id, trenutno_stanje, sledece_stanje, status_nakon_odbijanja)
+VALUES (1006, 1002, 1002, NULL, NULL);
 
-INSERT INTO tok_status(id, tok_id, trenutno_stanje, sledece_stanje, prethodno_stanje, status_nakon_odbijanja)
-VALUES (1006, 1002, 1002, NULL, 1001, NULL);
+COMMIT;
 
+-- 2) UPDATE za veze nakon što svi redovi postoje
+UPDATE tok_status SET sledece_stanje = 1002 WHERE id = 1001;
+
+UPDATE tok_status SET sledece_stanje = 1003 WHERE id = 1002;
+
+UPDATE tok_status SET sledece_stanje = 1004, status_nakon_odbijanja = 1002 WHERE id = 1003;
+
+UPDATE tok_status SET sledece_stanje = 1002 WHERE id = 1005;
+
+
+COMMIT;
 
 -- Tabela fajl
 INSERT INTO fajl(id, podatak, verzija, datum_kreiranja, naziv, ekstenzija)

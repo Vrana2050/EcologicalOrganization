@@ -1,5 +1,6 @@
 package DocumentPreparationService.dto;
 
+import DocumentPreparationService.model.TokStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,9 +12,9 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TokStatusDto {
     private Long id;
-    private TokDto tok;
+    private Long tokId;
+    private Long refId;
     private StatusDto trenutnoStanje;
-    private StatusDto sledeceStanje;
-    private StatusDto prethodnoStanje;
-    private StatusDto statusNakonOdbijanja;
+    private TokStatusDto sledeceStanje;
+    private TokStatusDto statusNakonOdbijanja;
 }

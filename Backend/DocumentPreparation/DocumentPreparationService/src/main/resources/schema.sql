@@ -57,7 +57,6 @@ CREATE TABLE tok_status (
                             tok_id integer,
                             trenutno_stanje integer,
                             sledece_stanje integer,
-                            prethodno_stanje integer,
                             status_nakon_odbijanja integer
 );
 
@@ -163,9 +162,8 @@ ALTER TABLE projekat ADD FOREIGN KEY (tok_projekta_id) REFERENCES tok (id);
 ALTER TABLE korisnik_projekat ADD FOREIGN KEY (projekat_id) REFERENCES projekat (id);
 ALTER TABLE tok_status ADD FOREIGN KEY (tok_id) REFERENCES tok (id);
 ALTER TABLE tok_status ADD FOREIGN KEY (trenutno_stanje) REFERENCES status (id);
-ALTER TABLE tok_status ADD FOREIGN KEY (sledece_stanje) REFERENCES status (id);
-ALTER TABLE tok_status ADD FOREIGN KEY (prethodno_stanje) REFERENCES status (id);
-ALTER TABLE tok_status ADD FOREIGN KEY (status_nakon_odbijanja) REFERENCES status (id);
+ALTER TABLE tok_status ADD FOREIGN KEY (sledece_stanje) REFERENCES tok_status (id);
+ALTER TABLE tok_status ADD FOREIGN KEY (status_nakon_odbijanja) REFERENCES tok_status (id);
 ALTER TABLE dokument ADD FOREIGN KEY (projekat_id) REFERENCES projekat (id);
 ALTER TABLE dokument ADD FOREIGN KEY (tok_izrade_dokumenta) REFERENCES tok (id);
 ALTER TABLE dokument ADD FOREIGN KEY (status) REFERENCES tok_status (id);

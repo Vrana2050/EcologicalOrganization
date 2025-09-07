@@ -1,5 +1,6 @@
 package DocumentPreparationService.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,21 +19,20 @@ public class TokStatus {
     @JoinColumn(name = "tok_id")
     private Tok tok;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "trenutno_stanje")
     private Status trenutnoStanje;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sledece_stanje")
-    private Status sledeceStanje;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "prethodno_stanje")
-    private Status prethodnoStanje;
+    private TokStatus sledeceStanje;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_nakon_odbijanja")
-    private Status statusNakonOdbijanja;
+    private TokStatus statusNakonOdbijanja;
+
+    @Transient
+    private Long refId;
 
     public TokStatus(){}
     public void validate() {

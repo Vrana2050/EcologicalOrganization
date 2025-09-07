@@ -32,7 +32,6 @@ public class TokConverter extends BaseMapper<Tok, TokDto> implements ITokConvert
         Tok entity = new Tok();
         entity.setId(dto.getId());
         entity.setNaziv(dto.getNaziv());
-
         if (dto.getStatusi() != null) {
             entity.setStatusi(getTokStatusConverter().ToEntities(dto.getStatusi()));
         }
