@@ -10,11 +10,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+import java.util.stream.Stream;
+
 @Service
 public class KorisnikProjekatService extends CrudService<KorisnikProjekat,Long> implements IKorisnikProjekatService {
 
+    @Autowired
+    IKorisnikProjekatRepository repository;
     protected KorisnikProjekatService(IKorisnikProjekatRepository repository) {
         super(repository);
     }
 
+    @Override
+    public Set<KorisnikProjekat> findByIds(Set<Long> ids) {
+        return repository.findAllByIdIn(ids);
+    }
 }

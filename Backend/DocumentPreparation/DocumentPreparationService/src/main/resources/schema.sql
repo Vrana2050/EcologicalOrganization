@@ -69,8 +69,11 @@ CREATE TABLE dokument (
                           status integer,
                           prioritet nvarchar2(255) NOT NULL CHECK (prioritet IN ('visok', 'srednji', 'mali')),
                           roditelj_dokument_id integer,
+                          rok_zavrsetka date NOT NULL,
                           glavni_fajl_id integer,
-                          vlasnik integer
+                          vlasnik integer,
+                          pripremna_verzija NUMBER(1) CHECK (pripremna_verzija IN (0,1))
+
 );
 
 CREATE TABLE dokument_revizija (

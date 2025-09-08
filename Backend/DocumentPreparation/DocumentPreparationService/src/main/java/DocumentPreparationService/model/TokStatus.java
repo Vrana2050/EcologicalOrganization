@@ -19,7 +19,7 @@ public class TokStatus {
     @JoinColumn(name = "tok_id")
     private Tok tok;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "trenutno_stanje")
     private Status trenutnoStanje;
 

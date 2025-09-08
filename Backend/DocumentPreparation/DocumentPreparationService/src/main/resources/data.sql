@@ -119,23 +119,23 @@ INSERT INTO fajl(id, podatak, verzija, datum_kreiranja, naziv, ekstenzija)
 VALUES (1008, EMPTY_BLOB(), 1002, SYSTIMESTAMP, 'Plan Projekta v2', 'docx');
 
 -- Tabela dokument
-INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik)
-VALUES (1001, 1001, 'Dokument 1001', 'Opis dokumenta 1001', 1001, 1001, 'visok', NULL, 1007, 1002);
+INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija)
+VALUES (1001, 1001, 'Dokument 1001', 'Opis dokumenta 1001', 1001, 1001, 'visok', NULL, 1007, 1002,TO_DATE('2026-6-15','YYYY-MM-DD'),0);
 
-INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik)
-VALUES (1002, 1001, 'Dokument 1002', 'Opis dokumenta 1002', 1001, 1002, 'srednji', 1001, 1008, 1001);
+INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik,rok_zavrsetka,pripremna_verzija)
+VALUES (1002, 1001, 'Dokument 1002', 'Opis dokumenta 1002', 1001, 1002, 'srednji', 1001, 1008, 1001,TO_DATE('2026-10-15','YYYY-MM-DD'),0);
 
-INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik)
-VALUES (1003, 1001, 'Dokument 1003', 'Opis dokumenta 1003', 1001, 1003, 'visok', NULL, 1003, 1002);
+INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija)
+VALUES (1003, 1001, 'Dokument 1003', 'Opis dokumenta 1003', 1001, 1003, 'visok', NULL, 1003, 1002,TO_DATE('2026-5-15','YYYY-MM-DD'),0);
 
-INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik)
-VALUES (1004, 1001, 'Dokument 1004', 'Opis dokumenta 1004', 1001, 1004, 'srednji', NULL, 1004, 1002);
+INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija)
+VALUES (1004, 1001, 'Dokument 1004', 'Opis dokumenta 1004', 1001, 1004, 'srednji', NULL, 1004, 1002,TO_DATE('2026-4-15','YYYY-MM-DD'),0);
 
-INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik)
-VALUES (1005, 1002, 'Dokument 1001', 'Opis dokumenta 1001', 1001, 1001, 'visok', NULL, 1005, 1008);
+INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija)
+VALUES (1005, 1002, 'Dokument 1001', 'Opis dokumenta 1001', 1001, 1001, 'visok', NULL, 1005, 1008,TO_DATE('2025-12-15','YYYY-MM-DD'),0);
 
-INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik)
-VALUES (1006, 1002, 'Dokument 1002', 'Opis dokumenta 1002', 1001, 1002, 'srednji', NULL, 1006, 1008);
+INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija)
+VALUES (1006, 1002, 'Dokument 1002', 'Opis dokumenta 1002', 1001, 1002, 'srednji', NULL, 1006, 1008,TO_DATE('2025-11-15','YYYY-MM-DD'),0);
 
 -- Tabela dokument_revizija
 INSERT INTO dokument_revizija(id, dokument_id, odobreno, trenutni_status, pregledac_id)

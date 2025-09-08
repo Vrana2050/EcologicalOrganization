@@ -1,7 +1,6 @@
-package DocumentPreparationService.controller.menadzer;
+package DocumentPreparationService.controller.Projekat;
 
 import DocumentPreparationService.annotation.RequireRole;
-import DocumentPreparationService.controller.BaseController;
 import DocumentPreparationService.dto.ProjekatDto;
 import DocumentPreparationService.mapper.interfaces.IProjekatConverter;
 import DocumentPreparationService.model.Projekat;

@@ -3,10 +3,7 @@ package DocumentPreparationService.service;
 import DocumentPreparationService.exception.ForbiddenException;
 import DocumentPreparationService.exception.InvalidRequestDataException;
 import DocumentPreparationService.exception.NotFoundException;
-import DocumentPreparationService.model.DokumentRevizija;
-import DocumentPreparationService.model.Projekat;
-import DocumentPreparationService.model.Tok;
-import DocumentPreparationService.model.TokStatus;
+import DocumentPreparationService.model.*;
 import DocumentPreparationService.repository.ICrudRepository;
 import DocumentPreparationService.repository.ITokRepository;
 import DocumentPreparationService.service.interfaces.IStatusService;
@@ -18,8 +15,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class TokService extends CrudService<Tok,Long> implements ITokService {
@@ -33,14 +29,37 @@ public class TokService extends CrudService<Tok,Long> implements ITokService {
     @Override
     @Transactional
     public Tok create(Tok newTok) {
+        for(TokStatus tokStatus : newTok.getStatusi())
+        {
+            if(tokStatus.getTrenutnoStanje().getId()!=null)
+            {
+                Status status = statusService.findById(tokStatus.getTrenutnoStanje().getId()).orElseThrow(() -> new NotFoundException("Status not found"));
+                tokStatus.setTrenutnoStanje(status);
+            }
+            else
+            {
+                tokStatus.setTrenutnoStanje(statusService.create(tokStatus.getTrenutnoStanje()));
+            }
+        }
         newTok.validate();
         return  super.create(newTok);
     }
     @Override
     public Tok update(Tok newTok) {
         try {
-            Tok oldTok = tokRepository.findById(newTok.getId()).orElseThrow(() -> new NotFoundException("Project not found"));
-
+            Tok oldTok = tokRepository.findById(newTok.getId()).orElseThrow(() -> new NotFoundException("Tok not found"));
+            for(TokStatus tokStatus : newTok.getStatusi())
+            {
+                if(tokStatus.getTrenutnoStanje().getId()!=null)
+                {
+                    Status status = statusService.findById(tokStatus.getTrenutnoStanje().getId()).orElseThrow(() -> new NotFoundException("Status not found"));
+                    tokStatus.setTrenutnoStanje(status);
+                }
+                else
+                {
+                    tokStatus.setTrenutnoStanje(statusService.create(tokStatus.getTrenutnoStanje()));
+                }
+            }
             oldTok.update(newTok);
 
             return super.update(oldTok);
@@ -48,5 +67,21 @@ public class TokService extends CrudService<Tok,Long> implements ITokService {
         } catch (DataIntegrityViolationException e) {
             throw new InvalidRequestDataException("Invalid request");
         }
+    }
+
+    @Override
+    public TokStatus getFirstStatus(Tok tok) {
+        Set<Long> nextStatusIds = new HashSet<>();
+        for (TokStatus ts : tok.getStatusi()) {
+            if (ts.getSledeceStanje() != null) {
+                nextStatusIds.add(ts.getSledeceStanje().getId());
+            }
+        }
+        for (TokStatus ts : tok.getStatusi()) {
+            if (!nextStatusIds.contains(ts.getId())) {
+                return ts;
+            }
+        }
+        return null;
     }
 }

@@ -14,4 +14,9 @@ public class StatusService extends CrudService<Status,Long> implements IStatusSe
     protected StatusService(IStatusRepository repository) {
         super(repository);
     }
+    @Override
+    public Status create(Status entity) {
+        entity.validate();
+        return super.create(entity);
+    }
 }

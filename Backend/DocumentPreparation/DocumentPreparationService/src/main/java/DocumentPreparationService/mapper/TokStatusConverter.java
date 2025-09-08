@@ -3,9 +3,7 @@ package DocumentPreparationService.mapper;
 import DocumentPreparationService.dto.*;
 import DocumentPreparationService.mapper.interfaces.IKorisnikProjekatConverter;
 import DocumentPreparationService.mapper.interfaces.ITokStatusConverter;
-import DocumentPreparationService.model.Dokument;
-import DocumentPreparationService.model.KorisnikProjekat;
-import DocumentPreparationService.model.TokStatus;
+import DocumentPreparationService.model.*;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +30,12 @@ public class TokStatusConverter extends BaseMapper<TokStatus, TokStatusDto> impl
         TokStatus entity = new TokStatus();
         entity.setId(dto.getId());
         entity.setRefId(dto.getRefId());
-
+        if(dto.getTokId() != null)
+        {
+            Tok tok = new Tok();
+            tok.setId(dto.getTokId());
+            entity.setTok(tok);
+        }
         if (dto.getTrenutnoStanje() != null) {
             entity.setTrenutnoStanje(getStatusConverter().ToEntity(dto.getTrenutnoStanje()));
         }
@@ -54,7 +57,8 @@ public class TokStatusConverter extends BaseMapper<TokStatus, TokStatusDto> impl
 
         TokStatusDto dto = new TokStatusDto();
         dto.setId(entity.getId());
-        dto.setTokId(entity.getTok().getId());
+        TokDto tokDto = new TokDto();
+        tokDto.setId(entity.getId());
 
         if (Hibernate.isInitialized(entity.getTrenutnoStanje()) && entity.getTrenutnoStanje() != null) {
             dto.setTrenutnoStanje(getStatusConverter().ToDto(entity.getTrenutnoStanje()));

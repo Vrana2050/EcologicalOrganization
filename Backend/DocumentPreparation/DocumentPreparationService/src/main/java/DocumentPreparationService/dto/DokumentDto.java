@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,6 +23,7 @@ public class DokumentDto {
     private ProjekatDto projekat;
     private String naziv;
     private String opis;
+    private LocalDate rokZavrsetka;
 
     private TokDto tokIzradeDokumenta;
     private TokStatusDto status;

@@ -60,6 +60,7 @@ public class DokumentConverter extends BaseMapper<Dokument, DokumentDto> impleme
         dokument.setNaziv(dto.getNaziv());
         dokument.setOpis(dto.getOpis());
         dokument.setPrioritet(dto.getPrioritet());
+        dokument.setRokZavrsetka(dto.getRokZavrsetka());
 
         if (dto.getProjekat() != null) {
             dokument.setProjekat(getProjekatConverter().ToEntity(dto.getProjekat()));

@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -25,12 +27,26 @@ public class Tok {
     private Set<TokStatus> statusi = new HashSet<>();
     public void setStatusi(Set<TokStatus> statusi) {
         this.statusi.clear();
-        for(TokStatus tokStatus : statusi) {
-            if(tokStatus.getSledeceStanje()!=null) {
-                tokStatus.setSledeceStanje(statusi.stream().filter(ts -> ts.getRefId() == tokStatus.getSledeceStanje().getRefId()).findFirst().orElse(null));
+        if(statusi.stream().allMatch(status -> status.getId()!=null)) {
+            for(TokStatus tokStatus : statusi) {
+                this.statusi.add(tokStatus);
+                tokStatus.setTok(this);
             }
-            if(tokStatus.getStatusNakonOdbijanja()!=null) {
-                tokStatus.setStatusNakonOdbijanja(statusi.stream().filter(ts -> ts.getRefId() == tokStatus.getStatusNakonOdbijanja().getRefId()).findFirst().orElse(null));
+        }
+        else {
+            connectStatusi(statusi);
+        }
+    }
+    private void connectStatusi(Set<TokStatus> statusi) {
+        Map<Long, TokStatus> byRefId = statusi.stream()
+                .collect(Collectors.toMap(TokStatus::getRefId, ts -> ts));
+
+        for (TokStatus tokStatus : statusi) {
+            if (tokStatus.getSledeceStanje() != null) {
+                tokStatus.setSledeceStanje(byRefId.get(tokStatus.getSledeceStanje().getRefId()));
+            }
+            if (tokStatus.getStatusNakonOdbijanja() != null) {
+                tokStatus.setStatusNakonOdbijanja(byRefId.get(tokStatus.getStatusNakonOdbijanja().getRefId()));
             }
             this.statusi.add(tokStatus);
             tokStatus.setTok(this);
