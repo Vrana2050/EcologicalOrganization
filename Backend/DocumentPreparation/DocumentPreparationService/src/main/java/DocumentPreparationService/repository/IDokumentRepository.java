@@ -1,6 +1,7 @@
 package DocumentPreparationService.repository;
 
 import DocumentPreparationService.model.Dokument;
+import DocumentPreparationService.model.KorisnikProjekat;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -26,4 +27,29 @@ public interface IDokumentRepository extends ICrudRepository<Dokument, Long> {
             "LEFT JOIN FETCH d.revizije " +
             "WHERE d.id = :id")
     Optional<Dokument> findByIdEager(@Param("id") Long id);
+    @Query("SELECT d FROM Dokument d " +
+            "LEFT JOIN FETCH d.dodeljeniKorisnici "+
+            "LEFT JOIN FETCH d.status "+
+            "WHERE d.id = :id")
+    Optional<Dokument> findByIdWithDodeljeniciAndStatus(@Param("id") Long id);
+
+
+    @Query("SELECT DISTINCT d FROM Dokument d " +
+            "JOIN d.dodeljeniKorisnici k " +
+            "WHERE k IN :korisnici")
+    Set<Dokument> findAllByAnyDodeljeniKorisnici(@Param("korisnici") Set<KorisnikProjekat> korisnici);
+
+    @Query("SELECT d FROM Dokument d " +
+            "LEFT JOIN FETCH d.aktivniFajlovi "+
+            "LEFT JOIN FETCH d.sviFajlovi "+
+            "WHERE d.id = :dokumentId")
+    Dokument findByIdWithFiles(Long dokumentId);
+    @Query("SELECT d FROM Dokument d " +
+            "LEFT JOIN FETCH d.sviFajlovi "+
+            "WHERE d.id = :dokumentId")
+    Optional<Dokument> findByIdWithSviFajlovi(Long dokumentId);
+    @Query("SELECT d FROM Dokument d " +
+            "LEFT JOIN FETCH d.aktivniFajlovi "+
+            "WHERE d.id = :dokumentId")
+    Optional<Dokument> findByIdWithAktivniFajlovi(Long dokumentId);
 }

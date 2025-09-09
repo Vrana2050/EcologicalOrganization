@@ -79,7 +79,9 @@ public class DokumentRevizijaConverter extends BaseMapper<DokumentRevizija, Doku
         dto.setOdobreno(entity.getOdobreno());
 
         if (Hibernate.isInitialized(entity.getDokument())) {
-            dto.setDokument(getDokumentConverter().ToDto(entity.getDokument()));
+            DokumentDto dokumentDto = new DokumentDto();
+            dokumentDto.setId(entity.getDokument().getId());
+            dto.setDokument(dokumentDto);
         } else if (entity.getDokument() != null) {
             DokumentDto dokumentDto = new DokumentDto();
             dokumentDto.setId(entity.getDokument().getId());

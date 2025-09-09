@@ -1,13 +1,12 @@
 package DocumentPreparationService.service;
 
+import DocumentPreparationService.exception.ForbiddenException;
 import DocumentPreparationService.exception.NotFoundException;
 import DocumentPreparationService.model.*;
 import DocumentPreparationService.repository.ICrudRepository;
 import DocumentPreparationService.repository.IDokumentRepository;
-import DocumentPreparationService.service.interfaces.IDokumentService;
-import DocumentPreparationService.service.interfaces.IProjekatService;
-import DocumentPreparationService.service.interfaces.ITokService;
-import DocumentPreparationService.service.interfaces.ITokStatusService;
+import DocumentPreparationService.service.interfaces.*;
+import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
@@ -30,7 +29,11 @@ public class DokumentService extends CrudService<Dokument,Long> implements IDoku
     @Autowired
     private ITokStatusService tokStatusService;
     @Autowired
-    private KorisnikProjekatService korisnikProjekatService;
+    private IKorisnikProjekatService korisnikProjekatService;
+    @Autowired
+    private IObavestenjeService obavestenjeService;
+    @Autowired
+    private EntityManager entityManager;
     protected DokumentService(IDokumentRepository repository) {
         super(repository);
     }
@@ -60,8 +63,16 @@ public class DokumentService extends CrudService<Dokument,Long> implements IDoku
             Set<KorisnikProjekat> dodeljenici = korisnikProjekatService.findByIds(newDokument.getDodeljeniKorisnici().stream().map(KorisnikProjekat::getId).collect(Collectors.toSet()));
             newDokument.setDodeljeniKorisnici(dodeljenici);
         }
+        if(newDokument.getVlasnik()!=null) {
+            newDokument.setVlasnik(korisnikProjekatService.findById(newDokument.getVlasnik().getId()).orElseThrow(() -> new NotFoundException("Owner not found")));
+        }
         newDokument.validate();
-        return super.create(newDokument);
+        Dokument savedDokument = super.create(newDokument);
+        if(!savedDokument.getPripremna_verzija())
+        {
+            obavestenjeService.creatNewDokumentObavestenje(savedDokument.getDodeljeniKorisnici(), newDokument);
+        }
+        return savedDokument;
     }
     @Override
     @Transactional
@@ -69,25 +80,72 @@ public class DokumentService extends CrudService<Dokument,Long> implements IDoku
         Dokument oldDokument = repository.findByIdEager(newDokument.getId()).orElseThrow(() -> new NotFoundException("Document not found"));
         if(newDokument.getTokIzradeDokumenta()!=null) {
             Tok tok = tokService.findById(newDokument.getTokIzradeDokumenta().getId()).orElseThrow(() -> new NotFoundException("Workflow not found"));
-            newDokument.setTokIzradeDokumenta(tok);
+            oldDokument.setTokIzradeDokumenta(tok);
         }
         if(newDokument.getProjekat()!=null) {
-            newDokument.setProjekat(newDokument.getProjekat());
+            oldDokument.setProjekat(newDokument.getProjekat());
         }
-        TokStatus newStatus = tokStatusService.findById(newDokument.getStatus().getId()).orElseThrow(() -> new NotFoundException("Status not found"));
-        newDokument.setStatus(newStatus);
+        if(newDokument.getVlasnik()!=null) {
+            newDokument.setVlasnik(korisnikProjekatService.findById(newDokument.getVlasnik().getId()).orElseThrow(() -> new NotFoundException("Owner not found")));
+        }
+        if(newDokument.getDodeljeniKorisnici()!=null) {
+            oldDokument.setDodeljeniKorisnici(korisnikProjekatService.findByIds(newDokument.getDodeljeniKorisnici().stream().map(KorisnikProjekat::getId).collect(Collectors.toSet())));
+        }
+        if(newDokument.getStatus()!=null) {
+            TokStatus newStatus = tokStatusService.findById(newDokument.getStatus().getId()).orElseThrow(() -> new NotFoundException("Status not found"));
+            newDokument.setStatus(newStatus);
+        }
         oldDokument.update(newDokument);
         return super.update(newDokument);
     }
-
     @Override
-    public Dokument create(Dokument entity, Long userId) {
-        return null;
+    public Dokument updateStatus(Dokument newDokument,Long userId)
+    {
+         Dokument updatedDokument = update(newDokument,userId);
+         if(updatedDokument.getStatus().isDone()) {
+            obavestenjeService.creatDoneObavestenje(newDokument.getVlasnik(),newDokument);
+         }
+        if(updatedDokument.getStatus().isInReview()) {
+            obavestenjeService.creatReviewObavestenje(newDokument.getVlasnik(),newDokument);
+        }
+         return updatedDokument;
+    }
+    @Override
+    public Dokument create(Dokument newDokument, Long userId) {
+        Dokument dokument =  repository.findByIdEager(newDokument.getId()).orElseThrow(() -> new NotFoundException("Document not found"));
+        if(dokument.getRoditeljDokument()!=null) {
+            if(dokument.getStatus().getTrenutnoStanje().getDozvolaDodavanjaZaZaduzenog())
+            {
+                throw new ForbiddenException("Cannot create a sub-document while the parent document is in its current status.");
+            }
+        }
+        else {
+            if(!dokument.getProjekat().isInProgress())
+            {
+                throw new ForbiddenException("Not allowed to create new document on finished project");
+            }
+        }
+        KorisnikProjekat korisnikProjekat = korisnikProjekatService.findByUserAndProjekat(userId,newDokument.getProjekat().getId()).orElseThrow(() -> new NotFoundException("User not found on project"));
+        newDokument.setVlasnik(korisnikProjekat);
+        return create(newDokument);
     }
 
     @Override
-    public Dokument update(Dokument entity, Long userId) {
-        return null;
+    public Dokument update(Dokument newDokument, Long userId) {
+        Dokument oldDokument =  repository.findByIdEager(newDokument.getId()).orElseThrow(() -> new NotFoundException("Document not found"));
+        entityManager.refresh(oldDokument);
+        KorisnikProjekat korisnikProjekat = korisnikProjekatService.findByUserAndProjekat(userId,oldDokument.getProjekat().getId()).orElseThrow(() -> new NotFoundException("User not found on project"));
+        if(oldDokument.hasEditPermission(korisnikProjekat))
+        {
+            Dokument savedDokument = update(newDokument);
+            if(!savedDokument.getPripremna_verzija() && oldDokument.getPripremna_verzija()) {
+                obavestenjeService.creatNewDokumentObavestenje(savedDokument.getDodeljeniKorisnici(),newDokument);
+            }
+            return savedDokument;
+        }
+        else{
+           throw new ForbiddenException("User not authorized to update this document");
+        }
     }
 
     @Override
@@ -96,12 +154,43 @@ public class DokumentService extends CrudService<Dokument,Long> implements IDoku
     }
 
     @Override
-    public Optional<Dokument> findById(Long id, Long userId) {
-        return repository.findByIdEager(id);
+    public Dokument findById(Long id, Long userId) {
+        Dokument dokument = repository.findByIdEager(id).orElseThrow(() -> new NotFoundException("Document not found"));
+        korisnikProjekatService.findByUserAndProjekat(userId,dokument.getProjekat().getId()).orElseThrow(() -> new ForbiddenException("Cannot read document on other projects"));
+        return dokument;
     }
 
     @Override
     public Set<Dokument> findAll(Long userId) {
-        return Set.of();
+        Set<KorisnikProjekat>korinsnikProjekti = korisnikProjekatService.findByUser(userId);
+        return repository.findAllByAnyDodeljeniKorisnici((korinsnikProjekti));
+    }
+    @Override
+    public Dokument getDokumentWithFiles(Long dokumentId)
+    {
+        return repository.findByIdWithFiles(dokumentId);
+    }
+    @Override
+    public Dokument updateDokumentFiles(Dokument dokument, Long userId)
+    {
+        KorisnikProjekat korisnikProjekat = korisnikProjekatService.findByUserAndProjekat(userId,dokument.getProjekat().getId()).orElseThrow(() -> new NotFoundException("User not found on project"));
+        if(dokument.canUpdate(korisnikProjekat) ) {
+            return super.update(dokument);
+        }
+        else throw new ForbiddenException("User not authorized to update files in this document");
+    }
+
+    public Set<Fajl> getDokumentSveFajlove(Long dokumentId, Long userId) {
+        Dokument dokument = repository.findByIdWithSviFajlovi(dokumentId).orElseThrow(() -> new NotFoundException("Document not found"));
+        korisnikProjekatService.findByUserAndProjekat(userId,dokument.getProjekat().getId()).orElseThrow(() -> new ForbiddenException("Cannot read document on other projects"));
+
+        return dokument.getSviFajlovi();
+    }
+
+    @Override
+    public Set<Fajl> getDokumentAktivneFajlove(Long dokumentId, Long userId) {
+        Dokument dokument = repository.findByIdWithAktivniFajlovi(dokumentId).orElseThrow(() -> new NotFoundException("Document not found"));
+        korisnikProjekatService.findByUserAndProjekat(userId,dokument.getProjekat().getId()).orElseThrow(() -> new ForbiddenException("Cannot read document on other projects"));
+        return dokument.getAktivniFajlovi();
     }
 }

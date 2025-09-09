@@ -32,6 +32,7 @@ public class RevizijaIzmenaConverter extends BaseMapper<RevizijaIzmena, Revizija
         entity.setId(dto.getId());
         entity.setIzmena(dto.getIzmena());
         entity.setIspravljena(dto.getIspravljena());
+        entity.setDatumIspravljanja(dto.getDatumIspravljanja());
 
         if (dto.getDokumentRevizijaId() != null) {
             DokumentRevizija dokumentRevizija = new  DokumentRevizija();
@@ -51,6 +52,7 @@ public class RevizijaIzmenaConverter extends BaseMapper<RevizijaIzmena, Revizija
         dto.setIzmena(entity.getIzmena());
         dto.setIspravljena(entity.getIspravljena());
         dto.setDokumentRevizijaId(entity.getRevizija().getId());
+        dto.setDatumIspravljanja(entity.getDatumIspravljanja());
 
         return dto;
     }

@@ -38,8 +38,8 @@ public class BaseController<Entity,KeyType, Dto> {
     }
 
     @PutMapping
-    public ResponseEntity<Dto> update( @RequestBody Entity entity) {
-        Entity updatedEntity = service.update(entity);
+    public ResponseEntity<Dto> update( @RequestBody Dto entity) {
+        Entity updatedEntity = service.update(mapper.ToEntity(entity));
         return ResponseEntity.ok(mapper.ToDto(updatedEntity));
     }
 

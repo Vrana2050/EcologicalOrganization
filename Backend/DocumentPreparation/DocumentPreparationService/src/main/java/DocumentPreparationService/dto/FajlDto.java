@@ -13,7 +13,7 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FajlDto {
     private Long id;
-    private Set<Long> dokumentIds;
+    private Long dokumentId;
     private byte[] podatak;
     private Long verzija;
     private LocalDateTime datumKreiranja;

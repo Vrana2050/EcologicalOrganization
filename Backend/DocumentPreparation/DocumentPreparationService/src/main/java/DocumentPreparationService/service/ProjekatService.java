@@ -35,6 +35,7 @@ public class ProjekatService extends CrudService<Projekat,Long> implements IProj
     @Override
     public Projekat create(Projekat projekat) {
         try {
+            //Proveriti usera
             projekat.validate();
             if(!tokService.findById(projekat.getTokProjekta().getId()).isPresent()){
                 throw new NotFoundException("Workflow not found");

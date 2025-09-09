@@ -1,5 +1,7 @@
 package DocumentPreparationService.model;
 
+import DocumentPreparationService.exception.ForbiddenException;
+import DocumentPreparationService.exception.InvalidRequestDataException;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -33,18 +35,32 @@ public class DokumentRevizija {
     @JoinColumn(name = "pregledac_id")
     private KorisnikProjekat pregledac;
 
-    @OneToMany(mappedBy = "revizija", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "revizija", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
     private Set<RevizijaIzmena> izmene = new HashSet<>();
-
-    public DokumentRevizija() {}
-
-    public void setIzmene(Set<RevizijaIzmena> izmene) {
-        for (RevizijaIzmena izmena : izmene) {
-            addIzmena(izmena);
+    public void setIzmene(Set<RevizijaIzmena> izmene){
+        this.izmene.clear();
+        for(RevizijaIzmena revizijaIzmena : izmene){
+            revizijaIzmena.setRevizija(this);
+            revizijaIzmena.validate();
+            this.izmene.add(revizijaIzmena);
         }
     }
-    public void addIzmena(RevizijaIzmena izmena) {
-        izmene.add(izmena);
-        izmena.setRevizija(this);
+
+    public DokumentRevizija() {}
+    public void validate(){
+        if(dokument==null) throw new InvalidRequestDataException("Dokument is required");
+        if(!trenutniStatus.getTrenutnoStanje().getPotrebnoOdobrenjeZaPrelazak()) throw new InvalidRequestDataException("Cannot review in current state");
+        validatePregledac();
+        setOdobreno(getIzmene().isEmpty());
+    }
+    private void validatePregledac() {
+        if(pregledac==null) throw new InvalidRequestDataException("Reviewer is required");
+        if(!dokument.isKorisnikVlasnik(pregledac)) throw  new ForbiddenException("Reviewer is not document owner");
+    }
+
+    public void update(DokumentRevizija newDokumentRevizija) {
+        for(RevizijaIzmena revizijaIzmena : newDokumentRevizija.getIzmene()) {
+            izmene.forEach(izmena->{if(izmena.getId()==revizijaIzmena.getId()) izmena.update(izmena);});
+        }
     }
 }

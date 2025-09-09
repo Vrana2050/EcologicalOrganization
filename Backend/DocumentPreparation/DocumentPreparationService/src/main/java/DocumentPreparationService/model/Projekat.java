@@ -92,4 +92,8 @@ public class Projekat {
         }
         return false;
     }
+
+    public boolean isInProgress() {
+        return status.equals(ProjekatStatus.u_toku);
+    }
 }

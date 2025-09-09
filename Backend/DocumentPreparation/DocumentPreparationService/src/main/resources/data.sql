@@ -7,10 +7,10 @@ VALUES (1002, 'Tok Revizije');
 
 -- Tabela projekat
 INSERT INTO projekat(id, naziv, status, rok_zavrsetka, tok_projekta_id)
-VALUES (1001, 'Projekat Alpha', 'u_toku', TO_DATE('2025-10-31','YYYY-MM-DD'), 1001);
+VALUES (1001, 'Projekat Alpha', 'u_toku', TO_DATE('2027-10-31','YYYY-MM-DD'), 1001);
 
 INSERT INTO projekat(id, naziv, status, rok_zavrsetka, tok_projekta_id)
-VALUES (1002, 'Projekat Beta', 'zavrsen', TO_DATE('2024-06-30','YYYY-MM-DD'), 1002);
+VALUES (1002, 'Projekat Beta', 'zavrsen', TO_DATE('2028-06-30','YYYY-MM-DD'), 1002);
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
 VALUES (1001, 1001, 1001, 'vodja');
@@ -146,11 +146,11 @@ VALUES (1002, 1004, 1, 1003, 1002);
 
 
 -- Tabela revizija_izmena
-INSERT INTO revizija_izmena(id, revizija_id, izmena, ispravljena)
-VALUES (1001, 1001, 'Ispravi naslov', 1);
+INSERT INTO revizija_izmena(id, revizija_id, izmena, ispravljena,datum_ispravljanja)
+VALUES (1001, 1001, 'Ispravi naslov', 1,SYSTIMESTAMP);
 
-INSERT INTO revizija_izmena(id, revizija_id, izmena, ispravljena)
-VALUES (1002, 1001, 'Dopuni opis', 1);
+INSERT INTO revizija_izmena(id, revizija_id, izmena, ispravljena,datum_ispravljanja)
+VALUES (1002, 1001, 'Dopuni opis', 1,SYSTIMESTAMP);
 
 
 -- Tabela dokument_fajl

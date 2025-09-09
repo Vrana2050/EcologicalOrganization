@@ -45,7 +45,7 @@ public class Dokument {
     private Tok tokIzradeDokumenta;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "status")
     private TokStatus status;
 
@@ -93,7 +93,7 @@ public class Dokument {
     )
     private Set<Dokument> zavisiOd = new HashSet<>();
 
-    @ManyToMany(mappedBy = "zavisiOd",cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "zavisiOd", cascade = CascadeType.ALL)
     private Set<Dokument> zavisnici = new HashSet<>();
     @ManyToMany
     @JoinTable(
@@ -103,15 +103,35 @@ public class Dokument {
     )
     private Set<KorisnikProjekat> dodeljeniKorisnici = new HashSet<>();
 
+
     @OneToMany(mappedBy = "dokument", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<DokumentRevizija> revizije = new HashSet<>();
 
-    public Dokument() {}
+    public Dokument() {
+    }
 
     public void validate() {
         if (this.naziv == null || this.naziv.isEmpty()) throw new InvalidRequestDataException("Name is required");
-        this.setPripremna_verzija(isInDraft().size()!=0);
+        validateVlasnik();
+        List<String> errors = isInDraft();
+        boolean isInPripremna_verzija = !errors.isEmpty();
+        if (pripremna_verzija != null && !pripremna_verzija && isInPripremna_verzija)
+            throw new InvalidRequestDataException(errors.toString());
+        this.setPripremna_verzija(isInPripremna_verzija);
     }
+
+    private void validateVlasnik() {
+        if (this.vlasnik == null)
+            throw new InvalidRequestDataException("Owner not selected");
+        if(roditeljDokument==null)
+        {
+            if(!projekat.isMenadzer(vlasnik.getId())) throw new InvalidRequestDataException("Only managers can create new documents");
+        }
+        else{
+            if(!roditeljDokument.isKorisnikDodeljenik(vlasnik)) throw new InvalidRequestDataException("Only assignees on parent document can create subdocument");
+        }
+    }
+
     public List<String> isInDraft() {
         List<String> errors = new ArrayList<>();
 
@@ -123,8 +143,6 @@ public class Dokument {
             errors.add("Project not selected");
         if (this.prioritet == null)
             errors.add("Priority not selected");
-        if (this.vlasnik == null)
-            errors.add("Owner not selected");
         if (this.rokZavrsetka == null || this.rokZavrsetka.isBefore(LocalDate.now())
                 || this.rokZavrsetka.isAfter(this.projekat.getRokZavrsetka()))
             errors.add("Invalid due date");
@@ -139,22 +157,21 @@ public class Dokument {
                     errors.add("Invalid dependency: cannot depend on document with longer due date.");
             }
         }
-
-        for (KorisnikProjekat korisnikProjekat : this.dodeljeniKorisnici) {
-            if (korisnikProjekat.getProjekat().getId() != this.projekat.getId())
-                errors.add("Assignees must belong to same project");
+        if (this.dodeljeniKorisnici != null) {
+            for (KorisnikProjekat korisnikProjekat : getDodeljeniKorisnici()) {
+                validateDodeljenik(korisnikProjekat);
+            }
         }
 
         return errors;
     }
-    public boolean HasSameParent(Dokument dokument)
-    {
+
+    public boolean HasSameParent(Dokument dokument) {
         return (dokument.roditeljDokument.equals(this.roditeljDokument) && dokument.projekat.equals(this.projekat));
     }
-    public boolean statusExistsInWorkflow()
-    {
-        if(this.getRoditeljDokument()!=null)
-        {
+
+    public boolean statusExistsInWorkflow() {
+        if (this.getRoditeljDokument() != null) {
             return getRoditeljDokument().getTokIzradeDokumenta().getStatusi().contains(this.getStatus());
         }
         return projekat.getTokProjekta().getStatusi().contains(this.getStatus());
@@ -165,51 +182,72 @@ public class Dokument {
         this.rokZavrsetka = newDokument.getRokZavrsetka();
         this.opis = newDokument.getOpis();
         this.prioritet = newDokument.getPrioritet();
-        this.tokIzradeDokumenta = newDokument.getTokIzradeDokumenta();
-        this.setZavisiOd(newDokument.getZavisiOd());
-        this.setDodeljeniKorisnici(newDokument.getDodeljeniKorisnici());
-        List<String> errors = isInDraft();
-        setPripremna_verzija(!errors.isEmpty());
-        if(!errors.isEmpty()) throw new InvalidRequestDataException(errors);
-        updateStatus(newDokument.getStatus());
+        this.vlasnik = newDokument.getVlasnik();
+        if(!updateStatus(newDokument.getStatus())) throw new InvalidRequestDataException("Status not valid");
+        validate();
     }
-    public boolean updateStatus(TokStatus newStatus)
-    {
-        if(pripremna_verzija)
-        {
+
+    public boolean updateStatus(TokStatus newStatus) {
+        if(newStatus == status)
+            return true;
+        if (pripremna_verzija) {
             return false;
         }
-        if(hasActiveDependency())
-        {
+        if (hasActiveDependency()) {
             return false;
         }
-        if(status.getTrenutnoStanje().getPotrebnoOdobrenjeZaPrelazak()){
+        if (status.getTrenutnoStanje().getPotrebnoOdobrenjeZaPrelazak()) {
             boolean hasReviewPermission = hasReviewPermission();
             Long novoStanjeId = newStatus.getTrenutnoStanje().getId();
-            if(hasReviewPermission && novoStanjeId.equals(status.getSledeceStanje().getId()) || !hasReviewPermission && novoStanjeId.equals(status.getStatusNakonOdbijanja().getId())){
-                this.status= newStatus;
+            if (hasReviewPermission && novoStanjeId.equals(status.getSledeceStanje().getId()) || !hasReviewPermission && novoStanjeId.equals(status.getStatusNakonOdbijanja().getId())) {
+                this.status = newStatus;
                 return true;
-            }
-            else {
+            } else {
                 return false;
             }
-        }
-        else{
-            if(newStatus.getTrenutnoStanje().getId().equals(status.getSledeceStanje().getId()))
-            {
-                this.status= newStatus;
+        } else {
+            if (newStatus.getTrenutnoStanje().getId().equals(status.getSledeceStanje().getId())) {
+                this.status = newStatus;
                 return true;
-            }
-            else
-            {
+            } else {
                 return false;
             }
         }
     }
-    private boolean hasActiveDependency(){
-        return zavisiOd.stream().anyMatch(dok-> dok.status.getSledeceStanje()!=null);
+
+    private boolean hasActiveDependency() {
+        return zavisiOd.stream().anyMatch(dok -> dok.status.getSledeceStanje() != null);
     }
-    private boolean hasReviewPermission(){
-        return revizije.stream().anyMatch(revizija-> !revizija.getOdobreno() && revizija.getTrenutniStatus().getId() == status.getTrenutnoStanje().getId());
+
+    private boolean hasReviewPermission() {
+        return revizije.stream().anyMatch(revizija -> revizija.getOdobreno() && revizija.getTrenutniStatus().getId() == status.getTrenutnoStanje().getId());
+    }
+
+    public void validateDodeljenik(KorisnikProjekat dodeljeniKorisnik) {
+        System.out.print(dodeljeniKorisnik.getUlogaUProjektu());
+        if(vlasnik.isLowerRanked(dodeljeniKorisnik))
+        {
+            throw new InvalidRequestDataException("Cannot assign people with higher rank");
+        }
+        if(!dodeljeniKorisnik.getProjekat().getId().equals(projekat.getId())){
+            throw new InvalidRequestDataException("Assignee is not on the same project");
+        }
+    }
+    public boolean isKorisnikDodeljenik(KorisnikProjekat dodeljeniKorisnik) {
+        return dodeljeniKorisnici.stream().anyMatch(dok -> dok.getId().equals(dodeljeniKorisnik.getId()));
+    }
+
+    public boolean hasEditPermission(KorisnikProjekat korisnikProjekat) {
+        boolean isVlasnik = getVlasnik().getId() == korisnikProjekat.getId();
+        boolean isDodeljenik =isKorisnikDodeljenik(korisnikProjekat);
+        return isVlasnik && getStatus().getTrenutnoStanje().getDozvolaMenjanjaZaVlasnika() || isDodeljenik && getStatus().getTrenutnoStanje().getDozvolaMenjanjaZaZaduzenog() != null;
+    }
+
+    public boolean canUpdate(KorisnikProjekat korisnikProjekat){
+        return hasEditPermission(korisnikProjekat) && !getPripremna_verzija();
+    }
+
+    public boolean isKorisnikVlasnik(KorisnikProjekat korisnikProjekat) {
+        return this.vlasnik.getId().equals(korisnikProjekat.getId());
     }
 }

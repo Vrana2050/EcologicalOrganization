@@ -40,4 +40,18 @@ public class TokStatus {
         if(trenutnoStanje.getPotrebnoOdobrenjeZaPrelazak() && statusNakonOdbijanja == null) throw new IllegalArgumentException("Invalid workflow");
         trenutnoStanje.validate();
     }
+
+    public boolean isDone() {
+        if(sledeceStanje==null)
+            return true;
+        return false;
+    }
+
+    public boolean isInReview() {
+        if(trenutnoStanje.getPotrebnoOdobrenjeZaPrelazak())
+        {
+            return true;
+        }
+        return false;
+    }
 }

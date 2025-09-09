@@ -28,4 +28,11 @@ public class Obavestenje {
     private Dokument dokument;
 
     public Obavestenje() {}
+
+    public boolean markAsRead(Long userId) {
+        if(this.korisnikId != userId) return false;
+        if(this.procitana == true) return false;
+        this.procitana = Boolean.TRUE;
+        return true;
+    }
 }

@@ -28,14 +28,6 @@ public class FajlConverter extends BaseMapper<Fajl, FajlDto> implements IFajlCon
         entity.setVerzija(dto.getVerzija());
         entity.setDatumKreiranja(dto.getDatumKreiranja());
         entity.setPodatak(dto.getPodatak());
-        if(dto.getDokumentIds() != null){
-            Set<Dokument> dokumenti = new HashSet<>();
-            for(Long dokumentId : dto.getDokumentIds()) {
-                Dokument dokument = new Dokument();
-                dokument.setId(dokumentId);
-            }
-            entity.setDokumenti(dokumenti);
-        }
         return entity;
     }
 
@@ -50,13 +42,6 @@ public class FajlConverter extends BaseMapper<Fajl, FajlDto> implements IFajlCon
         dto.setVerzija(entity.getVerzija());
         dto.setDatumKreiranja(entity.getDatumKreiranja());
         dto.setPodatak(entity.getPodatak());
-        if (Hibernate.isInitialized(entity.getDokumenti())) {
-            Set<Long> dokumentIds = new HashSet<>();
-           for(Dokument dokument : entity.getDokumenti()) {
-               dokumentIds.add(dokument.getId());
-           }
-            dto.setDokumentIds(dokumentIds);
-        }
         return dto;
     }
 

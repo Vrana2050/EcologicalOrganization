@@ -50,4 +50,8 @@ public class KorisnikProjekat {
     public KorisnikProjekat() {
 
     }
+
+    public boolean isLowerRanked(KorisnikProjekat korisnikProjekat) {
+        return this.ulogaUProjektu.ordinal() > korisnikProjekat.getUlogaUProjektu().ordinal();
+    }
 }

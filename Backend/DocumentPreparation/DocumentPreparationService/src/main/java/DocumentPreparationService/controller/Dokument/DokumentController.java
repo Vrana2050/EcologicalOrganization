@@ -36,9 +36,7 @@ public class DokumentController  {
 
     @GetMapping("/{id}")
     public ResponseEntity<DokumentDto> getById(@RequestHeader(name = "X-USER-ID") Long userId, @PathVariable Long id) {
-        return dokumentService.findById(id,userId)
-                .map(entity -> ResponseEntity.ok(mapper.ToDto(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        return ResponseEntity.ok(mapper.ToDto(dokumentService.findById(id,userId)));
     }
 
     @GetMapping

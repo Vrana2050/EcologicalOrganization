@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 
 @Getter
 @Setter
@@ -13,5 +15,5 @@ public class RevizijaIzmenaDto {
     private Long dokumentRevizijaId;
     private String izmena;
     private Boolean ispravljena;
-
+    private LocalDate datumIspravljanja;
 }
