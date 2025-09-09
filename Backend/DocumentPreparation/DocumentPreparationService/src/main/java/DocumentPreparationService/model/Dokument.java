@@ -220,7 +220,7 @@ public class Dokument {
     }
 
     private boolean hasReviewPermission() {
-        return revizije.stream().anyMatch(revizija -> revizija.getOdobreno() && revizija.getTrenutniStatus().getId() == status.getTrenutnoStanje().getId());
+        return revizije.stream().anyMatch(revizija -> revizija.getOdobreno() && revizija.getTrenutniStatus().getId().equals(status.getTrenutnoStanje().getId()));
     }
 
     public void validateDodeljenik(KorisnikProjekat dodeljeniKorisnik) {

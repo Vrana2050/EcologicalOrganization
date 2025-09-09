@@ -48,6 +48,7 @@ public class TokStatus {
     }
 
     public boolean isInReview() {
+        if(isDone()) return false;
         if(trenutnoStanje.getPotrebnoOdobrenjeZaPrelazak())
         {
             return true;

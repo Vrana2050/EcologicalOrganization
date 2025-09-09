@@ -56,5 +56,10 @@ public class DokumentController  {
         boolean success = dokumentService.delete(id,userId);
         return success ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
+    @PatchMapping
+    public ResponseEntity<DokumentDto> updateStatus(@RequestHeader(name = "X-USER-ID") Long userId, @RequestBody Dokument entity) {
+        Dokument updatedEntity = dokumentService.updateStatus(entity,userId);
+        return ResponseEntity.ok(mapper.ToDto(updatedEntity));
+    }
 
 }

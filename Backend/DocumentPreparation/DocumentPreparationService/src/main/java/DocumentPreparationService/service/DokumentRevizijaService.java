@@ -13,6 +13,7 @@ import DocumentPreparationService.repository.IDokumentRevizijaRepository;
 import DocumentPreparationService.service.interfaces.IDokumentRevizijaService;
 import DocumentPreparationService.service.interfaces.IDokumentService;
 import DocumentPreparationService.service.interfaces.IKorisnikProjekatService;
+import DocumentPreparationService.service.interfaces.IObavestenjeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ public class DokumentRevizijaService  extends CrudService<DokumentRevizija,Long>
     @Autowired
     private IKorisnikProjekatService  korisnikProjekatService;
     @Autowired
+    private IObavestenjeService  obavestenjeService;
     protected DokumentRevizijaService(IDokumentRevizijaRepository repository) {
         super(repository);
     }
@@ -51,7 +53,8 @@ public class DokumentRevizijaService  extends CrudService<DokumentRevizija,Long>
             newStatus.setId(dokument.getStatus().getStatusNakonOdbijanja().getId());
             dokument.setStatus(newStatus);
         }
-        dokumentService.update(dokument,savedDokumentRevizija.getPregledac().getKorisnikId());
+        Dokument savedDokument = dokumentService.update(dokument,savedDokumentRevizija.getPregledac().getKorisnikId());
+        obavestenjeService.creatReviewResultObavestenje(savedDokument.getDodeljeniKorisnici(),savedDokument,savedDokumentRevizija.getOdobreno());
         return savedDokumentRevizija;
     }
     @Override

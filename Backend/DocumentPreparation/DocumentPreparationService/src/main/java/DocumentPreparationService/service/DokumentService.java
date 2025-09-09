@@ -96,20 +96,44 @@ public class DokumentService extends CrudService<Dokument,Long> implements IDoku
             newDokument.setStatus(newStatus);
         }
         oldDokument.update(newDokument);
-        return super.update(newDokument);
+        return super.update(oldDokument);
     }
     @Override
+    @Transactional
     public Dokument updateStatus(Dokument newDokument,Long userId)
     {
          Dokument updatedDokument = update(newDokument,userId);
          if(updatedDokument.getStatus().isDone()) {
-            obavestenjeService.creatDoneObavestenje(newDokument.getVlasnik(),newDokument);
+            obavestenjeService.creatDoneObavestenje(updatedDokument.getVlasnik(),updatedDokument);
+            if(updatedDokument.getRoditeljDokument()!=null) {
+                updateFajloveInParentDokument(updatedDokument.getRoditeljDokument(),updatedDokument.getAktivniFajlovi());
+            }
          }
         if(updatedDokument.getStatus().isInReview()) {
-            obavestenjeService.creatReviewObavestenje(newDokument.getVlasnik(),newDokument);
+            obavestenjeService.creatReviewObavestenje(updatedDokument.getVlasnik(),updatedDokument);
         }
          return updatedDokument;
     }
+
+    private void updateFajloveInParentDokument(Dokument roditeljDokument,Set<Fajl> aktivniFajlovi) {
+        roditeljDokument.getSviFajlovi().addAll(aktivniFajlovi);
+        Set<Fajl> fajloviForDeletion = new HashSet<>();
+        for(Fajl fajl : aktivniFajlovi)
+        {
+            for(Fajl roditeljAktivniFajl : roditeljDokument.getAktivniFajlovi())
+            {
+                if(fajl.isNewVerzija(roditeljAktivniFajl))
+                {
+                    fajloviForDeletion.add(roditeljAktivniFajl);
+                }
+
+            }
+        }
+        roditeljDokument.getAktivniFajlovi().removeAll(fajloviForDeletion);
+        roditeljDokument.getAktivniFajlovi().addAll(aktivniFajlovi);
+        super.update(roditeljDokument);
+    }
+
     @Override
     public Dokument create(Dokument newDokument, Long userId) {
         Dokument dokument =  repository.findByIdEager(newDokument.getId()).orElseThrow(() -> new NotFoundException("Document not found"));
