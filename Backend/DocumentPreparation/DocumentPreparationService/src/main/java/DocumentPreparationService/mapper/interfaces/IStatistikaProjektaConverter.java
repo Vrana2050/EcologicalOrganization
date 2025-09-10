@@ -1,0 +1,9 @@
+package DocumentPreparationService.mapper.interfaces;
+
+import DocumentPreparationService.dto.DokumentRevizijaDto;
+import DocumentPreparationService.dto.StatistikaProjektaDto;
+import DocumentPreparationService.model.DokumentRevizija;
+import DocumentPreparationService.model.StatistikaProjekta;
+
+public interface IStatistikaProjektaConverter extends IBaseConverter<StatistikaProjekta, StatistikaProjektaDto>{
+}

@@ -1,0 +1,7 @@
+package DocumentPreparationService.service.interfaces;
+
+import DocumentPreparationService.model.DokumentRevizija;
+import DocumentPreparationService.model.StatistikaProjektnihDokumenata;
+
+public interface IStatistikaProjektnihDokumenataService extends ICrudService<StatistikaProjektnihDokumenata,Long>{
+}
