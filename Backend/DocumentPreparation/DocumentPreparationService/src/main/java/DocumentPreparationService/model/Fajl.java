@@ -58,7 +58,7 @@ public class Fajl {
         if(ekstenzija == null || ekstenzija.isEmpty()) throw new IllegalArgumentException("Invalid file extension");
         Set<String> allowedExtensions = Set.of(
                 "txt",
-                "doc", "docx",
+                "doc", "docx","pdf",
                 "jpg", "jpeg", "png", "gif", "bmp"
         );
         String lowerExt = ekstenzija.toLowerCase();

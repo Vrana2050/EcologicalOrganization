@@ -47,13 +47,12 @@ public class DokumentRevizijaService  extends CrudService<DokumentRevizija,Long>
         if(savedDokumentRevizija.getOdobreno())
         {
             newStatus.setId(dokument.getStatus().getSledeceStanje().getId());
-            dokument.setStatus(newStatus);
         }
         else {
             newStatus.setId(dokument.getStatus().getStatusNakonOdbijanja().getId());
-            dokument.setStatus(newStatus);
         }
-        Dokument savedDokument = dokumentService.update(dokument,savedDokumentRevizija.getPregledac().getKorisnikId());
+        dokument.setStatus(newStatus);
+        Dokument savedDokument = dokumentService.updateStatus(dokument,savedDokumentRevizija.getPregledac().getKorisnikId());
         obavestenjeService.creatReviewResultObavestenje(savedDokument.getDodeljeniKorisnici(),savedDokument,savedDokumentRevizija.getOdobreno());
         return savedDokumentRevizija;
     }
