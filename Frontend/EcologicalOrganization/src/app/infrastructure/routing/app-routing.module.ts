@@ -14,8 +14,8 @@ const routes: Routes = [
   {
     path: 'register',
     component: RegistrationComponent,
-    canActivate: [AuthGuard],
-    data: { roles: ['ADMIN'] },
+    // canActivate: [AuthGuard],
+    // data: { roles: ['ADMIN'] },
   },
 
   { path: 'writing-assistant', component: WritingAssistantPageComponent },
