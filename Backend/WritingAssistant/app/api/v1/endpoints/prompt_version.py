@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from app.core.container import Container
 from app.core.dependencies import get_current_user_id, require_admin
 from app.core.security import CurrentUser
-from app.schema.prompt_version_schema import CreatePromptVersion, PromptVersionOut, PromptVersionPageOut, PromptVersionQuery
+from app.schema.prompt_version_schema import CreatePromptVersion, PromptVersionOut, PatchPromptVersionPromptText, PromptVersionPageOut, PatchPromptVersionBasicInfo
 from app.services.prompt_version_service import PromptVersionService
 
 router = APIRouter(prefix="/prompt-versions")
@@ -54,3 +54,29 @@ def list_prompt_versions(
     user_id: int = Depends(get_current_user_id),
 ):
     return service.list_for_prompt(prompt_id=prompt_id, page=page, per_page=per_page)
+
+
+
+
+@router.patch("/{id}/basic-info", response_model=PromptVersionOut)
+@inject
+def patch_prompt_version_basic_info(
+    id: int,
+    payload: PatchPromptVersionBasicInfo,
+    _: CurrentUser = Depends(require_admin),
+    user_id: int = Depends(get_current_user_id),
+    service: PromptVersionService = Depends(Provide[Container.prompt_version_service]),
+):
+    return service.update_basic_info(id, payload, user_id)
+
+
+@router.patch("/{id}/prompt-text", response_model=PromptVersionOut)
+@inject
+def patch_prompt_version_prompt_text(
+    id: int,
+    payload: PatchPromptVersionPromptText,
+    _: CurrentUser = Depends(require_admin),
+    user_id: int = Depends(get_current_user_id),
+    service: PromptVersionService = Depends(Provide[Container.prompt_version_service]),
+):
+    return service.update_prompt_text(id, payload, user_id)

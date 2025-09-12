@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from app.schema.prompt_schema import CreatePrompt, PromptOut, PromptWithActiveVersionOut, PromptWithActiveVersionPageOut, PromptQuery
+from app.schema.prompt_schema import CreatePrompt, PromptOut, PromptWithActiveVersionOut, PromptWithActiveVersionPageOut, PromptQuery, PatchPromptTitle
 from app.schema.pagination_schema import PaginationMeta
 from app.schema.prompt_version_schema import PromptVersionOut
 from app.schema.document_type_schema import CreateDocumentType
@@ -109,3 +109,21 @@ class PromptService(BaseService):
 
 
         self.prompt_repo.delete_by_id(prompt_id)
+
+    def update_title(self, prompt_id: int, title: str, user_id: int) -> PromptOut:
+        prompt = self.prompt_repo.read_by_id(prompt_id)
+
+        patch = PatchPromptTitle(
+            title=title,
+            updated_at=datetime.now(timezone.utc),
+        )
+        updated = self.prompt_repo.update(prompt_id, patch)
+
+        return PromptOut(
+            id=updated.id,
+            title=updated.title,
+            document_type_id=updated.document_type_id,
+            is_active=False,  
+            created_at=updated.created_at,
+            updated_at=updated.updated_at,
+        )

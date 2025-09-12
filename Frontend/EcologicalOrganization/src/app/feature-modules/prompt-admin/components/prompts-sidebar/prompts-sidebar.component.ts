@@ -6,6 +6,7 @@ import {
   HostListener,
 } from '@angular/core';
 import { Prompt } from '../../models/prompt.model';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'pa-prompts-sidebar',

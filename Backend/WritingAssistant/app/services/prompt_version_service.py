@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from app.services.base_service import BaseService
-from app.schema.prompt_version_schema import CreatePromptVersion, PromptVersionOut, PromptVersionPageOut, PromptVersionQuery
+from app.schema.prompt_version_schema import CreatePromptVersion, PromptVersionOut, PatchPromptVersionPromptText, PromptVersionPageOut, PromptVersionQuery, PatchPromptVersionBasicInfo
 from app.schema.pagination_schema import PaginationMeta
 from app.schema.prompt_active_history_schema import CreatePromptActiveHistory
 from datetime import datetime, timezone
@@ -132,3 +132,38 @@ class PromptVersionService(BaseService):
                 )
 
             self.repo.delete_by_id(version_id)
+
+
+
+    def update_basic_info(self, version_id: int, schema: PatchPromptVersionBasicInfo, user_id: int) -> PromptVersionOut:
+        schema.updated_at = datetime.now(timezone.utc)
+
+        updated = self.repo.update(version_id, schema)
+
+        return PromptVersionOut(
+            id=updated.id,
+            prompt_id=updated.prompt_id,
+            name=updated.name,
+            description=updated.description,
+            prompt_text=updated.prompt_text,
+            is_active=False,
+            created_at=updated.created_at,
+            updated_at=updated.updated_at,
+        )
+    
+    def update_prompt_text(self, version_id: int, schema: PatchPromptVersionPromptText, user_id: int) -> PromptVersionOut:
+
+        schema.updated_at = datetime.now(timezone.utc)
+
+        updated = self.repo.update(version_id, schema)
+
+        return PromptVersionOut(
+            id=updated.id,
+            prompt_id=updated.prompt_id,
+            name=updated.name,
+            description=updated.description,
+            prompt_text=updated.prompt_text,
+            is_active=False,
+            created_at=updated.created_at,   
+            updated_at=updated.updated_at,
+        )

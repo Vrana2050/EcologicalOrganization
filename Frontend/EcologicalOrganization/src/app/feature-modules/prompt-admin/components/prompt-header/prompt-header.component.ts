@@ -7,6 +7,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { Prompt } from '../../models/prompt.model';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'pa-prompt-header',
@@ -17,7 +18,7 @@ export class PromptHeaderComponent implements OnChanges {
   @Input() prompt: Prompt | null = null;
   @Input() documentTypeName: string | null | undefined = null;
 
-  @Output() save = new EventEmitter<{ name: string }>();
+  @Output() savePrompt = new EventEmitter<{ name: string }>();
   @Output() deletePrompt = new EventEmitter<void>();
 
   nameDraft = '';
@@ -50,7 +51,7 @@ export class PromptHeaderComponent implements OnChanges {
     this.invalidName = false;
     this.editingName = false;
 
-    this.save.emit({ name: newName });
+    this.savePrompt.emit({ name: newName });
   }
 
   cancelEditName(): void {

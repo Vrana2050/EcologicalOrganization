@@ -217,4 +217,87 @@ export class PromptAdminPageComponent implements OnInit {
   }): void {
     console.log('Save as new version', ev);
   }
+
+  onSavePrompt(ev: { name: string }): void {
+    if (!this.activePrompt) return;
+
+    this.activePrompt = {
+      ...this.activePrompt,
+      title: ev.name,
+    };
+
+    this.prompts = this.prompts.map((p) =>
+      p.id === this.activePrompt!.id ? { ...p, title: ev.name } : p
+    );
+
+    this.promptService.updateTitle(this.activePrompt.id, ev.name).subscribe({
+      error: (err) => {
+        console.error('Error updating prompt title:', err);
+        alert('Nije uspelo ažuriranje naziva prompta.');
+      },
+    });
+  }
+
+  onSaveVersionBasicInfo(ev: {
+    versionId: number;
+    name: string;
+    description: string;
+  }): void {
+    if (!this.activePrompt?.activeVersion) return;
+
+    const keepText = this.activePrompt.activeVersion.promptText;
+
+    this.promptVersionService
+      .updateBasicInfo(ev.versionId, ev.name, ev.description)
+      .subscribe({
+        next: (server) => {
+          // MERGE: uzmi name/description/updatedAt sa servera, zadrži promptText koji je već u editoru
+          const merged = {
+            ...this.activePrompt!.activeVersion!,
+            name: server.name,
+            description: server.description,
+            updatedAt: server.updatedAt,
+            promptText: keepText, // <— ključni deo
+          };
+
+          this.activePrompt = { ...this.activePrompt!, activeVersion: merged };
+
+          this.versions = this.versions.map((v) =>
+            v.id === ev.versionId
+              ? {
+                  ...v,
+                  name: server.name,
+                  description: server.description,
+                  updatedAt: server.updatedAt,
+                }
+              : v
+          );
+        },
+        error: (err) => console.error('PATCH basic-info gagal', err),
+      });
+  }
+
+  onSaveVersionPromptText(ev: { versionId: number; promptText: string }): void {
+    if (!this.activePrompt?.activeVersion) return;
+
+    const keepName = this.activePrompt.activeVersion.name;
+    const keepDesc = this.activePrompt.activeVersion.description;
+
+    this.promptVersionService
+      .updatePromptText(ev.versionId, ev.promptText)
+      .subscribe({
+        next: (server) => {
+          const merged = {
+            ...this.activePrompt!.activeVersion!,
+            promptText: server.promptText,
+            updatedAt: server.updatedAt,
+            name: keepName, // <—
+            description: keepDesc, // <—
+          };
+
+          this.activePrompt = { ...this.activePrompt!, activeVersion: merged };
+        },
+        error: (err) => console.error('PATCH prompt-text gagal', err),
+      });
+  }
 }

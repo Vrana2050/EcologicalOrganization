@@ -4,7 +4,7 @@
     <pa-prompt-header
       [prompt]="prompt"
       [documentTypeName]="documentTypeName || null"
-      (save)="onHeaderSavePrompt($event)"
+      (savePrompt)="onHeaderSavePrompt($event)"
       (deletePrompt)="onHeaderDeletePrompt()"
     >
     </pa-prompt-header>
@@ -12,9 +12,10 @@
     <xp-prompt-version
       *ngIf="selectedVersion"
       [version]="selectedVersion"
-      (save)="onVersionSave($event)"
-      (setActive)="onVersionSetActive()"
-      (deletePromptVersion)="onDeletePromptVersion()"
+      (saveBasicInfo)="onSaveVersionBasicInfo($event)"
+      (savePromptText)="onSaveVersionPromptText($event)"
+      (setActive)="onSetActiveVersion($event)"
+      (deletePromptVersion)="onDeletePromptVersion($event)"
     >
     </xp-prompt-version>
   </div>

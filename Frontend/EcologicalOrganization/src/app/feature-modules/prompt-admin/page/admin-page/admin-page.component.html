@@ -23,6 +23,9 @@
         [selectedVersion]="prompt.activeVersion || null"
         (deletePrompt)="onDeletePrompt($event)"
         (deletePromptVersion)="onDeletePromptVersion($event)"
+        (savePrompt)="onSavePrompt($event)"
+        (saveVersionBasicInfo)="onSaveVersionBasicInfo($event)"
+        (saveVersionPromptText)="onSaveVersionPromptText($event)"
       ></pa-prompt-editor>
     </div>
   </main>

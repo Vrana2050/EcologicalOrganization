@@ -51,4 +51,57 @@ export class PromptVersionService {
       headers: this.headers,
     });
   }
+
+  updateBasicInfo(
+    versionId: number,
+    name: string,
+    description: string
+  ): Observable<PromptVersion> {
+    return this.http
+      .patch<any>(
+        `${this.versionsUrl}/${versionId}/basic-info`,
+        { name, description },
+        { headers: this.headers }
+      )
+      .pipe(
+        map(
+          (v): PromptVersion => ({
+            id: v.id,
+            promptId: v.prompt_id,
+            name: v.name ?? null,
+            description: v.description ?? null,
+            promptText: v.prompt_text ?? null,
+            isActive: !!v.is_active,
+            createdAt: v.created_at ?? null,
+            updatedAt: v.updated_at ?? null,
+          })
+        )
+      );
+  }
+
+  updatePromptText(
+    versionId: number,
+    promptText: string
+  ): Observable<PromptVersion> {
+    return this.http
+      .patch<any>(
+        `${this.versionsUrl}/${versionId}/prompt-text`,
+        { prompt_text: promptText },
+        { headers: this.headers }
+      )
+      .pipe(
+        map(
+          (v): PromptVersion => ({
+            id: v.id,
+            promptId: v.prompt_id,
+            name: v.name ?? null,
+            description: v.description ?? null,
+            promptText: v.prompt_text ?? null,
+            isActive: !!v.is_active,
+            createdAt: v.created_at ?? null,
+            updatedAt: v.updated_at ?? null,
+          })
+        )
+      );
+  }
 }

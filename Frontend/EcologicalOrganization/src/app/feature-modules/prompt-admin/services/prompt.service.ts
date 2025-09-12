@@ -62,4 +62,12 @@ export class PromptService {
       headers: this.headers,
     });
   }
+
+  updateTitle(id: number, title: string): Observable<void> {
+    return this.http.patch<void>(
+      `${this.promptsUrl}/${id}/title`,
+      { title },
+      { headers: this.headers }
+    );
+  }
 }

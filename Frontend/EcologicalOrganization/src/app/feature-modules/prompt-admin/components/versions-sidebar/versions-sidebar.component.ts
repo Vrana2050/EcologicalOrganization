@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { PromptVersion } from '../../models/prompt-version.model';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'pa-versions-sidebar',

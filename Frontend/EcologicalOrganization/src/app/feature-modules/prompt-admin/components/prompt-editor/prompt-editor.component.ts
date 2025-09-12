@@ -24,27 +24,29 @@ export class PromptEditorComponent implements OnChanges {
   /** (opciono) naziv tipa dokumenta za pilulu u headeru */
   @Input() documentTypeName: string | null | undefined = null;
 
-  /** Eventi prema parent komponenti */
+  /** Eventi prema parent komponenti (AdminPage) */
   @Output() savePrompt = new EventEmitter<{ name: string }>();
-  @Output() saveVersion = new EventEmitter<{
+
+  // Razdvojeni eventovi za verziju:
+  @Output() saveVersionBasicInfo = new EventEmitter<{
     versionId: number;
     name: string;
     description: string;
+  }>();
+  @Output() saveVersionPromptText = new EventEmitter<{
+    versionId: number;
     promptText: string;
   }>();
+
   @Output() setActiveVersion = new EventEmitter<number>();
   @Output() deletePrompt = new EventEmitter<number>();
   @Output() deletePromptVersion = new EventEmitter<number>();
-
-  promptTextDraft = '';
 
   loading = false;
   error?: string;
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['selectedVersion']) {
-      this.promptTextDraft = this.selectedVersion?.promptText ?? '';
-    }
+    // nothing to derive right now
   }
 
   /** --- Header handlers --- */
@@ -60,32 +62,31 @@ export class PromptEditorComponent implements OnChanges {
     this.deletePrompt.emit(this.prompt.id);
   }
 
-  onDeletePromptVersion(): void {
-    if (!this.selectedVersion) return;
-    this.deletePromptVersion.emit(this.selectedVersion.id);
-  }
-  /** --- Version handlers --- */
-  onVersionSave(ev: { name: string; description: string }): void {
-    if (!this.selectedVersion) return;
-    this.saveVersion.emit({
-      versionId: this.selectedVersion.id,
+  /** --- Version handlers (prosleđuju xp-prompt-version emitove parentu) --- */
+  onSaveVersionBasicInfo(ev: {
+    versionId: number;
+    name: string;
+    description: string;
+  }): void {
+    this.saveVersionBasicInfo.emit({
+      versionId: ev.versionId,
       name: (ev.name || '').trim(),
       description: (ev.description || '').trim(),
-      promptText: (this.promptTextDraft || '').trim(),
     });
   }
 
-  onVersionSetActive(): void {
-    if (!this.selectedVersion) return;
-    this.setActiveVersion.emit(this.selectedVersion.id);
+  onSaveVersionPromptText(ev: { versionId: number; promptText: string }): void {
+    this.saveVersionPromptText.emit({
+      versionId: ev.versionId,
+      promptText: (ev.promptText || '').trim(),
+    });
   }
 
-  onHeaderDeletePromptVersion(): void {
-    this.onHeaderDeletePrompt();
+  onSetActiveVersion(versionId: number): void {
+    this.setActiveVersion.emit(versionId);
   }
 
-  /** --- Tekst verzije --- */
-  onTextInput(val: string): void {
-    this.promptTextDraft = val;
+  onDeletePromptVersion(versionId: number): void {
+    this.deletePromptVersion.emit(versionId);
   }
 }

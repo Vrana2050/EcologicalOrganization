@@ -38,3 +38,15 @@ class PromptVersionQuery(BaseModel):
 class PromptVersionPageOut(BaseModel):
     items: list[PromptVersionOut]
     meta: PaginationMeta
+
+
+
+class PatchPromptVersionBasicInfo(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    updated_at: Optional[datetime] = None
+
+
+class PatchPromptVersionPromptText(BaseModel):
+    prompt_text: Optional[str] = None
+    updated_at: Optional[datetime] = None

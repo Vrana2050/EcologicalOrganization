@@ -48,3 +48,9 @@ class PromptWithActiveVersionPageOut(BaseModel):
     meta: PaginationMeta
 
 
+
+class PatchPromptTitle(BaseModel):
+    title: str
+    updated_at: Optional[datetime] = None
+
+
