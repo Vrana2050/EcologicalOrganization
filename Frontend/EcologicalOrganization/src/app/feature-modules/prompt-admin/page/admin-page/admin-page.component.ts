@@ -5,7 +5,6 @@ import { Prompt } from '../../models/prompt.model';
 import { PromptService } from '../../services/prompt.service';
 import { PromptVersion } from '../../models/prompt-version.model';
 import { PromptVersionService } from '../../services/prompt-version.service';
-import { finalize } from 'rxjs';
 
 @Component({
   selector: 'pa-admin-page',
@@ -18,10 +17,14 @@ export class PromptAdminPageComponent implements OnInit {
 
   activePrompt: Prompt | null = null;
 
+  versions: PromptVersion[] = [];
+  versionsLoading = false;
+
   showVersionsSidebar = false;
 
   constructor(
     private promptService: PromptService,
+    private promptVersionService: PromptVersionService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
@@ -48,9 +51,7 @@ export class PromptAdminPageComponent implements OnInit {
 
         if (!this.activePrompt && this.prompts.length > 0) {
           const active = this.prompts.find((p) => p.isActive);
-
           const toOpen = active ?? this.prompts[0] ?? '';
-
           this.openPrompt(toOpen.id);
           this.router.navigate(['/prompt-admin', toOpen.id]);
         }
@@ -62,9 +63,34 @@ export class PromptAdminPageComponent implements OnInit {
     });
   }
 
+  loadVersions(promptId: number): void {
+    this.versionsLoading = true;
+    this.promptVersionService.listVersions(promptId).subscribe({
+      next: (rows) => {
+        this.versions = rows;
+        this.versionsLoading = false;
+
+        const active = rows.find((v) => v.isActive);
+        const selected = active ?? rows[0] ?? null;
+        if (selected) {
+          this.onVersionSelected(selected);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading versions:', err);
+        this.versions = [];
+        this.versionsLoading = false;
+      },
+    });
+  }
+
   openPrompt(id: number): void {
     const found = this.prompts.find((x) => x.id === id);
     this.activePrompt = found ?? null;
+
+    if (this.activePrompt) {
+      this.loadVersions(this.activePrompt.id);
+    }
 
     this.showVersionsSidebar = !!this.activePrompt;
   }
@@ -77,7 +103,9 @@ export class PromptAdminPageComponent implements OnInit {
     this.activePrompt = p;
     this.router.navigate(['/prompt-admin', p.id]);
     this.showVersionsSidebar = true;
+    this.loadVersions(p.id);
   }
+
   onDeletePrompt(promptId: number): void {
     if (!promptId) return;
     const confirmed = window.confirm(
@@ -96,8 +124,10 @@ export class PromptAdminPageComponent implements OnInit {
           this.activePrompt = nextPrompt;
           if (nextPrompt) {
             this.router.navigate(['/prompt-admin', nextPrompt.id]);
+            this.loadVersions(nextPrompt.id);
           } else {
             this.showVersionsSidebar = false;
+            this.versions = [];
             this.router.navigate(['/prompt-admin']);
           }
         }
@@ -106,11 +136,42 @@ export class PromptAdminPageComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error deleting prompt:', err);
-
         if (err.status === 409) {
           alert('Ne možeš obrisati prompt koji u sebi ima aktivnu verziju.');
         } else {
           alert('Brisanje prompta nije uspelo. Pokušaj ponovo.');
+        }
+      },
+    });
+  }
+
+  onDeletePromptVersion(versionId: number): void {
+    if (!versionId || !this.activePrompt) return;
+    const confirmed = window.confirm(
+      'Da li sigurno želiš da obrišeš ovu verziju?'
+    );
+    if (!confirmed) return;
+
+    this.promptVersionService.delete(versionId).subscribe({
+      next: () => {
+        if (this.activePrompt?.activeVersion?.id === versionId) {
+          this.activePrompt = {
+            ...this.activePrompt,
+            activeVersion: null,
+          };
+        }
+        if (this.activePrompt) {
+          this.loadVersions(this.activePrompt.id);
+        }
+      },
+      error: (err) => {
+        console.error('Error deleting version:', err);
+        if (err.status === 409) {
+          alert(
+            'Ne možeš obrisati verziju koja je aktivna. Postavi neku drugu verziju kao aktivnu i pokušaj ponovo.'
+          );
+        } else {
+          alert('Brisanje verzije nije uspelo. Pokušaj ponovo.');
         }
       },
     });

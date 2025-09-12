@@ -9,7 +9,9 @@
   ></pa-prompts-sidebar>
 
   <pa-versions-sidebar
-    [promptId]="activePrompt?.id || null"
+    [versions]="versions"
+    [loading]="versionsLoading"
+    [selectedId]="activePrompt?.activeVersion?.id || null"
     (hide)="closeVersions()"
     (selected)="onVersionSelected($event)"
   ></pa-versions-sidebar>
@@ -20,6 +22,7 @@
         [prompt]="prompt"
         [selectedVersion]="prompt.activeVersion || null"
         (deletePrompt)="onDeletePrompt($event)"
+        (deletePromptVersion)="onDeletePromptVersion($event)"
       ></pa-prompt-editor>
     </div>
   </main>

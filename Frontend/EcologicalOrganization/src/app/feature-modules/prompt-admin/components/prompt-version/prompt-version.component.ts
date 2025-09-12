@@ -34,7 +34,7 @@ export class PromptVersionComponent implements OnChanges {
   }>();
 
   @Output() setActive = new EventEmitter<number>();
-  @Output() deletePrompt = new EventEmitter<void>();
+  @Output() deletePromptVersion = new EventEmitter<number>();
 
   /** Draftovi input polja */
   nameDraft = '';
@@ -72,7 +72,8 @@ export class PromptVersionComponent implements OnChanges {
     this.setActive.emit(this.version.id);
   }
 
-  onDeletePrompt(): void {
-    this.deletePrompt.emit();
+  onDeletePromptVersion(): void {
+    if (!this.version) return;
+    this.deletePromptVersion.emit(this.version.id);
   }
 }

@@ -45,4 +45,10 @@ export class PromptVersionService {
         )
       );
   }
+
+  delete(versionId: number): Observable<void> {
+    return this.http.delete<void>(`${this.versionsUrl}/${versionId}`, {
+      headers: this.headers,
+    });
+  }
 }

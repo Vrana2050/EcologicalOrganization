@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from app.repository.prompt_version_repository import PromptVersionRepository
 from app.repository.prompt_repository import PromptRepository
 from app.repository.prompt_active_history_repository import PromptActiveHistoryRepository
+from app.core.exceptions import ConflictError
 
 from app.model.prompt_version import PromptVersion
 
@@ -115,3 +116,19 @@ class PromptVersionService(BaseService):
                     total_count=result["search_options"]["total_count"],
                 ),
             )
+    
+
+    def remove_by_id(self, version_id: int) -> None:
+            version = self.repo.read_by_id(version_id, eagers=[PromptVersion.prompt])
+
+
+            active = self.pah_repo.get_active_prompt_version(version.prompt.document_type_id)
+
+        
+            if active.id == version.id:
+                raise ConflictError(
+                    detail="Ne možeš obrisati aktivnu verziju. "
+                        "Postavi neku drugu verziju kao aktivnu i pokušaj ponovo."
+                )
+
+            self.repo.delete_by_id(version_id)

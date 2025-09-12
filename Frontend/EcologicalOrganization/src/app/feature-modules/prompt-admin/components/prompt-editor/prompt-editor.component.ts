@@ -34,6 +34,7 @@ export class PromptEditorComponent implements OnChanges {
   }>();
   @Output() setActiveVersion = new EventEmitter<number>();
   @Output() deletePrompt = new EventEmitter<number>();
+  @Output() deletePromptVersion = new EventEmitter<number>();
 
   promptTextDraft = '';
 
@@ -59,6 +60,10 @@ export class PromptEditorComponent implements OnChanges {
     this.deletePrompt.emit(this.prompt.id);
   }
 
+  onDeletePromptVersion(): void {
+    if (!this.selectedVersion) return;
+    this.deletePromptVersion.emit(this.selectedVersion.id);
+  }
   /** --- Version handlers --- */
   onVersionSave(ev: { name: string; description: string }): void {
     if (!this.selectedVersion) return;
