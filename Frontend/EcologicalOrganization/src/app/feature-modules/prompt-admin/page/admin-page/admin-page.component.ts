@@ -5,6 +5,7 @@ import { Prompt } from '../../models/prompt.model';
 import { PromptService } from '../../services/prompt.service';
 import { PromptVersion } from '../../models/prompt-version.model';
 import { PromptVersionService } from '../../services/prompt-version.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'pa-admin-page',
@@ -78,7 +79,41 @@ export class PromptAdminPageComponent implements OnInit {
     this.showVersionsSidebar = true;
   }
   onDeletePrompt(promptId: number): void {
-    console.log('TODO: delete prompt', promptId);
+    if (!promptId) return;
+    const confirmed = window.confirm(
+      'Da li sigurno želiš da obrišeš ovaj prompt?'
+    );
+    if (!confirmed) return;
+
+    this.promptService.delete(promptId).subscribe({
+      next: () => {
+        this.loading = true;
+
+        this.prompts = this.prompts.filter((p) => p.id !== promptId);
+
+        if (this.activePrompt?.id === promptId) {
+          const nextPrompt = this.prompts[0] ?? null;
+          this.activePrompt = nextPrompt;
+          if (nextPrompt) {
+            this.router.navigate(['/prompt-admin', nextPrompt.id]);
+          } else {
+            this.showVersionsSidebar = false;
+            this.router.navigate(['/prompt-admin']);
+          }
+        }
+
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error deleting prompt:', err);
+
+        if (err.status === 409) {
+          alert('Ne možeš obrisati prompt koji u sebi ima aktivnu verziju.');
+        } else {
+          alert('Brisanje prompta nije uspelo. Pokušaj ponovo.');
+        }
+      },
+    });
   }
 
   openVersions(): void {

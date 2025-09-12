@@ -8,7 +8,8 @@ from app.repository.document_type_repository import DocumentTypeRepository
 from app.repository.prompt_active_history_repository import PromptActiveHistoryRepository
 from app.model.document_type import DocumentType
 from app.services.base_service import BaseService
-
+from app.model.prompt import Prompt
+from app.core.exceptions import ConflictError
 
 class PromptService(BaseService):
     def __init__(
@@ -92,3 +93,19 @@ class PromptService(BaseService):
                 total_count=result["search_options"]["total_count"],
             ),
         )
+
+
+    def remove(self, prompt_id: int) -> None:
+        prompt = self.prompt_repo.read_by_id(prompt_id, eagers=[Prompt.prompt_version])
+
+        active_version = self.pah_repository.get_active_prompt_version(prompt.document_type_id)
+
+
+        if active_version and any(pv.id == active_version.id for pv in prompt.prompt_version):
+            raise ConflictError(
+                detail="Ne možeš obrisati prompt dok je neka njegova verzija aktivna. "
+                       "Postavi drugi prompt kao aktivan i pokušaj ponovo."
+            )
+
+
+        self.prompt_repo.delete_by_id(prompt_id)
