@@ -1,32 +1,73 @@
 <section class="wa-card">
   <div class="wa-header-top">
-    <div class="wa-title-wrap">
-      <ng-container *ngIf="!editingTitle; else editTpl">
-        <h2 class="wa-title">{{ title }}</h2>
-        <button class="wa-btn icon small" (click)="startEdit()">✎</button>
-      </ng-container>
+    <div class="wa-header-left">
+      <!-- Naslov -->
+      <div class="wa-title-wrap">
+        <ng-container *ngIf="!editingTitle; else editTpl">
+          <h2 class="wa-title">{{ title }}</h2>
+          <button
+            class="wa-btn icon small"
+            (click)="startEdit()"
+            aria-label="Uredi naslov"
+          >
+            ✎
+          </button>
+        </ng-container>
 
-      <ng-template #editTpl>
-        <div class="wa-edit-wrap">
-          <input
-            class="wa-input small"
-            type="text"
-            [(ngModel)]="titleDraft"
-            (keyup.enter)="trySave()"
-            (blur)="trySave()"
-            [class.invalid]="invalidTitle"
-          />
-          <button class="wa-btn small" (click)="trySave()">✔</button>
-          <button class="wa-btn danger small" (click)="cancelEdit()">✕</button>
-        </div>
-      </ng-template>
+        <ng-template #editTpl>
+          <div class="wa-edit-wrap">
+            <input
+              class="wa-input small"
+              type="text"
+              [(ngModel)]="titleDraft"
+              (keyup.enter)="trySave()"
+              (blur)="trySave()"
+              [class.invalid]="invalidTitle"
+              placeholder="Unesi naslov…"
+            />
+            <button class="wa-btn small" (click)="trySave()">✔</button>
+            <button class="wa-btn danger small" (click)="cancelEdit()">
+              ✕
+            </button>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Combobox uvek postoji -->
+      <div class="wa-doc-type">
+        <label class="wa-label" for="docTypeSelect">Tip dokumenta</label>
+        <select
+          id="docTypeSelect"
+          class="wa-input small"
+          [disabled]="!documentTypes?.length"
+          [ngModel]="documentTypeId"
+          (ngModelChange)="onDocTypeChanged($event)"
+        >
+          <!-- Prazna opcija za Default -->
+          <option *ngFor="let dt of documentTypes" [value]="dt.id">
+            {{ dt.name === "Default" ? "" : dt.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Opis samo ako nije Default -->
+  <div
+    class="wa-doc-desc"
+    *ngIf="selectedDocType && selectedDocType.name !== 'Default'"
+  >
+    <strong>{{ selectedDocType.name }}</strong>
+    <div class="wa-doc-desc-text" [title]="selectedDocType.description || ''">
+      {{ selectedDocType.description || "—" }}
     </div>
   </div>
 
   <div class="wa-stack">
     <div>
-      <label class="wa-label">Globalne instrukcije</label>
+      <label class="wa-label" for="giTextarea">Globalne instrukcije</label>
       <textarea
+        id="giTextarea"
         class="wa-input"
         [ngModel]="globalInstruction"
         (ngModelChange)="onGlobalInstructionInput($event)"

@@ -13,6 +13,7 @@ import {
 } from '../../models/session-section.model';
 import { ChatSessionService } from '../../services/chat-session.service';
 import { SessionSectionService } from '../../services/session-section.service';
+import { DocumentType } from 'src/app/feature-modules/prompt-admin/models/document-type.model';
 
 @Component({
   selector: 'wa-session-editor',
@@ -24,11 +25,22 @@ import { SessionSectionService } from '../../services/session-section.service';
 })
 export class SessionEditorComponent implements OnChanges {
   @Input() session?: ChatSession;
+  @Input() documentTypes: DocumentType[] = [];
 
   @Output() sessionTitleChanged = new EventEmitter<{
     id: number;
     title: string;
   }>();
+
+  @Output() documentTypeChanged = new EventEmitter<{
+    id: number;
+    documentTypeId: number;
+  }>();
+
+  onHeaderDocTypeChange(documentTypeId: number) {
+    if (!this.session) return;
+    this.documentTypeChanged.emit({ id: this.session.id, documentTypeId });
+  }
 
   loading = false;
   error?: string;

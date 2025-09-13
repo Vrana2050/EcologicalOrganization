@@ -75,16 +75,16 @@ class SectionIterationService(BaseService):
     ) -> tuple[SessionSection, ChatSession, int]:
         section = self._sec_repo.read_by_id(section_id)
         session = self._sess_repo.read_by_id(
-            section.session_id, eagers=[ChatSession.template]
+            section.session_id
         )
 
         if int(session.created_by) != int(user_id):
             raise AuthError(detail="Forbidden")
 
-        if not session.template or session.template.document_type_id is None:
+        if session.document_type_id is None:
             raise NotFoundError(detail="Session missing document type")
 
-        return section, session, int(session.template.document_type_id)
+        return section, session, int(session.document_type_id)
 
     def get_by_seq(self, section_id: int, seq_no: int, user_id: int):
         section = self._sec_repo.read_by_id(section_id, eagers=[SessionSection.session])

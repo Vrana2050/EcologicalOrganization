@@ -5,7 +5,7 @@ from app.schema.session_overview_schema import SessionOverviewOut
 
 from app.core.container import Container
 from app.core.dependencies import get_current_user_id
-from app.schema.chat_session_schema import CreateChatSession, ChatSessionOut, ChatSessionPageOut, ChatSessionQuery, PatchChatSessionTitle
+from app.schema.chat_session_schema import CreateChatSession, ChatSessionOut, ChatSessionPageOut, PatchChatSessionDocumentType, PatchChatSessionTitle
 from app.services.chat_session_service import ChatSessionService
 from app.services.session_section_service import SessionSectionService
 from app.core.middleware import inject  
@@ -64,3 +64,14 @@ def delete_chat_session(
 ):
     service.remove_by_id(chat_session_id, user_id)
     return
+
+
+@router.patch("/{chat_session_id}/document-type", response_model=ChatSessionOut)
+@inject
+def patch_chat_session_document_type(
+    chat_session_id: int,
+    payload: PatchChatSessionDocumentType,
+    user_id: int = Depends(get_current_user_id),
+    service: ChatSessionService = Depends(Provide[Container.chat_session_service]),
+):
+    return service.update_document_type(chat_session_id, payload.document_type_id, user_id)

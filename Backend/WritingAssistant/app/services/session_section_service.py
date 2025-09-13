@@ -53,6 +53,7 @@ class SessionSectionService(BaseService):
         gi_text = gi.text_ if gi and getattr(gi, "text_", None) else ""
 
         title = session_obj.title
+        document_type_id = session_obj.document_type_id
 
         out_sections: List[SessionSectionWithLatestOut] = []
         for sec in sections:
@@ -85,6 +86,7 @@ class SessionSectionService(BaseService):
             )
 
         return SessionOverviewOut(
+            document_type_id=document_type_id,
             title=title,
             latest_global_instruction_text=gi_text,
             sections=out_sections,

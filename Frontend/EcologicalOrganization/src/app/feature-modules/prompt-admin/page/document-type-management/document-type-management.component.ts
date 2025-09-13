@@ -107,8 +107,8 @@ export class DocumentTypeManagementComponent implements OnInit {
 
   autoGrow(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
-    textarea.style.height = 'auto'; // reset
-    textarea.style.height = textarea.scrollHeight + 'px'; // nova visina
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
   }
 
   startEdit(item: DocumentType): void {
@@ -131,7 +131,7 @@ export class DocumentTypeManagementComponent implements OnInit {
   }
 
   addNew(): void {
-    const tempId = -Date.now(); // privremeni negativan ID
+    const tempId = -Date.now();
     const newItem: DocumentType = {
       id: tempId,
       name: '',
@@ -140,7 +140,7 @@ export class DocumentTypeManagementComponent implements OnInit {
       createdAt: undefined,
       updatedAt: undefined,
     };
-    // ubaci ga na početak niza
+
     this.items = [newItem, ...this.items];
     this.editingId = tempId;
     this.nameDraft = '';

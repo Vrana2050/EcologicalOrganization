@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { DocumentType } from 'src/app/feature-modules/prompt-admin/models/document-type.model';
 
 @Component({
   selector: 'wa-session-header',
@@ -9,12 +10,15 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   ],
 })
 export class SessionHeaderComponent {
-  @Output() addSection = new EventEmitter<void>();
   @Output() saveTitle = new EventEmitter<string>();
+  @Output() addSection = new EventEmitter<void>();
   @Output() globalInstructionChange = new EventEmitter<string>();
+  @Output() documentTypeChange = new EventEmitter<number>();
 
-  @Input() title = 'Dokument';
+  @Input() title = '';
   @Input() globalInstruction = '';
+  @Input() documentTypes: DocumentType[] = [];
+  @Input() documentTypeId: number | null = null;
 
   editingTitle = false;
   titleDraft = '';
@@ -37,6 +41,15 @@ export class SessionHeaderComponent {
     this.editingTitle = false;
   }
 
+  get selectedDocType(): DocumentType | null {
+    return this.documentTypes.find((d) => d.id === this.documentTypeId) ?? null;
+  }
+
+  onDocTypeChanged(val: string | number) {
+    const id = +val;
+    this.documentTypeChange.emit(id);
+  }
+
   cancelEdit() {
     this.editingTitle = false;
     this.invalidTitle = false;
@@ -45,5 +58,10 @@ export class SessionHeaderComponent {
 
   onGlobalInstructionInput(val: string) {
     this.globalInstructionChange.emit(val);
+  }
+
+  // Možeš dodatno olakšati proveru
+  get isDefaultDocType(): boolean {
+    return this.selectedDocType?.name === 'Default';
   }
 }

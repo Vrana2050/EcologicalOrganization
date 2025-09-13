@@ -3,9 +3,12 @@
     <wa-session-header
       [title]="overview?.title || session?.title || ''"
       [globalInstruction]="overview?.latestGlobalInstructionText || ''"
+      [documentTypes]="documentTypes"
+      [documentTypeId]="session?.documentTypeId || null"
       (saveTitle)="onSaveSessionTitle($event)"
       (addSection)="onAddSection()"
       (globalInstructionChange)="onGlobalInstructionChange($event)"
+      (documentTypeChange)="onHeaderDocTypeChange($event)"
     >
     </wa-session-header>
 

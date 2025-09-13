@@ -25,7 +25,9 @@
       <wa-session-editor
         *ngIf="activeSession"
         [session]="activeSession"
+        [documentTypes]="documentTypes"
         (sessionTitleChanged)="onSessionTitleChanged($event)"
+        (documentTypeChanged)="onSessionDocTypeChanged($event)"
       >
       </wa-session-editor>
     </div>

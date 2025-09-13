@@ -1,6 +1,7 @@
 export interface ChatSession {
   id: number;
   templateId: number;
+  documentTypeId: number;
   createdBy: number;
   title?: string;
   updatedAt?: string;

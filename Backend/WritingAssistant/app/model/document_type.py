@@ -23,4 +23,4 @@ class DocumentType(Base):
 
     prompt: Mapped[list['Prompt']] = relationship('Prompt', back_populates='document_type')
     template: Mapped[list['Template']] = relationship('Template', back_populates='document_type')
-
+    chat_session: Mapped[list['ChatSession']] = relationship('ChatSession', back_populates='document_type')  # NEW

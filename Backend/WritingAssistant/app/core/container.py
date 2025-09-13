@@ -58,7 +58,10 @@ class Container(containers.DeclarativeContainer):
     chat_session_service = providers.Factory(
         ChatSessionService,
         repository=chat_session_repository,
+        template_repository=template_repository,
+        document_type_repository=document_type_repository,
     )
+
 
     session_section_service = providers.Factory(
         SessionSectionService,
@@ -89,7 +92,7 @@ class Container(containers.DeclarativeContainer):
         exec_repo=prompt_execution_repository,
         out_repo=model_output_repository,
         llm_service=providers.Singleton(LLMService),
-        dt_service=document_type_service,   
+        doc_type_service=document_type_service,   
     )
 
     prompt_service = providers.Factory(

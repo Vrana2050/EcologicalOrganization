@@ -6,6 +6,7 @@ from app.repository.document_type_repository import DocumentTypeRepository
 from app.model.document_type import DocumentType
 from app.model.prompt import Prompt
 from app.model.template import Template
+from app.model.chat_session import ChatSession
 
 from app.schema.document_type_schema import (
     CreateDocumentType,
@@ -35,8 +36,8 @@ class DocumentTypeService(BaseService):
                 .count()
             )
             template_cnt = (
-                s.query(Template)
-                .filter(Template.document_type_id == id, Template.deleted == 0)
+                s.query(ChatSession)
+                .filter(ChatSession.document_type_id == id, ChatSession.deleted == 0)
                 .count()
             )
             return (prompt_cnt + template_cnt) > 0

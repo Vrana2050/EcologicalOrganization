@@ -29,10 +29,11 @@ export class ChatSessionService {
       .pipe(
         map(
           (raw): ChatSessionPage => ({
-            items: raw.items.map(
+            items: (raw.items || []).map(
               (it: any): ChatSession => ({
                 id: it.id,
                 templateId: it.template_id,
+                documentTypeId: it.document_type_id ?? null, // ⬅️ dodato
                 createdBy: it.created_by,
                 title: it.title,
                 updatedAt: it.updated_at,
@@ -59,6 +60,7 @@ export class ChatSessionService {
           (raw): ChatSession => ({
             id: raw.id,
             templateId: raw.template_id,
+            documentTypeId: raw.document_type_id ?? null, // ⬅️ dodato
             createdBy: raw.created_by,
             title: raw.title,
             updatedAt: raw.updated_at,
@@ -85,12 +87,28 @@ export class ChatSessionService {
           (raw): ChatSession => ({
             id: raw.id,
             templateId: raw.template_id,
+            documentTypeId: raw.document_type_id ?? null,
             createdBy: raw.created_by,
             title: raw.title,
             updatedAt: raw.updated_at,
           })
         )
       );
+  }
+
+  /** PATCH /chat-session/:id/document-type */
+  patchDocumentType(
+    sessionId: number,
+    documentTypeId: number
+  ): Observable<void> {
+    return this.http.patch<void>(
+      `${this.baseUrl}/${sessionId}/document-type`,
+      {
+        document_type_id: documentTypeId,
+        updated_at: new Date().toISOString(),
+      },
+      { headers: this.headers }
+    );
   }
 
   getOverview(sessionId: number): Observable<SessionOverview> {
@@ -101,6 +119,7 @@ export class ChatSessionService {
       .pipe(
         map(
           (raw): SessionOverview => ({
+            documentTypeId: raw.document_type_id,
             title: raw.title,
             latestGlobalInstructionText:
               raw.latest_global_instruction_text ?? '',
@@ -118,7 +137,8 @@ export class ChatSessionService {
                       sectionInstruction: x.latest_iteration.section_instruction
                         ? {
                             id: x.latest_iteration.section_instruction.id,
-                            text: x.latest_iteration.section_instruction.text_,
+                            text: x.latest_iteration.section_instruction
+                              .text_ /* ili .text */,
                             createdAt:
                               x.latest_iteration.section_instruction
                                 .created_at ?? null,
@@ -141,6 +161,7 @@ export class ChatSessionService {
         catchError((err) => {
           this.router.navigate(['/writing-assistant']);
           return of({
+            documentTypeId: 0,
             title: '',
             latestGlobalInstructionText: '',
             sections: [],

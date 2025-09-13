@@ -9,6 +9,7 @@ from app.schema.pagination_schema import PaginationMeta
 class CreateChatSession(BaseModel):
     template_id: int
     created_by: Optional[int] = None
+    document_type_id: Optional[int] = None
     deleted: Optional[int] = 0
     title: Optional[str] = None
     created_at: Optional[datetime] = None
@@ -21,6 +22,7 @@ class ChatSessionOut(BaseModel):
     created_by: int
     title: Optional[str]
     updated_at: Optional[datetime]
+    document_type_id: int 
 
     class Config:
         from_attributes = True  
@@ -45,5 +47,9 @@ class PatchChatSessionTitle(BaseModel):
     title: str = Field(..., min_length=1, max_length=255)
     updated_at: Optional[datetime] = None
 
+
+class PatchChatSessionDocumentType(BaseModel):
+    document_type_id: int
+    updated_at: datetime
 
 

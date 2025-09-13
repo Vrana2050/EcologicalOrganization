@@ -4,6 +4,8 @@ import { map, filter, distinctUntilChanged } from 'rxjs/operators';
 import { ChatSession } from '../../models/chat-session.model';
 import { ChatSessionService } from '../../services/chat-session.service';
 import { SessionOverview } from '../../models/session-section.model';
+import { DocumentTypeService } from 'src/app/feature-modules/prompt-admin/services/document-type.service';
+import { DocumentType } from 'src/app/feature-modules/prompt-admin/models/document-type.model';
 
 @Component({
   selector: 'xp-writing-assistant-page',
@@ -12,6 +14,7 @@ import { SessionOverview } from '../../models/session-section.model';
 })
 export class WritingAssistantPageComponent implements OnInit {
   conversations: ChatSession[] = [];
+  documentTypes: DocumentType[] = [];
   loading = true;
 
   showTemplatesSidebar = false;
@@ -20,12 +23,14 @@ export class WritingAssistantPageComponent implements OnInit {
 
   constructor(
     private chatSessionService: ChatSessionService,
+    private documentTypeService: DocumentTypeService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadConversations();
+    this.loadDocumentTypes();
 
     this.route.paramMap
       .pipe(
@@ -49,6 +54,35 @@ export class WritingAssistantPageComponent implements OnInit {
         this.loading = false;
       },
     });
+  }
+
+  loadDocumentTypes(): void {
+    this.documentTypeService.list().subscribe({
+      next: (page) => {
+        this.documentTypes = page.items;
+      },
+      error: (err) => {
+        console.error('Error loading document types:', err);
+      },
+    });
+  }
+
+  onDocTypeChanged(newId: number) {
+    if (!this.activeSession) return;
+
+    const prev = this.activeSession.documentTypeId;
+    this.activeSession = { ...this.activeSession, documentTypeId: +newId };
+
+    this.chatSessionService
+      .patchDocumentType(this.activeSession.id, +newId)
+      .subscribe({
+        next: () => {},
+        error: (err) => {
+          console.error('Error patching document type:', err);
+
+          this.activeSession = { ...this.activeSession!, documentTypeId: prev };
+        },
+      });
   }
 
   openTemplates(): void {
@@ -78,6 +112,7 @@ export class WritingAssistantPageComponent implements OnInit {
       id,
       templateId: 0,
       createdBy: 0,
+      documentTypeId: 0,
       title: '',
       updatedAt: undefined,
     };
@@ -87,7 +122,16 @@ export class WritingAssistantPageComponent implements OnInit {
 
   private loadOverview(sessionId: number): void {
     this.chatSessionService.getOverview(sessionId).subscribe({
-      next: (rows) => (this.sessionOverview = rows),
+      next: (rows) => {
+        this.sessionOverview = rows;
+
+        if (this.activeSession) {
+          this.activeSession = {
+            ...this.activeSession,
+            documentTypeId: rows.documentTypeId,
+          };
+        }
+      },
       error: (err) =>
         console.error('Error loading session overview for', sessionId, err),
     });
@@ -104,6 +148,26 @@ export class WritingAssistantPageComponent implements OnInit {
     if (this.activeSession?.id === ev.id) {
       this.activeSession = { ...this.activeSession, title: ev.title };
     }
+  }
+
+  onSessionDocTypeChanged(ev: { id: number; documentTypeId: number }) {
+    if (!this.activeSession) return;
+
+    const prev = this.activeSession.documentTypeId;
+    this.activeSession = {
+      ...this.activeSession,
+      documentTypeId: ev.documentTypeId,
+    };
+
+    this.chatSessionService
+      .patchDocumentType(ev.id, ev.documentTypeId)
+      .subscribe({
+        next: () => {},
+        error: (err) => {
+          console.error('Error updating document type:', err);
+          this.activeSession = { ...this.activeSession!, documentTypeId: prev };
+        },
+      });
   }
 
   onDeleteConversation(c: ChatSession): void {
