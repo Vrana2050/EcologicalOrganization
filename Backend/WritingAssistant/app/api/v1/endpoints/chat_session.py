@@ -10,7 +10,7 @@ from app.services.chat_session_service import ChatSessionService
 from app.services.session_section_service import SessionSectionService
 from app.core.middleware import inject  
 
-router = APIRouter(prefix="/chat-session")
+router = APIRouter(prefix="/chat-session", tags=["chat-sessions"])
 
 @router.post("", response_model=ChatSessionOut)
 @inject

@@ -1,0 +1,122 @@
+<div class="doc-type-container">
+  <div class="header-row">
+    <h2 class="doc-type-title">Upravljanje tipovima dokumenata</h2>
+    <button class="wa-btn small primary" (click)="addNew()">
+      + Dodaj novi tip dokumenta
+    </button>
+  </div>
+
+  <table *ngIf="!loading; else loadingTpl" class="wa-table">
+    <colgroup>
+      <col style="width: 30%" />
+      <col style="width: 40%" />
+      <col style="width: 20%" />
+      <col style="width: 10%" />
+    </colgroup>
+    <thead>
+      <tr>
+        <th (click)="sortBy('name')">
+          Naziv
+          <span
+            class="sort-indicator"
+            [class.active]="ordering.includes('name')"
+          >
+            {{ ordering === "name" ? "▲" : ordering === "-name" ? "▼" : "" }}
+          </span>
+        </th>
+        <th (click)="sortBy('description')">
+          Opis
+          <span
+            class="sort-indicator"
+            [class.active]="ordering.includes('description')"
+          >
+            {{
+              ordering === "description"
+                ? "▲"
+                : ordering === "-description"
+                ? "▼"
+                : ""
+            }}
+          </span>
+        </th>
+        <th (click)="sortBy('updated_at')">
+          Ažurirano
+          <span
+            class="sort-indicator"
+            [class.active]="ordering.includes('updated_at')"
+          >
+            {{
+              ordering === "updated_at"
+                ? "▲"
+                : ordering === "-updated_at"
+                ? "▼"
+                : ""
+            }}
+          </span>
+        </th>
+        <th>Akcije</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let dt of items">
+        <!-- VIEW MODE -->
+        <ng-container *ngIf="editingId !== dt.id; else editRowTpl">
+          <td>{{ dt.name }}</td>
+          <td class="description-cell">{{ dt.description }}</td>
+          <td>{{ dt.updatedAt | date : "short" }}</td>
+          <td class="actions-cell">
+            <div class="actions-wrap" *ngIf="!isDefault(dt)">
+              <button class="wa-btn small icon" (click)="startEdit(dt)">
+                ✎
+              </button>
+              <button class="wa-btn small danger icon" (click)="delete(dt.id)">
+                🗑
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- EDIT MODE -->
+        <ng-template #editRowTpl>
+          <td>
+            <div class="wa-edit-wrap full">
+              <input
+                class="wa-input"
+                type="text"
+                [(ngModel)]="nameDraft"
+                placeholder="Naziv"
+              />
+            </div>
+          </td>
+          <td>
+            <div class="wa-edit-wrap full">
+              <textarea
+                #descArea
+                class="wa-input"
+                [(ngModel)]="descDraft"
+                placeholder="Opis"
+                (input)="autoGrow($event)"
+              ></textarea>
+            </div>
+          </td>
+          <td>{{ dt.updatedAt | date : "short" }}</td>
+          <td class="actions-cell">
+            <div class="actions-wrap" *ngIf="!isDefault(dt)">
+              <button class="wa-btn small primary" (click)="saveEdit(dt.id)">
+                ✔
+              </button>
+              <button class="wa-btn small danger" (click)="cancelEdit()">
+                ✕
+              </button>
+            </div>
+          </td>
+        </ng-template>
+      </tr>
+    </tbody>
+  </table>
+
+  <ng-template #loadingTpl>
+    <div class="loading">Učitavanje...</div>
+  </ng-template>
+</div>

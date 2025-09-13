@@ -8,7 +8,7 @@ from app.services.session_section_service import SessionSectionService
 from app.services.section_iteration_service import SectionIterationService
 from app.schema.section_iteration_schema import SectionIterationOut, GenerateIterationIn
 
-router = APIRouter(prefix="/session-section")
+router = APIRouter(prefix="/session-section", tags=["session-sections"])
 
 
 @router.post("", response_model=SessionSectionOut)

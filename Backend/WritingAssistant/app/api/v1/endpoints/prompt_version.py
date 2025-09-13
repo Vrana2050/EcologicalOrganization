@@ -7,7 +7,7 @@ from app.core.security import CurrentUser
 from app.schema.prompt_version_schema import CreatePromptVersion, PromptVersionOut, PatchPromptVersionPromptText, PromptVersionPageOut, PatchPromptVersionBasicInfo
 from app.services.prompt_version_service import PromptVersionService
 
-router = APIRouter(prefix="/prompt-versions")
+router = APIRouter(prefix="/prompt-versions", tags=["prompt-versions"])
 
 
 @router.post("", response_model=PromptVersionOut)

@@ -1,6 +1,5 @@
 <div class="wa-editor">
   <div class="wa-editor-inner" *ngIf="!loading && !error; else stateTpl">
-    <!-- Header sa podacima o promptu -->
     <pa-prompt-header
       [prompt]="prompt"
       [documentTypeName]="documentTypeName || null"

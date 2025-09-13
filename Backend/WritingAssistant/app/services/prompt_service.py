@@ -1,41 +1,38 @@
 from datetime import datetime, timezone
-from app.schema.prompt_schema import CreatePrompt, PromptOut, PromptWithActiveVersionOut, PromptWithActiveVersionPageOut, PromptQuery, PatchPromptTitle
+from app.schema.prompt_schema import (
+    CreatePrompt, PromptOut, PromptWithActiveVersionOut, 
+    PromptWithActiveVersionPageOut, PromptQuery, PatchPromptTitle
+)
 from app.schema.pagination_schema import PaginationMeta
 from app.schema.prompt_version_schema import PromptVersionOut
-from app.schema.document_type_schema import CreateDocumentType
 from app.repository.prompt_repository import PromptRepository
-from app.repository.document_type_repository import DocumentTypeRepository
 from app.repository.prompt_active_history_repository import PromptActiveHistoryRepository
-from app.model.document_type import DocumentType
 from app.services.base_service import BaseService
+from app.services.document_type_service import DocumentTypeService
 from app.model.prompt import Prompt
 from app.core.exceptions import ConflictError
+
 
 class PromptService(BaseService):
     def __init__(
         self,
         repository: PromptRepository,
-        doc_type_repo: DocumentTypeRepository,
-        pah_repository: PromptActiveHistoryRepository,  
+        doc_type_service: DocumentTypeService,
+        pah_repository: PromptActiveHistoryRepository,
     ):
         super().__init__(repository)
         self.prompt_repo = repository
-        self.doc_type_repo = doc_type_repo
-        self.pah_repository = pah_repository            
+        self.doc_type_service = doc_type_service
+        self.pah_repository = pah_repository
 
     def add(self, schema: CreatePrompt, user_id: int) -> PromptOut:
-        doc_type: DocumentType = self.doc_type_repo.get_by_name(schema.document_type_name)
-        if not doc_type:
-            create_schema = CreateDocumentType(name=schema.document_type_name)
-            doc_type = self.doc_type_repo.create(create_schema)
+        self.doc_type_service.get(schema.document_type_id)
 
         now = datetime.now(timezone.utc)
-
         schema.created_by = user_id
         schema.created_at = now
         schema.updated_at = now
         schema.deleted = 0
-        schema.document_type_id = doc_type.id  
 
         prompt = self.prompt_repo.create_prompt(schema)
 
@@ -94,19 +91,15 @@ class PromptService(BaseService):
             ),
         )
 
-
     def remove(self, prompt_id: int) -> None:
         prompt = self.prompt_repo.read_by_id(prompt_id, eagers=[Prompt.prompt_version])
-
         active_version = self.pah_repository.get_active_prompt_version(prompt.document_type_id)
-
 
         if active_version and any(pv.id == active_version.id for pv in prompt.prompt_version):
             raise ConflictError(
                 detail="Ne možeš obrisati prompt dok je neka njegova verzija aktivna. "
                        "Postavi drugi prompt kao aktivan i pokušaj ponovo."
             )
-
 
         self.prompt_repo.delete_by_id(prompt_id)
 

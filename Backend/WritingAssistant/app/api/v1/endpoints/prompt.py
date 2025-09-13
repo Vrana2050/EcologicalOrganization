@@ -10,7 +10,7 @@ from app.schema.prompt_schema import CreatePrompt, PromptOut, PromptWithActiveVe
 from app.services.prompt_service import PromptService
 
 
-router = APIRouter(prefix="/prompts")
+router = APIRouter(prefix="/prompts", tags=["prompts"])
 
 
 @router.post("", response_model=PromptOut)

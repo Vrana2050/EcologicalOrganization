@@ -7,6 +7,7 @@ import { PromptHeaderComponent } from './components/prompt-header/prompt-header.
 import { PromptEditorComponent } from './components/prompt-editor/prompt-editor.component';
 import { PromptVersionComponent } from './components/prompt-version/prompt-version.component';
 import { FormsModule } from '@angular/forms';
+import { DocumentTypeManagementComponent } from './page/document-type-management/document-type-management.component';
 
 @NgModule({
   declarations: [
@@ -16,6 +17,7 @@ import { FormsModule } from '@angular/forms';
     PromptHeaderComponent,
     PromptEditorComponent,
     PromptVersionComponent,
+    DocumentTypeManagementComponent,
   ],
   imports: [CommonModule, FormsModule],
 })

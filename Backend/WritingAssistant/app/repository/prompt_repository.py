@@ -33,8 +33,7 @@ class PromptRepository(BaseRepository):
                     detail="Prompt with same title already exists for this document type"
                 )
 
-            data = schema.dict(exclude={"document_type_name"})  
-            obj = Prompt(**data)
+            obj = Prompt(**schema.dict())   
             s.add(obj)
             s.commit()
             s.refresh(obj)

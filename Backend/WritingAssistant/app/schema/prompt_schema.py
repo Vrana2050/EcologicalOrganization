@@ -7,13 +7,11 @@ from app.schema.pagination_schema import PaginationMeta
 
 class CreatePrompt(BaseModel):
     title: str
-    document_type_name: str
-    document_type_id: Optional[int] = None
+    document_type_id: int             
     created_by: Optional[int] = None
     deleted: int = 0
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
-
 
 class PromptOut(BaseModel):
     id: int

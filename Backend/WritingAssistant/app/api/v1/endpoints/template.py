@@ -6,7 +6,7 @@ from app.core.dependencies import get_current_user_id
 from app.schema.template_schema import TemplatePageOut
 from app.services.template_service import TemplateService
 
-router = APIRouter(prefix="/templates")
+router = APIRouter(prefix="/templates", tags=["templates"])
 
 @router.get("", response_model=TemplatePageOut)
 @inject

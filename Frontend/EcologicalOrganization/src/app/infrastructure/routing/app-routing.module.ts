@@ -7,7 +7,7 @@ import { RegistrationComponent } from '../auth/registration/registration.compone
 import { WritingAssistantPageComponent } from 'src/app/feature-modules/writting-assistant/page/writing-assistant-page/writing-assistant-page.component';
 import { PromptAdminModule } from 'src/app/feature-modules/prompt-admin/prompt-admin.module';
 import { PromptAdminPageComponent } from 'src/app/feature-modules/prompt-admin/page/admin-page/admin-page.component';
-
+import { DocumentTypeManagementComponent } from 'src/app/feature-modules/prompt-admin/page/document-type-management/document-type-management.component';
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'login', component: LoginComponent },
@@ -26,6 +26,10 @@ const routes: Routes = [
   {
     path: 'dashboard',
     component: PromptAdminPageComponent,
+  },
+  {
+    path: 'document-type-management',
+    component: DocumentTypeManagementComponent,
   },
 ];
 

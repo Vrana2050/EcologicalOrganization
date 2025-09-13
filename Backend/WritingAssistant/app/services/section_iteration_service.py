@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 
 from app.services.base_service import BaseService
 from app.services.llm_service import LLMService
+from app.services.document_type_service import DocumentTypeService
 
 from app.repository.section_iteration_repository import SectionIterationRepository
 from app.repository.session_section_repository import SessionSectionRepository
@@ -18,9 +19,12 @@ from app.schema.section_instruction_schema import CreateSectionInstruction
 from app.schema.section_iteration_schema import GenerateIterationIn
 from app.schema.prompt_execution_schema import CreatePromptExecution
 from app.schema.model_output_schema import CreateModelOutput
-from app.schema.section_iteration_schema import CreateSectionIteration, SectionIterationOut, ModelOutputOut
+from app.schema.section_iteration_schema import (
+    CreateSectionIteration,
+    SectionIterationOut,
+    ModelOutputOut,
+)
 from app.schema.section_instruction_schema import SectionInstructionOut
-
 
 from app.model.session_section import SessionSection
 from app.model.chat_session import ChatSession
@@ -39,6 +43,7 @@ class SectionIterationService(BaseService):
         exec_repo: PromptExecutionRepository,
         out_repo: ModelOutputRepository,
         llm_service: LLMService,
+        doc_type_service: DocumentTypeService,
     ):
         super().__init__(repository)
         self._iter_repo = repository
@@ -50,6 +55,7 @@ class SectionIterationService(BaseService):
         self._exec_repo = exec_repo
         self._out_repo = out_repo
         self._llm = llm_service
+        self._dt_service = doc_type_service
 
     def _compose_final_prompt(
         self,
@@ -64,9 +70,13 @@ class SectionIterationService(BaseService):
                 parts.append(p)
         return "\n\n".join(parts)
 
-    def _assert_ownership_and_doc_type(self, section_id: int, user_id: int) -> tuple[SessionSection, ChatSession, int]:
+    def _assert_ownership_and_doc_type(
+        self, section_id: int, user_id: int
+    ) -> tuple[SessionSection, ChatSession, int]:
         section = self._sec_repo.read_by_id(section_id)
-        session = self._sess_repo.read_by_id(section.session_id, eagers=[ChatSession.template])
+        session = self._sess_repo.read_by_id(
+            section.session_id, eagers=[ChatSession.template]
+        )
 
         if int(session.created_by) != int(user_id):
             raise AuthError(detail="Forbidden")
@@ -91,12 +101,29 @@ class SectionIterationService(BaseService):
 
         return iteration
 
-    def generate(self, section_id: int, payload: GenerateIterationIn, user_id: int) -> SectionIterationOut:
-
-        section, session_obj, document_type_id = self._assert_ownership_and_doc_type(section_id, user_id)
+    def generate(
+        self, section_id: int, payload: GenerateIterationIn, user_id: int
+    ) -> SectionIterationOut:
+        section, session_obj, document_type_id = self._assert_ownership_and_doc_type(
+            section_id, user_id
+        )
         now = datetime.now(timezone.utc)
 
-        prompt_version = self._pah_repo.get_active_prompt_version(document_type_id)
+
+        dt = self._dt_service.get_including_deleted(document_type_id)
+        if dt.deleted == 1:
+            default_dt = self._dt_service.get_by_name_ci("Default")
+            if not default_dt:
+                raise NotFoundError(detail='Nije pronađen "Default" Document Type')
+            prompt_version = self._pah_repo.get_active_prompt_version(int(default_dt.id))
+        else:
+            prompt_version = self._pah_repo.get_active_prompt_version(document_type_id)
+
+        if not prompt_version:
+            raise NotFoundError(
+                detail="Aktivna verzija prompta nije podešena za traženi Document Type"
+            )
+
         base_prompt = prompt_version.prompt_text or ""
 
         final_prompt = self._compose_final_prompt(
@@ -118,7 +145,10 @@ class SectionIterationService(BaseService):
         if gi_text:
             gi = self._gi_repo.create(
                 CreateGlobalInstruction(
-                    session_id=int(session_obj.id), text_=gi_text, deleted=0, created_at=now,
+                    session_id=int(session_obj.id),
+                    text_=gi_text,
+                    deleted=0,
+                    created_at=now,
                 )
             )
             global_instruction_id = int(gi.id)
@@ -164,7 +194,6 @@ class SectionIterationService(BaseService):
             )
         )
 
-
         iteration = self._iter_repo.create(
             CreateSectionIteration(
                 seq_no=next_seq,
@@ -177,14 +206,14 @@ class SectionIterationService(BaseService):
             )
         )
 
-
         return SectionIterationOut(
             id=iteration.id,
             seq_no=iteration.seq_no,
             session_section_id=iteration.session_section_id,
             section_instruction=(
                 SectionInstructionOut.model_validate(si)
-                if section_instruction_id else None
+                if section_instruction_id
+                else None
             ),
             model_output=ModelOutputOut.model_validate(out),
-)
+        )

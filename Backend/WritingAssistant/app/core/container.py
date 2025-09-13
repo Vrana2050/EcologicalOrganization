@@ -23,6 +23,7 @@ from app.services.llm_service import LLMService
 from app.services.prompt_service import PromptService
 from app.services.prompt_version_service import PromptVersionService
 from app.services.template_service import TemplateService
+from app.services.document_type_service import DocumentTypeService
 
 
 class Container(containers.DeclarativeContainer):
@@ -32,13 +33,14 @@ class Container(containers.DeclarativeContainer):
             "app.api.v1.endpoints.session_section",   
             "app.api.v1.endpoints.prompt",
             "app.api.v1.endpoints.prompt_version",
-            "app.api.v1.endpoints.template"
+            "app.api.v1.endpoints.template",
+            "app.api.v1.endpoints.document_type",  
         ]
     )
 
     db = providers.Singleton(Database)
 
-
+    # repositories
     chat_session_repository = providers.Factory(ChatSessionRepository, session_factory=db.provided.session)
     session_section_repository = providers.Factory(SessionSectionRepository, session_factory=db.provided.session)
     section_instruction_repository = providers.Factory(SectionInstructionRepository, session_factory=db.provided.session)
@@ -51,21 +53,31 @@ class Container(containers.DeclarativeContainer):
     document_type_repository = providers.Factory(DocumentTypeRepository, session_factory=db.provided.session)
     prompt_version_repository = providers.Factory(PromptVersionRepository, session_factory=db.provided.session)   
     template_repository = providers.Factory(TemplateRepository, session_factory=db.provided.session)
-    
 
+    # services
+    chat_session_service = providers.Factory(
+        ChatSessionService,
+        repository=chat_session_repository,
+    )
 
-    chat_session_service = providers.Factory(ChatSessionService, repository=chat_session_repository)
     session_section_service = providers.Factory(
         SessionSectionService,
         repository=session_section_repository,
         chat_session_repository=chat_session_repository,  
         global_instruction_repository=global_instruction_repository,
     )
+
     section_instruction_service = providers.Factory(
         SectionInstructionService,
         repository=section_instruction_repository,
         session_section_repository=session_section_repository,
     )
+
+    document_type_service = providers.Factory(
+        DocumentTypeService,
+        repository=document_type_repository,
+    )
+
     section_iteration_service = providers.Factory(                                            
         SectionIterationService,
         repository=section_iteration_repository,
@@ -77,11 +89,13 @@ class Container(containers.DeclarativeContainer):
         exec_repo=prompt_execution_repository,
         out_repo=model_output_repository,
         llm_service=providers.Singleton(LLMService),
+        dt_service=document_type_service,   
     )
+
     prompt_service = providers.Factory(
         PromptService,
         repository=prompt_repository,
-        doc_type_repo=document_type_repository,
+        doc_type_service=document_type_service,  
         pah_repository=prompt_active_history_repository,   
     )
 
@@ -89,7 +103,7 @@ class Container(containers.DeclarativeContainer):
         PromptVersionService,
         repository=prompt_version_repository,
         prompt_repo=prompt_repository,
-        pah_repo=prompt_active_history_repository
+        pah_repo=prompt_active_history_repository,
     )
 
     template_service = providers.Factory(

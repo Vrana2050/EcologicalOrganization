@@ -16,6 +16,7 @@ class DocumentType(Base):
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     name: Mapped[str] = mapped_column(VARCHAR(255), nullable=False)
+    description: Mapped[Optional[str]] = mapped_column(VARCHAR(1000), nullable=True)
     deleted: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0 '))
     created_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(True), server_default=text('CURRENT_TIMESTAMP'))
     updated_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(True))
