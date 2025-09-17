@@ -115,8 +115,7 @@ public class Dokument {
         validateVlasnik();
         List<String> errors = isInDraft();
         boolean isInPripremna_verzija = !errors.isEmpty();
-        if (pripremna_verzija != null && !pripremna_verzija && isInPripremna_verzija)
-            throw new InvalidRequestDataException(errors.toString());
+        if (pripremna_verzija != null && !pripremna_verzija && isInPripremna_verzija) throw new InvalidRequestDataException(errors.toString());
         this.setPripremna_verzija(isInPripremna_verzija);
     }
 

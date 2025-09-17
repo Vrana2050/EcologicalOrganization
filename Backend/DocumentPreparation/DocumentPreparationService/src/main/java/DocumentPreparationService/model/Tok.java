@@ -59,15 +59,19 @@ public class Tok {
     public void validate(){
         if(this.naziv == null || this.naziv.isEmpty()) throw new InvalidRequestDataException("Name is required");
         if(this.statusi == null || this.statusi.isEmpty()) throw new InvalidRequestDataException("Status is required");
+        validateWorkflow();
+    }
+
+    private void validateWorkflow() {
         boolean hasEnding =false;
         for(TokStatus tokStatus : statusi) {
             tokStatus.validate();
             if(tokStatus.getSledeceStanje()==null){
-              if(hasEnding==true){
-                  throw new InvalidRequestDataException("Invalid workflow");
-              }
-              hasEnding=true;
-          }
+                if(hasEnding==true){
+                    throw new InvalidRequestDataException("Invalid workflow");
+                }
+                hasEnding=true;
+            }
         }
         if(!hasEnding) throw new InvalidRequestDataException("Invalid workflow");
     }
