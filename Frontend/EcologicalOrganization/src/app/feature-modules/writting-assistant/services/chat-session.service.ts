@@ -33,7 +33,7 @@ export class ChatSessionService {
               (it: any): ChatSession => ({
                 id: it.id,
                 templateId: it.template_id,
-                documentTypeId: it.document_type_id ?? null, // ⬅️ dodato
+                documentTypeId: it.document_type_id ?? null,
                 createdBy: it.created_by,
                 title: it.title,
                 updatedAt: it.updated_at,
@@ -60,7 +60,7 @@ export class ChatSessionService {
           (raw): ChatSession => ({
             id: raw.id,
             templateId: raw.template_id,
-            documentTypeId: raw.document_type_id ?? null, // ⬅️ dodato
+            documentTypeId: raw.document_type_id ?? null,
             createdBy: raw.created_by,
             title: raw.title,
             updatedAt: raw.updated_at,
