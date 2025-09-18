@@ -20,35 +20,34 @@ import { PromptVersion } from '../../models/prompt-version.model';
 export class PromptVersionComponent implements OnChanges, OnDestroy {
   @Input() version: PromptVersion | null = null;
 
-  /** Emit za PATCH basic-info (name + description) */
   @Output() saveBasicInfo = new EventEmitter<{
     versionId: number;
     name: string;
     description: string;
   }>();
-
-  /** Emit za PATCH prompt-text (prompt_text) */
   @Output() savePromptText = new EventEmitter<{
     versionId: number;
     promptText: string;
   }>();
-
   @Output() setActive = new EventEmitter<number>();
   @Output() deletePromptVersion = new EventEmitter<number>();
 
-  /** Draftovi input polja */
+  @Output() saveNewVersion = new EventEmitter<{
+    promptId: number;
+    name: string;
+    description: string;
+    promptText: string;
+  }>();
+
   nameDraft = '';
   descriptionDraft = '';
   promptTextDraft = '';
 
-  /** Status indikatori */
   statusMessageBasic: string | null = null;
   statusTypeBasic: 'unsaved' | 'saved' | null = null;
-
   statusMessageText: string | null = null;
   statusTypeText: 'unsaved' | 'saved' | null = null;
 
-  /** Tajmeri za auto-hide poruka o uspehu */
   private basicHideTimer: any = null;
   private textHideTimer: any = null;
 
@@ -56,13 +55,10 @@ export class PromptVersionComponent implements OnChanges, OnDestroy {
     if (changes['version']) {
       const prevId = changes['version'].previousValue?.id;
       const currId = changes['version'].currentValue?.id;
-
       if (prevId !== currId) {
         this.nameDraft = this.version?.name ?? '';
         this.descriptionDraft = this.version?.description ?? '';
         this.promptTextDraft = this.version?.promptText ?? '';
-
-        // reset statusa
         this.clearBasicTimer();
         this.clearTextTimer();
         this.statusMessageBasic = null;
@@ -86,16 +82,17 @@ export class PromptVersionComponent implements OnChanges, OnDestroy {
     return !!this.version?.isActive;
   }
 
-  /** Promene u basic info poljima */
-  onBasicChange(): void {
-    if (!this.version) return;
+  get isNew(): boolean {
+    return !!(this.version?.isNew || this.version?.id === -1);
+  }
 
+  onBasicChange(): void {
+    if (!this.version || this.isNew) return;
     const changed =
       this.nameDraft.trim() !== (this.version.name ?? '') ||
       this.descriptionDraft.trim() !== (this.version.description ?? '');
-
     if (changed) {
-      this.clearBasicTimer(); // ako je bio tajmer za "saved", ne diraj novu poruku
+      this.clearBasicTimer();
       this.statusMessageBasic = 'Promene nisu sačuvane';
       this.statusTypeBasic = 'unsaved';
     } else {
@@ -104,13 +101,11 @@ export class PromptVersionComponent implements OnChanges, OnDestroy {
     }
   }
 
-  /** Promene u prompt text polju */
   onTextChange(): void {
     if (!this.version) return;
-
+    if (this.isNew) return;
     const changed =
       this.promptTextDraft.trim() !== (this.version.promptText ?? '');
-
     if (changed) {
       this.clearTextTimer();
       this.statusMessageText = 'Promene nisu sačuvane';
@@ -121,50 +116,58 @@ export class PromptVersionComponent implements OnChanges, OnDestroy {
     }
   }
 
-  /** Snimi basic info (optimistički) */
   onSaveBasicInfo(): void {
-    if (!this.version) return;
-
+    if (!this.version || this.isNew) return;
     this.saveBasicInfo.emit({
       versionId: this.version.id,
       name: (this.nameDraft || '').trim(),
       description: (this.descriptionDraft || '').trim(),
     });
-
     this.statusMessageBasic = 'Promene uspešno sačuvane';
     this.statusTypeBasic = 'saved';
     this.startBasicHideTimer();
   }
 
-  /** Snimi prompt text (optimistički) */
   onSavePromptText(): void {
-    if (!this.version) return;
-
+    if (!this.version || this.isNew) return;
     this.savePromptText.emit({
       versionId: this.version.id,
       promptText: (this.promptTextDraft || '').trim(),
     });
-
     this.statusMessageText = 'Promene uspešno sačuvane';
     this.statusTypeText = 'saved';
     this.startTextHideTimer();
   }
 
-  onSetActive(): void {
+  onSaveNewVersion(): void {
     if (!this.version) return;
+    console.log('[xp] emit saveNewVersion', {
+      promptId: this.version.promptId,
+      name: this.nameDraft,
+      description: this.descriptionDraft,
+      promptText: this.promptTextDraft,
+    });
+    this.saveNewVersion.emit({
+      promptId: this.version.promptId,
+      name: (this.nameDraft || '').trim(),
+      description: (this.descriptionDraft || '').trim(),
+      promptText: (this.promptTextDraft || '').trim(),
+    });
+  }
+
+  onSetActive(): void {
+    if (!this.version || this.isNew) return;
     this.setActive.emit(this.version.id);
   }
 
   onDeletePromptVersion(): void {
-    if (!this.version) return;
+    if (!this.version || this.isNew) return;
     this.deletePromptVersion.emit(this.version.id);
   }
 
-  /** Helpers za auto-hide */
   private startBasicHideTimer(): void {
     this.clearBasicTimer();
     this.basicHideTimer = setTimeout(() => {
-      // ukloni poruku samo ako je još uvek "saved"
       if (this.statusTypeBasic === 'saved') {
         this.statusMessageBasic = null;
         this.statusTypeBasic = null;

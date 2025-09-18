@@ -6,7 +6,6 @@ import {
   HostListener,
 } from '@angular/core';
 import { Prompt } from '../../models/prompt.model';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'pa-prompts-sidebar',
@@ -18,14 +17,14 @@ export class PromptsSidebarComponent {
   @Input() loading = false;
   @Input() selectedId: number | null | undefined = null;
 
-  @Output() createNew = new EventEmitter<void>();
+  @Output() createNewPrompt = new EventEmitter<void>();
   @Output() selectPrompt = new EventEmitter<Prompt>();
   @Output() deletePrompt = new EventEmitter<number>();
 
   menuOpenId: number | null = null;
 
-  onCreateNew(): void {
-    this.createNew.emit();
+  onCreateNewPrompt(): void {
+    this.createNewPrompt.emit();
   }
   onSelectPrompt(p: Prompt): void {
     this.selectPrompt.emit(p);
@@ -41,8 +40,6 @@ export class PromptsSidebarComponent {
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event): void {
     const target = event.target as HTMLElement;
-    if (!target.closest('.menu-wrap')) {
-      this.menuOpenId = null;
-    }
+    if (!target.closest('.menu-wrap')) this.menuOpenId = null;
   }
 }

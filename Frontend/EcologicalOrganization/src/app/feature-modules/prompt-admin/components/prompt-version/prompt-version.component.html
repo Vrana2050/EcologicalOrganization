@@ -1,10 +1,9 @@
-<!-- BASIC INFO -->
 <section class="wa-card pa-card">
   <div class="pa-header-top">
-    <h3 class="pa-card-title">Osnovni podaci prompta</h3>
+    <h3 class="pa-card-title">Osnovni podaci verzije</h3>
     <div
       class="status"
-      *ngIf="statusMessageBasic"
+      *ngIf="statusMessageBasic && !isNew"
       [class.unsaved]="statusTypeBasic === 'unsaved'"
       [class.saved]="statusTypeBasic === 'saved'"
     >
@@ -37,7 +36,8 @@
     ></textarea>
   </div>
 
-  <div class="pa-actions">
+  <!-- Akcije za postojeću verziju (ne prikazuj za draft) -->
+  <div class="pa-actions" *ngIf="!isNew">
     <div class="pa-actions-left">
       <button
         *ngIf="!isActive; else activeTpl"
@@ -48,7 +48,6 @@
       >
         Postavi kao aktivnu
       </button>
-
       <ng-template #activeTpl>
         <button class="wa-btn success solid" type="button" disabled>
           Aktivna verzija
@@ -82,7 +81,7 @@
     <h3 class="pa-card-title">Prompt tekst</h3>
     <div
       class="status"
-      *ngIf="statusMessageText"
+      *ngIf="statusMessageText && !isNew"
       [class.unsaved]="statusTypeText === 'unsaved'"
       [class.saved]="statusTypeText === 'saved'"
     >
@@ -102,11 +101,22 @@
   </div>
 
   <div class="pa-actions pa-actions-right">
-    <button class="wa-btn" type="button" (click)="onSavePromptText()">
-      Sačuvaj tekst
+    <button
+      class="wa-btn"
+      type="button"
+      *ngIf="isNew"
+      (click)="onSaveNewVersion()"
+    >
+      Kreiraj novu verziju
     </button>
-    <button class="wa-btn" type="button">
-      Idi na stranicu za testiranje prompta ↗
-    </button>
+
+    <ng-container *ngIf="!isNew">
+      <button class="wa-btn" type="button" (click)="onSavePromptText()">
+        Sačuvaj tekst
+      </button>
+      <button class="wa-btn" type="button">
+        Idi na stranicu za testiranje prompta ↗
+      </button>
+    </ng-container>
   </div>
 </section>

@@ -17,6 +17,25 @@ class CreatePromptVersion(BaseModel):
     updated_at: Optional[datetime] = None
 
 
+    num_executions: int = 0
+    avg_duration_ms: Optional[float] = None
+    avg_input_tokens: Optional[float] = None
+    avg_output_tokens: Optional[float] = None
+    avg_cost: Optional[float] = None
+    total_cost_usd: Optional[float] = None
+    error_rate: Optional[float] = None
+    failed_exec_count: int = 0
+    rating_count: int = 0
+    rating_avg: Optional[float] = None
+    rating_median: Optional[float] = None
+    rating_c1: int = 0
+    rating_c2: int = 0
+    rating_c3: int = 0
+    rating_c4: int = 0
+    rating_c5: int = 0
+    stats_finalized_at: Optional[datetime] = None
+
+
 class PromptVersionOut(BaseModel):
     id: int
     prompt_id: int

@@ -17,14 +17,14 @@ export class ConversationsSidebarComponent {
   @Input() loading = false;
   @Input() selectedId: number | null | undefined = null;
 
-  @Output() createNew = new EventEmitter<void>();
+  @Output() createNewPrompt = new EventEmitter<void>();
   @Output() selectConversation = new EventEmitter<ChatSession>();
   @Output() deleteConversation = new EventEmitter<ChatSession>();
 
   menuOpenId: number | null = null;
 
-  onCreateNew(): void {
-    this.createNew.emit();
+  onCreateNewPrompt(): void {
+    this.createNewPrompt.emit();
   }
 
   onSelectConversation(c: ChatSession): void {
@@ -43,8 +43,6 @@ export class ConversationsSidebarComponent {
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event): void {
     const target = event.target as HTMLElement;
-    if (!target.closest('.menu-wrap')) {
-      this.menuOpenId = null;
-    }
+    if (!target.closest('.menu-wrap')) this.menuOpenId = null;
   }
 }

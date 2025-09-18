@@ -18,7 +18,11 @@ def create_prompt_version(
     user_id: int = Depends(get_current_user_id),
     service: PromptVersionService = Depends(Provide[Container.prompt_version_service]),
 ):
+    print(">>> create_prompt_version entered")
     return service.add(payload, user_id)
+
+
+
 
 
 @router.delete("/{id}", status_code=204)

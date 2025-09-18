@@ -33,6 +33,25 @@ class PromptVersionService(BaseService):
         schema.updated_at = now
         schema.deleted = 0
 
+
+        schema.num_executions = 0
+        schema.avg_duration_ms = None
+        schema.avg_input_tokens = None
+        schema.avg_output_tokens = None
+        schema.avg_cost = None
+        schema.total_cost_usd = None
+        schema.error_rate = None
+        schema.failed_exec_count = 0
+        schema.rating_count = 0
+        schema.rating_avg = None
+        schema.rating_median = None
+        schema.rating_c1 = 0
+        schema.rating_c2 = 0
+        schema.rating_c3 = 0
+        schema.rating_c4 = 0
+        schema.rating_c5 = 0
+        schema.stats_finalized_at = None
+
         version = self.repo.create(schema)
 
         return PromptVersionOut(

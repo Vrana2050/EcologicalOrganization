@@ -60,7 +60,6 @@ export class SessionHeaderComponent {
     this.globalInstructionChange.emit(val);
   }
 
-  // Možeš dodatno olakšati proveru
   get isDefaultDocType(): boolean {
     return this.selectedDocType?.name === 'Default';
   }

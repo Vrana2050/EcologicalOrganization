@@ -8,6 +8,8 @@ import {
 } from '@angular/core';
 import { Prompt } from '../../models/prompt.model';
 import { PromptVersion } from '../../models/prompt-version.model';
+import { DocumentType } from '../../models/document-type.model';
+import { DocumentTypeService } from '../../services/document-type.service';
 
 @Component({
   selector: 'pa-prompt-editor',
@@ -15,19 +17,10 @@ import { PromptVersion } from '../../models/prompt-version.model';
   styleUrls: ['../../prompt-admin.styles.css', './prompt-editor.component.css'],
 })
 export class PromptEditorComponent implements OnChanges {
-  /** Aktivni prompt */
   @Input() prompt: Prompt | null = null;
-
-  /** Selektovana verzija */
   @Input() selectedVersion: PromptVersion | null = null;
 
-  /** (opciono) naziv tipa dokumenta za pilulu u headeru */
-  @Input() documentTypeName: string | null | undefined = null;
-
-  /** Eventi prema parent komponenti (AdminPage) */
   @Output() savePrompt = new EventEmitter<{ name: string }>();
-
-  // Razdvojeni eventovi za verziju:
   @Output() saveVersionBasicInfo = new EventEmitter<{
     versionId: number;
     name: string;
@@ -37,19 +30,78 @@ export class PromptEditorComponent implements OnChanges {
     versionId: number;
     promptText: string;
   }>();
-
   @Output() setActiveVersion = new EventEmitter<number>();
   @Output() deletePrompt = new EventEmitter<number>();
   @Output() deletePromptVersion = new EventEmitter<number>();
+  @Output() createNewVersion = new EventEmitter<void>();
 
+  @Output() saveNewVersion = new EventEmitter<{
+    promptId: number;
+    name: string;
+    description: string;
+    promptText: string;
+  }>();
+
+  onHeaderCreateNewVersion(): void {
+    this.createNewVersion.emit();
+  }
+
+  @Output() saveNewPrompt = new EventEmitter<{
+    title: string;
+    documentTypeId: number;
+  }>();
+
+  onHeaderSaveNewPrompt(ev: { title: string; documentTypeId: number }): void {
+    this.saveNewPrompt.emit(ev);
+  }
+
+  onSaveNewVersion(ev: {
+    promptId: number;
+    name: string;
+    description: string;
+    promptText: string;
+  }): void {
+    console.log('[editor] got saveNewVersion', ev);
+    this.saveNewVersion.emit(ev);
+  }
+
+  documentTypes: DocumentType[] = [];
   loading = false;
   error?: string;
 
-  ngOnChanges(changes: SimpleChanges): void {
-    // nothing to derive right now
+  constructor(private documentTypeService: DocumentTypeService) {}
+
+  ngOnInit(): void {
+    this.loadDocumentTypes();
   }
 
-  /** --- Header handlers --- */
+  ngOnChanges(changes: SimpleChanges): void {}
+
+  onHeaderDocTypeChanged(newId: number): void {
+    if (!this.prompt) return;
+    this.prompt = { ...this.prompt, documentTypeId: newId };
+    if (this.prompt.id === -1) return;
+  }
+
+  loadDocumentTypes(): void {
+    this.documentTypeService.list().subscribe({
+      next: (page) => {
+        this.documentTypes = page.items;
+      },
+      error: (err) => {
+        console.error('Error loading document types:', err);
+      },
+    });
+  }
+
+  get documentTypeName(): string {
+    if (!this.prompt?.documentTypeId) return 'Default';
+    const dt = this.documentTypes.find(
+      (d) => d.id === this.prompt!.documentTypeId
+    );
+    return dt ? dt.name : 'Default';
+  }
+
   onHeaderSavePrompt(ev: { name: string }): void {
     if (!this.prompt) return;
     this.savePrompt.emit({
@@ -62,7 +114,6 @@ export class PromptEditorComponent implements OnChanges {
     this.deletePrompt.emit(this.prompt.id);
   }
 
-  /** --- Version handlers (prosleđuju xp-prompt-version emitove parentu) --- */
   onSaveVersionBasicInfo(ev: {
     versionId: number;
     name: string;

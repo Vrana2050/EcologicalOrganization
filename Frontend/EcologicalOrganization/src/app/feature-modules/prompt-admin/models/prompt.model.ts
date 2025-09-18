@@ -3,7 +3,7 @@ import { PromptVersion } from './prompt-version.model';
 export interface Prompt {
   id: number;
   title: string;
-  documentTypeId: number;
+  documentTypeId: number | null;
   isActive: boolean;
   activeVersion?: PromptVersion | null;
   updatedAt?: string | null;

@@ -10,7 +10,7 @@
 /* Header: naslov + status u jednom redu */
 .pa-header-top {
   display: flex;
-  align-items: center; /* isto kao "center" */
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 12px;
@@ -20,7 +20,7 @@
   margin: 0;
 }
 
-/* Status badge (ne širi se, stoji desno u headeru) */
+/* Status badge */
 .status {
   font-size: 13px;
   font-weight: 500;
@@ -29,10 +29,7 @@
   display: inline-flex;
   align-items: center;
   white-space: nowrap;
-
   height: 20px;
-
-  /* osigurava da se zalepi desno u okviru .pa-header-top */
   margin-left: auto;
 }
 
@@ -71,7 +68,7 @@
   min-height: 200px;
 }
 
-/* izbegni autoprefixer warning: koristi flex-start umesto start */
+/* Grid za naziv i opis */
 .pa-grid-2 {
   display: flex;
   gap: 50px;
@@ -79,6 +76,7 @@
   margin-bottom: 12px;
 }
 
+/* Akcije */
 .pa-actions {
   display: flex;
   align-items: center;
@@ -87,8 +85,23 @@
   margin-top: 12px;
 }
 
-.pa-actions-right {
+/* Leva strana akcija (postavi kao aktivnu) */
+.pa-actions-left {
   display: flex;
+  gap: 8px;
+}
+
+/* Desna strana akcija */
+.pa-actions-right {
+  align-items: end;
+  display: flex;
+  gap: 8px;
+}
+
+.pa-actions.pa-actions-right {
+  display: flex;
+  justify-content: flex-end; /* gurne dugmad do desne ivice */
+  align-items: center;
   gap: 8px;
 }
 

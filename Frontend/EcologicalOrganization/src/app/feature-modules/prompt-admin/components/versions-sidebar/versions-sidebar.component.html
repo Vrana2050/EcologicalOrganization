@@ -4,7 +4,9 @@
   </div>
 
   <div class="actions">
-    <button class="wa-btn full" type="button">+ Kreiraj novu verziju</button>
+    <button class="wa-btn full" type="button" (click)="onCreateNewVersion()">
+      + Kreiraj novu verziju
+    </button>
   </div>
 
   <div *ngIf="loading" class="loading">Učitavanje…</div>
@@ -22,7 +24,7 @@
         <span *ngIf="v.isActive" class="badge">aktivna</span>
       </div>
       <div class="t-desc">
-        {{ v.createdAt ? (v.createdAt | date : "short") : "—" }}
+        {{ v.updatedAt ? (v.updatedAt | date : "short") : "--" }}
       </div>
     </button>
   </div>

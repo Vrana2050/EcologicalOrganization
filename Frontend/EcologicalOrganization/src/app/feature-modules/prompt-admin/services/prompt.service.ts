@@ -70,4 +70,25 @@ export class PromptService {
       { headers: this.headers }
     );
   }
+
+  saveNewPrompt(title: string, documentTypeId: number): Observable<Prompt> {
+    return this.http
+      .post<any>(
+        this.promptsUrl,
+        { title, document_type_id: documentTypeId },
+        { headers: this.headers }
+      )
+      .pipe(
+        map(
+          (p): Prompt => ({
+            id: p.id,
+            title: p.title,
+            documentTypeId: p.document_type_id,
+            isActive: !!p.is_active,
+            activeVersion: null,
+            updatedAt: p.updated_at ?? null,
+          })
+        )
+      );
+  }
 }

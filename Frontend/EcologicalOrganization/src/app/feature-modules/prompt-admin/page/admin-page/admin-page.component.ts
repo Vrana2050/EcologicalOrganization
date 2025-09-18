@@ -5,6 +5,12 @@ import { Prompt } from '../../models/prompt.model';
 import { PromptService } from '../../services/prompt.service';
 import { PromptVersion } from '../../models/prompt-version.model';
 import { PromptVersionService } from '../../services/prompt-version.service';
+import { CommonModule } from '@angular/common';
+import { DocumentTypeService } from '../../services/document-type.service';
+import {
+  DocumentTypePage,
+  DocumentType,
+} from '../../models/document-type.model';
 
 @Component({
   selector: 'pa-admin-page',
@@ -18,11 +24,13 @@ export class PromptAdminPageComponent implements OnInit {
   activePrompt: Prompt | null = null;
 
   versions: PromptVersion[] = [];
+  documentTypes: DocumentType[] = [];
   versionsLoading = false;
 
   showVersionsSidebar = false;
 
   constructor(
+    private documentTypeService: DocumentTypeService,
     private promptService: PromptService,
     private promptVersionService: PromptVersionService,
     private route: ActivatedRoute,
@@ -30,6 +38,7 @@ export class PromptAdminPageComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loadDocumentTypes();
     this.loadPrompts();
 
     this.route.paramMap
@@ -53,7 +62,6 @@ export class PromptAdminPageComponent implements OnInit {
           const active = this.prompts.find((p) => p.isActive);
           const toOpen = active ?? this.prompts[0] ?? '';
           this.openPrompt(toOpen.id);
-          this.router.navigate(['/prompt-admin', toOpen.id]);
         }
       },
       error: (err) => {
@@ -95,13 +103,81 @@ export class PromptAdminPageComponent implements OnInit {
     this.showVersionsSidebar = !!this.activePrompt;
   }
 
-  onCreateNew(): void {
-    console.log('TODO: create prompt');
+  onCreateNewPrompt(): void {
+    const defaultDocTypeId = this.getDefaultDocTypeId();
+    if (defaultDocTypeId == null) {
+      alert('Nije učitan nijedan Tip dokumenta. Pokušaj ponovo.');
+      return;
+    }
+
+    const draft: Prompt = {
+      id: -1,
+      title: '',
+      documentTypeId: defaultDocTypeId,
+      isActive: false,
+      activeVersion: null,
+      updatedAt: null,
+    };
+
+    this.versions = [];
+    this.activePrompt = draft;
+
+    this.showVersionsSidebar = true;
   }
 
+  private getDefaultDocTypeId(): number | null {
+    const def = this.documentTypes.find((dt) => dt.name === 'Default');
+    return def?.id ?? this.documentTypes[0]?.id ?? null;
+  }
+
+  onCreateNewVersion(): void {
+    if (!this.activePrompt) return;
+
+    const draft: PromptVersion = {
+      id: -1,
+      promptId: this.activePrompt.id,
+      name: this.buildDefaultDraftName(),
+      description: '',
+      promptText: '',
+      isActive: false,
+      createdAt: null,
+      updatedAt: null,
+      isNew: true,
+    };
+
+    this.versions = [draft, ...this.versions];
+    this.activePrompt = { ...this.activePrompt, activeVersion: draft };
+
+    this.showVersionsSidebar = true;
+  }
+
+  onSaveNewVersion(ev: {
+    promptId: number;
+    name: string;
+    description: string;
+    promptText: string;
+  }): void {
+    this.promptVersionService.createVersion(ev).subscribe({
+      next: (created) => {
+        console.log('[page] createVersion OK', created);
+
+        if (this.activePrompt) {
+          this.versions = this.versions.filter((v) => v.id !== -1 && !v.isNew);
+
+          this.versions = [created, ...this.versions];
+
+          this.onVersionSelected(created);
+        }
+      },
+      error: (err) => {
+        console.error('[page] createVersion ERROR', err);
+        alert('Kreiranje nove verzije nije uspelo.');
+      },
+    });
+  }
   onSelectPrompt(p: Prompt): void {
     this.activePrompt = p;
-    this.router.navigate(['/prompt-admin', p.id]);
+    // this.router.navigate(['/prompt-admin', p.id]);
     this.showVersionsSidebar = true;
     this.loadVersions(p.id);
   }
@@ -123,7 +199,7 @@ export class PromptAdminPageComponent implements OnInit {
           const nextPrompt = this.prompts[0] ?? null;
           this.activePrompt = nextPrompt;
           if (nextPrompt) {
-            this.router.navigate(['/prompt-admin', nextPrompt.id]);
+            // this.router.navigate(['/prompt-admin', nextPrompt.id]);
             this.loadVersions(nextPrompt.id);
           } else {
             this.showVersionsSidebar = false;
@@ -177,6 +253,23 @@ export class PromptAdminPageComponent implements OnInit {
     });
   }
 
+  onSaveNewPrompt(ev: { title: string; documentTypeId: number }): void {
+    this.promptService.saveNewPrompt(ev.title, ev.documentTypeId).subscribe({
+      next: (created) => {
+        this.prompts = this.prompts.filter((p) => p.id !== -1);
+
+        this.prompts = [created, ...this.prompts];
+
+        this.activePrompt = created;
+
+        this.showVersionsSidebar = true;
+      },
+      error: (err) => {
+        console.error('Error creating prompt:', err);
+        alert('Kreiranje prompta nije uspelo.');
+      },
+    });
+  }
   openVersions(): void {
     this.showVersionsSidebar = true;
   }
@@ -209,21 +302,17 @@ export class PromptAdminPageComponent implements OnInit {
     console.log('Save existing version', ev);
   }
 
-  onSaveAsNewVersion(ev: {
-    promptId: number;
-    name: string;
-    description: string;
-    promptText: string;
-  }): void {
-    console.log('Save as new version', ev);
-  }
-
   onSavePrompt(ev: { name: string }): void {
     if (!this.activePrompt) return;
+
+    if (this.activePrompt.id === -1) {
+      return;
+    }
 
     this.activePrompt = {
       ...this.activePrompt,
       title: ev.name,
+      documentTypeId: this.activePrompt.documentTypeId,
     };
 
     this.prompts = this.prompts.map((p) =>
@@ -251,13 +340,12 @@ export class PromptAdminPageComponent implements OnInit {
       .updateBasicInfo(ev.versionId, ev.name, ev.description)
       .subscribe({
         next: (server) => {
-          // MERGE: uzmi name/description/updatedAt sa servera, zadrži promptText koji je već u editoru
           const merged = {
             ...this.activePrompt!.activeVersion!,
             name: server.name,
             description: server.description,
             updatedAt: server.updatedAt,
-            promptText: keepText, // <— ključni deo
+            promptText: keepText,
           };
 
           this.activePrompt = { ...this.activePrompt!, activeVersion: merged };
@@ -291,13 +379,43 @@ export class PromptAdminPageComponent implements OnInit {
             ...this.activePrompt!.activeVersion!,
             promptText: server.promptText,
             updatedAt: server.updatedAt,
-            name: keepName, // <—
-            description: keepDesc, // <—
+            name: keepName,
+            description: keepDesc,
           };
 
           this.activePrompt = { ...this.activePrompt!, activeVersion: merged };
         },
         error: (err) => console.error('PATCH prompt-text gagal', err),
       });
+  }
+
+  loadDocumentTypes(): void {
+    this.documentTypeService.list().subscribe({
+      next: (page) => {
+        this.documentTypes = page.items;
+      },
+      error: (err) => {
+        console.error('Error loading document types:', err);
+      },
+    });
+  }
+
+  getDocumentTypeName(documentTypeId: number | undefined | null): string {
+    if (!documentTypeId) return 'Default';
+    const dt = this.documentTypes.find((d) => d.id === documentTypeId);
+    return dt ? dt.name : 'Default';
+  }
+
+  private buildDefaultDraftName(): string {
+    const dt = new Date();
+    const pad = (n: number, w = 2) => String(n).padStart(w, '0');
+    const yyyy = dt.getFullYear();
+    const MM = pad(dt.getMonth() + 1);
+    const dd = pad(dt.getDate());
+    const HH = pad(dt.getHours());
+    const mm = pad(dt.getMinutes());
+    const ss = pad(dt.getSeconds());
+    const SSS = String(dt.getMilliseconds()).padStart(3, '0');
+    return `v - ${yyyy}/${MM}/${dd} ${HH}:${mm}:${ss}.${SSS}`;
   }
 }

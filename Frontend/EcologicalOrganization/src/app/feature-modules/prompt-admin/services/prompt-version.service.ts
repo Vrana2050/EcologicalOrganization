@@ -104,4 +104,58 @@ export class PromptVersionService {
         )
       );
   }
+
+  createVersion(payload: {
+    promptId: number;
+    name: string;
+    description: string;
+    promptText: string;
+  }): Observable<PromptVersion> {
+    const body = {
+      prompt_id: payload.promptId,
+      name: payload.name,
+      description: payload.description,
+      prompt_text: payload.promptText,
+    };
+
+    return this.http
+      .post<any>(this.versionsUrl, body, { headers: this.headers })
+      .pipe(
+        map(
+          (v): PromptVersion => ({
+            id: v.id,
+            promptId: v.prompt_id,
+            name: v.name ?? null,
+            description: v.description ?? null,
+            promptText: v.prompt_text ?? null,
+            isActive: !!v.is_active,
+            createdAt: v.created_at ?? null,
+            updatedAt: v.updated_at ?? null,
+          })
+        )
+      );
+  }
+
+  activateVersion(versionId: number): Observable<PromptVersion> {
+    return this.http
+      .post<any>(
+        `${this.versionsUrl}/activate/${versionId}`,
+        {},
+        { headers: this.headers }
+      )
+      .pipe(
+        map(
+          (v): PromptVersion => ({
+            id: v.id,
+            promptId: v.prompt_id,
+            name: v.name ?? null,
+            description: v.description ?? null,
+            promptText: v.prompt_text ?? null,
+            isActive: !!v.is_active,
+            createdAt: v.created_at ?? null,
+            updatedAt: v.updated_at ?? null,
+          })
+        )
+      );
+  }
 }

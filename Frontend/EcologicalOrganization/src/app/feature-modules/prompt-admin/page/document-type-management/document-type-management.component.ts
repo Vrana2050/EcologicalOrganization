@@ -21,7 +21,7 @@ export class DocumentTypeManagementComponent implements OnInit {
   editingId: number | null = null;
   nameDraft = '';
   descDraft = '';
-  isNew = false; // 👈 flag da li je red "novi"
+  isNew = false;
 
   constructor(private docTypeService: DocumentTypeService) {}
 
@@ -54,7 +54,6 @@ export class DocumentTypeManagementComponent implements OnInit {
 
   cancelEdit(): void {
     if (this.isNew) {
-      // ako je bio novi red, ukloni ga iz items
       this.items = this.items.filter((x) => x.id !== this.editingId);
       this.isNew = false;
     }
@@ -68,7 +67,6 @@ export class DocumentTypeManagementComponent implements OnInit {
     if (!newName) return;
 
     if (this.isNew) {
-      // ADD
       this.docTypeService.create(newName, this.descDraft).subscribe({
         next: () => {
           this.isNew = false;

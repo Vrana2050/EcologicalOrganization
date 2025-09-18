@@ -7,4 +7,5 @@ export interface PromptVersion {
   isActive?: boolean;
   createdAt?: string | null;
   updatedAt?: string | null;
+  isNew?: boolean;
 }

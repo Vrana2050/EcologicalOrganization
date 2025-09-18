@@ -1,12 +1,17 @@
 <div class="wa-editor">
   <div class="wa-editor-inner" *ngIf="!loading && !error; else stateTpl">
     <pa-prompt-header
-      [prompt]="prompt"
-      [documentTypeName]="documentTypeName || null"
+      [title]="prompt?.title || null"
+      [documentTypes]="documentTypes"
+      [documentTypeId]="prompt?.documentTypeId ?? null"
+      [isNewPrompt]="prompt?.id === -1"
+      [startInEditMode]="prompt?.id === -1"
       (savePrompt)="onHeaderSavePrompt($event)"
       (deletePrompt)="onHeaderDeletePrompt()"
-    >
-    </pa-prompt-header>
+      (docTypeChanged)="onHeaderDocTypeChanged($event)"
+      (createNewVersion)="onHeaderCreateNewVersion()"
+      (saveNewPrompt)="onHeaderSaveNewPrompt($event)"
+    ></pa-prompt-header>
 
     <xp-prompt-version
       *ngIf="selectedVersion"
@@ -15,6 +20,7 @@
       (savePromptText)="onSaveVersionPromptText($event)"
       (setActive)="onSetActiveVersion($event)"
       (deletePromptVersion)="onDeletePromptVersion($event)"
+      (saveNewVersion)="onSaveNewVersion($event)"
     >
     </xp-prompt-version>
   </div>

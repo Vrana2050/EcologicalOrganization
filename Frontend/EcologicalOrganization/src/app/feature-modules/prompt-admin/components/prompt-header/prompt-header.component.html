@@ -3,6 +3,7 @@
 
   <div class="pa-grid-3">
     <div class="left">
+      <!-- Naziv prompta -->
       <div class="pa-field">
         <label class="wa-label">Naziv prompta</label>
 
@@ -13,6 +14,7 @@
               class="wa-btn icon small"
               type="button"
               (click)="startEditName()"
+              aria-label="Uredi naslov"
             >
               ✎
             </button>
@@ -28,30 +30,81 @@
               (keyup.enter)="trySaveName()"
               (blur)="trySaveName()"
               [class.invalid]="invalidName"
+              placeholder="Unesi naslov…"
             />
             <button class="wa-btn small" (click)="trySaveName()">✔</button>
-            <button class="wa-btn danger small" (click)="cancelEditName()">
+            <button
+              class="wa-btn danger small"
+              *ngIf="!isNewPrompt"
+              (click)="cancelEditName()"
+            >
               ✕
             </button>
           </div>
         </ng-template>
       </div>
 
+      <!-- Tip dokumenta -->
       <div class="pa-field">
         <label class="wa-label">Tip dokumenta</label>
-        <div class="pa-doc-type" [title]="docTypeLabel">{{ docTypeLabel }}</div>
+
+        <!-- NOVO: combobox samo za novi (draft) prompt -->
+        <ng-container *ngIf="isNewPrompt; else fixedDocTypeTpl">
+          <select
+            class="wa-input small wa-doc-type-select"
+            [disabled]="!documentTypes?.length"
+            [ngModel]="documentTypeId"
+            (ngModelChange)="onDocTypeChanged($event)"
+          >
+            <option *ngFor="let dt of documentTypes" [value]="dt.id">
+              {{ dt.name === "Default" ? "" : dt.name }}
+            </option>
+          </select>
+        </ng-container>
+
+        <!-- Stari prikaz (pilula) za postojeće promptove -->
+        <ng-template #fixedDocTypeTpl>
+          <div class="pa-doc-type" [title]="docTypeLabel">
+            {{ docTypeLabel }}
+          </div>
+        </ng-template>
       </div>
     </div>
 
-    <div class="pa-field pa-delete">
-      <label class="wa-label">&nbsp;</label>
-      <button
-        class="wa-btn danger full"
-        type="button"
-        (click)="onDeletePrompt()"
-      >
-        Obriši prompt
-      </button>
+    <!-- Desna kolona: akcije -->
+    <div class="action-buttons-right" *ngIf="!isNewPrompt">
+      <div class="pa-field pa-new-version">
+        <label class="wa-label">&nbsp;</label>
+        <button
+          class="wa-btn full"
+          type="button"
+          (click)="onCreateNewVersion()"
+        >
+          + Kreiraj novu verziju
+        </button>
+      </div>
+
+      <div class="pa-field pa-delete">
+        <label class="wa-label">&nbsp;</label>
+        <button
+          class="wa-btn danger full"
+          type="button"
+          (click)="onDeletePrompt()"
+        >
+          Obriši prompt
+        </button>
+      </div>
     </div>
+
+    <ng-template [ngIf]="isNewPrompt">
+      <div class="action-buttons-right">
+        <div class="pa-field">
+          <label class="wa-label">&nbsp;</label>
+          <button class="wa-btn full" type="button" (click)="onSaveNewPrompt()">
+            Sačuvaj novi prompt
+          </button>
+        </div>
+      </div>
+    </ng-template>
   </div>
 </section>

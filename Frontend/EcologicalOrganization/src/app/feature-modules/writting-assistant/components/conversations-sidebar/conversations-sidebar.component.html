@@ -4,7 +4,7 @@
     <h1>Asistirano pisanje</h1>
   </div>
 
-  <button class="wa-btn primary" (click)="onCreateNew()">
+  <button class="wa-btn primary" (click)="onCreateNewPrompt()">
     + Kreiraj novi dokument
   </button>
 
@@ -18,9 +18,7 @@
       *ngFor="let c of conversations"
       [class.selected]="c.id === selectedId"
     >
-      <div class="avatar" (click)="onSelectConversation(c)">
-        {{ "💬" }}
-      </div>
+      <div class="avatar" (click)="onSelectConversation(c)">💬</div>
 
       <div class="meta" (click)="onSelectConversation(c)">
         <div class="title">{{ c.title || "(bez naslova)" }}</div>
