@@ -27,6 +27,20 @@ class PromptVersionOut(BaseModel):
     updated_at: datetime = None
 
 
+    num_executions: Optional[int] = None
+    avg_duration_ms: Optional[float] = None
+    avg_input_tokens: Optional[float] = None
+    avg_output_tokens: Optional[float] = None
+    avg_cost: Optional[float] = None
+    error_rate: Optional[float] = None
+    
+    total_cost_usd: Optional[float] = None
+    rating_count: Optional[int] = None
+    rating_avg: Optional[float] = None
+    rating_median: Optional[float] = None
+    stats_finalized_at: Optional[datetime] = None
+
+
 class PromptVersionQuery(BaseModel):
     page: int = 1
     per_page: int = 20

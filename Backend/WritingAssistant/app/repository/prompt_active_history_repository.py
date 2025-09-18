@@ -14,6 +14,7 @@ from app.model.prompt_active_history import PromptActiveHistory
 from app.model.prompt_version import PromptVersion
 
 
+
 class PromptActiveHistoryRepository(BaseRepository):
     def __init__(self, session_factory: Callable[..., AbstractContextManager[Session]]):
         super().__init__(session_factory, PromptActiveHistory)
@@ -68,22 +69,20 @@ class PromptActiveHistoryRepository(BaseRepository):
     def __init__(self, session_factory: Callable[..., AbstractContextManager[Session]]):
         super().__init__(session_factory, PromptActiveHistory)
 
-    def get_active_prompt_version(self, document_type_id: int) -> PromptVersion:
+    def get_active_prompt_version(self, document_type_id: int) -> Optional[PromptVersion]:
         with self.session_factory() as s:
             pv = (
                 s.query(PromptVersion)
-                 .join(PromptActiveHistory, PromptActiveHistory.prompt_version_id == PromptVersion.id)
-                 .filter(
-                     PromptActiveHistory.document_type_id == document_type_id,
-                     PromptActiveHistory.deleted == 0,
-                     PromptVersion.deleted == 0,
-                 )
-                 .order_by(PromptActiveHistory.activated_at.desc())
-                 .first()
+                .join(PromptActiveHistory, PromptActiveHistory.prompt_version_id == PromptVersion.id)
+                .filter(
+                    PromptActiveHistory.document_type_id == document_type_id,
+                    PromptActiveHistory.deleted == 0,
+                    PromptVersion.deleted == 0,
+                )
+                .order_by(PromptActiveHistory.activated_at.desc())
+                .first()
             )
-            if not pv:
-                raise NotFoundError(detail="Active prompt version not configured for this document type")
-            return pv
+            return pv 
         
 
 

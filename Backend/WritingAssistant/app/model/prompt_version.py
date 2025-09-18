@@ -26,6 +26,28 @@ class PromptVersion(Base):
     created_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(True), server_default=text('CURRENT_TIMESTAMP'))
     updated_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(True))
 
+    num_executions:   Mapped[Optional[int]]   = mapped_column(BigInteger)
+    avg_duration_ms:  Mapped[Optional[float]] = mapped_column(NUMBER(19, 2))
+    avg_input_tokens: Mapped[Optional[float]] = mapped_column(NUMBER(19, 2))
+    avg_output_tokens:Mapped[Optional[float]] = mapped_column(NUMBER(19, 2))
+    avg_cost:         Mapped[Optional[float]] = mapped_column(NUMBER(19, 6))
+    total_cost_usd:   Mapped[Optional[float]] = mapped_column(NUMBER(19, 6))
+    error_rate:       Mapped[Optional[float]] = mapped_column(NUMBER(9, 6))
+    failed_exec_count:Mapped[Optional[int]]   = mapped_column(BigInteger)  
+
+
+    rating_count:     Mapped[Optional[int]]   = mapped_column(BigInteger)
+    rating_avg:       Mapped[Optional[float]] = mapped_column(NUMBER(5, 2))
+    rating_median:    Mapped[Optional[float]] = mapped_column(NUMBER(5, 2))
+    rating_c1:        Mapped[Optional[int]]   = mapped_column(BigInteger)  
+    rating_c2:        Mapped[Optional[int]]   = mapped_column(BigInteger)  
+    rating_c3:        Mapped[Optional[int]]   = mapped_column(BigInteger)  
+    rating_c4:        Mapped[Optional[int]]   = mapped_column(BigInteger)  
+    rating_c5:        Mapped[Optional[int]]   = mapped_column(BigInteger)  
+
+
+    stats_finalized_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(timezone=True))
+
     user: Mapped['User'] = relationship('User', back_populates='prompt_version')
     prompt: Mapped['Prompt'] = relationship('Prompt', back_populates='prompt_version')
     prompt_active_history: Mapped[list['PromptActiveHistory']] = relationship('PromptActiveHistory', back_populates='prompt_version')

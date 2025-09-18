@@ -1,7 +1,6 @@
 <section class="wa-card">
   <div class="wa-header-top">
     <div class="wa-header-left">
-      <!-- Naslov -->
       <div class="wa-title-wrap">
         <ng-container *ngIf="!editingTitle; else editTpl">
           <h2 class="wa-title">{{ title }}</h2>
@@ -33,7 +32,6 @@
         </ng-template>
       </div>
 
-      <!-- Combobox uvek postoji -->
       <div class="wa-doc-type">
         <label class="wa-label" for="docTypeSelect">Tip dokumenta</label>
         <select
@@ -43,7 +41,6 @@
           [ngModel]="documentTypeId"
           (ngModelChange)="onDocTypeChanged($event)"
         >
-          <!-- Prazna opcija za Default -->
           <option *ngFor="let dt of documentTypes" [value]="dt.id">
             {{ dt.name === "Default" ? "" : dt.name }}
           </option>
@@ -52,7 +49,6 @@
     </div>
   </div>
 
-  <!-- Opis samo ako nije Default -->
   <div
     class="wa-doc-desc"
     *ngIf="selectedDocType && selectedDocType.name !== 'Default'"

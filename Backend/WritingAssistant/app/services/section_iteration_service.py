@@ -118,6 +118,11 @@ class SectionIterationService(BaseService):
             prompt_version = self._pah_repo.get_active_prompt_version(int(default_dt.id))
         else:
             prompt_version = self._pah_repo.get_active_prompt_version(document_type_id)
+            if prompt_version is None or prompt_version.deleted == 1:
+                default_dt = self._dt_service.get_by_name_ci("Default")
+                if not default_dt:
+                    raise NotFoundError(detail='Nije pronađen "Default" Document Type')
+                prompt_version = self._pah_repo.get_active_prompt_version(int(default_dt.id))
 
         if not prompt_version:
             raise NotFoundError(

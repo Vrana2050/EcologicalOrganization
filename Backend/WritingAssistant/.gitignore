@@ -197,3 +197,5 @@ pyrightconfig.json
 notes/
 
 /notes/**
+
+.idea/
