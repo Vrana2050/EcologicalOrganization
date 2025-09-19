@@ -4,7 +4,17 @@ from pydantic import BaseModel, Field
 
 from app.schema.pagination_schema import PaginationMeta
 
+class CreateTestChatSession(BaseModel):
+    title: Optional[str] = None
+    document_type_id: Optional[int] = None
+    template_id: Optional[int] = None
+    test_prompt_version_id: Optional[int] = None
 
+    created_by: Optional[int] = None
+    deleted: int = 0
+    is_test_session: int = 0
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
 class CreateChatSession(BaseModel):
     template_id: int
@@ -23,6 +33,9 @@ class ChatSessionOut(BaseModel):
     title: Optional[str]
     updated_at: Optional[datetime]
     document_type_id: int 
+
+    is_test_session: Optional[int] = 0
+    test_prompt_version_id: Optional[int] = None
 
     class Config:
         from_attributes = True  

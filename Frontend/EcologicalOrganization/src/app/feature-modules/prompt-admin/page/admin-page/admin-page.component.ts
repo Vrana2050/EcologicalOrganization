@@ -159,8 +159,6 @@ export class PromptAdminPageComponent implements OnInit {
   }): void {
     this.promptVersionService.createVersion(ev).subscribe({
       next: (created) => {
-        console.log('[page] createVersion OK', created);
-
         if (this.activePrompt) {
           this.versions = this.versions.filter((v) => v.id !== -1 && !v.isNew);
 
@@ -297,13 +295,11 @@ export class PromptAdminPageComponent implements OnInit {
 
     this.promptVersionService.activateVersion(versionId).subscribe({
       next: (activated) => {
-        // 1) U okviru TRENUTNOG prompta: označi samo ovu verziju kao aktivnu
         this.versions = this.versions.map((v) => ({
           ...v,
           isActive: v.id === activated.id,
         }));
 
-        // 2) Postavi activeVersion na editoru (merge da zadržimo eventualne lokalne izmene)
         const newActiveLocal =
           this.versions.find((v) => v.id === activated.id) ||
           ({
@@ -323,24 +319,20 @@ export class PromptAdminPageComponent implements OnInit {
           activeVersion: { ...newActiveLocal, isActive: true },
         };
 
-        // 3) U listi PROMPTA: po istom document_type setuj da je samo ovaj prompt aktivan
         this.prompts = this.prompts.map((p) => {
           if (p.documentTypeId !== currentDocTypeId) return p;
 
           if (p.id === currentPromptId) {
-            // trenutno otvoren prompt -> aktivan
             return {
               ...p,
               isActive: true,
               activeVersion: this.activePrompt!.activeVersion ?? null,
             };
           } else {
-            // svi ostali sa istim doc type -> neaktivni
             return { ...p, isActive: false, activeVersion: null };
           }
         });
 
-        // (opciono) ako želiš da “selected” verzija u sidebaru prati aktivnu:
         const selected = this.versions.find((v) => v.id === activated.id);
         if (selected) {
           this.onVersionSelected(selected);

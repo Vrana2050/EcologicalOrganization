@@ -48,6 +48,13 @@ export class WritingAssistantPageComponent implements OnInit {
       next: (page) => {
         this.conversations = page.items;
         this.loading = false;
+
+        if (this.activeSession?.id) {
+          const full = this.conversations.find(
+            (c) => c.id === this.activeSession!.id
+          );
+          if (full) this.activeSession = full;
+        }
       },
       error: (err) => {
         console.error('Error loading conversations:', err);

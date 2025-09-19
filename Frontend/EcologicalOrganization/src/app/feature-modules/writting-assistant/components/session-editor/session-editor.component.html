@@ -5,6 +5,7 @@
       [globalInstruction]="overview?.latestGlobalInstructionText || ''"
       [documentTypes]="documentTypes"
       [documentTypeId]="session?.documentTypeId || null"
+      [isTestSession]="session?.isTestSession || false"
       (saveTitle)="onSaveSessionTitle($event)"
       (addSection)="onAddSection()"
       (globalInstructionChange)="onGlobalInstructionChange($event)"

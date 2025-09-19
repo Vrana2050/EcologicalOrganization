@@ -33,18 +33,29 @@
       </div>
 
       <div class="wa-doc-type">
-        <label class="wa-label" for="docTypeSelect">Tip dokumenta</label>
-        <select
-          id="docTypeSelect"
-          class="wa-input small"
-          [disabled]="!documentTypes?.length"
-          [ngModel]="documentTypeId"
-          (ngModelChange)="onDocTypeChanged($event)"
-        >
-          <option *ngFor="let dt of documentTypes" [value]="dt.id">
-            {{ dt.name === "Default" ? "" : dt.name }}
-          </option>
-        </select>
+        <label class="wa-label">Tip dokumenta</label>
+
+        <!-- Ako je test session, samo prikaz -->
+        <ng-container *ngIf="isTestSession; else selectTpl">
+          <div class="pa-doc-type" [title]="selectedDocType?.description || ''">
+            {{ selectedDocType?.name || "—" }}
+          </div>
+        </ng-container>
+
+        <!-- Inače combobox -->
+        <ng-template #selectTpl>
+          <select
+            id="docTypeSelect"
+            class="wa-input small wa-doc-type-select"
+            [disabled]="!documentTypes?.length"
+            [ngModel]="documentTypeId"
+            (ngModelChange)="onDocTypeChanged($event)"
+          >
+            <option *ngFor="let dt of documentTypes" [value]="dt.id">
+              {{ dt.name === "Default" ? "" : dt.name }}
+            </option>
+          </select>
+        </ng-template>
       </div>
     </div>
   </div>

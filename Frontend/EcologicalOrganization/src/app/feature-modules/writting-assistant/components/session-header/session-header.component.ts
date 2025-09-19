@@ -1,4 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import { DocumentType } from 'src/app/feature-modules/prompt-admin/models/document-type.model';
 
 @Component({
@@ -19,6 +25,7 @@ export class SessionHeaderComponent {
   @Input() globalInstruction = '';
   @Input() documentTypes: DocumentType[] = [];
   @Input() documentTypeId: number | null = null;
+  @Input() isTestSession = false;
 
   editingTitle = false;
   titleDraft = '';

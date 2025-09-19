@@ -37,6 +37,9 @@ export class SessionEditorComponent implements OnChanges {
     documentTypeId: number;
   }>();
 
+  get isTestSession(): boolean {
+    return !!this.session?.isTestSession;
+  }
   onHeaderDocTypeChange(documentTypeId: number) {
     if (!this.session) return;
     this.documentTypeChanged.emit({ id: this.session.id, documentTypeId });

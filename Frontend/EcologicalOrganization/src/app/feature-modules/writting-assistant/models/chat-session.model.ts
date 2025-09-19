@@ -5,6 +5,9 @@ export interface ChatSession {
   createdBy: number;
   title?: string;
   updatedAt?: string;
+
+  isTestSession?: boolean;
+  promptVersionId?: number | null;
 }
 
 export interface PaginationMeta {

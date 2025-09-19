@@ -20,6 +20,10 @@ export class ChatSessionService {
     return new HttpHeaders({ 'x-user-id': '2' });
   }
 
+  private get adminHeaders(): HttpHeaders {
+    return new HttpHeaders({ 'x-user-id': '2', 'x-user-role': 'ADMIN' });
+  }
+
   list(page = 1, perPage = 20): Observable<ChatSessionPage> {
     return this.http
       .get<any>(this.baseUrl, {
@@ -37,6 +41,8 @@ export class ChatSessionService {
                 createdBy: it.created_by,
                 title: it.title,
                 updatedAt: it.updated_at,
+                isTestSession: it.is_test_session === 1,
+                promptVersionId: it.test_prompt_version_id ?? null,
               })
             ),
             meta: {
@@ -64,6 +70,8 @@ export class ChatSessionService {
             createdBy: raw.created_by,
             title: raw.title,
             updatedAt: raw.updated_at,
+            isTestSession: raw.is_test_session === 1,
+            promptVersionId: raw.test_prompt_version_id ?? null,
           })
         )
       );
@@ -91,6 +99,8 @@ export class ChatSessionService {
             createdBy: raw.created_by,
             title: raw.title,
             updatedAt: raw.updated_at,
+            isTestSession: raw.is_test_session === 1,
+            promptVersionId: raw.test_prompt_version_id ?? null,
           })
         )
       );
@@ -167,6 +177,35 @@ export class ChatSessionService {
             sections: [],
           });
         })
+      );
+  }
+
+  createTestSession(payload: {
+    testPromptVersionId: number;
+    title: string;
+  }): Observable<ChatSession> {
+    const body = {
+      test_prompt_version_id: payload.testPromptVersionId,
+      title: payload.title,
+    };
+
+    return this.http
+      .post<any>(`${this.baseUrl}/test`, body, {
+        headers: new HttpHeaders({ 'x-user-id': '2', 'x-user-role': 'ADMIN' }),
+      })
+      .pipe(
+        map(
+          (raw): ChatSession => ({
+            id: raw.id,
+            templateId: raw.template_id,
+            documentTypeId: raw.document_type_id ?? null,
+            createdBy: raw.created_by,
+            title: raw.title,
+            updatedAt: raw.updated_at,
+            isTestSession: raw.is_test_session === 1,
+            promptVersionId: raw.test_prompt_version_id ?? null,
+          })
+        )
       );
   }
 }

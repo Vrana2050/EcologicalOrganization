@@ -3,7 +3,6 @@
 
   <div class="pa-grid-3">
     <div class="left">
-      <!-- Naziv prompta -->
       <div class="pa-field">
         <label class="wa-label">Naziv prompta</label>
 
@@ -44,11 +43,9 @@
         </ng-template>
       </div>
 
-      <!-- Tip dokumenta -->
       <div class="pa-field">
         <label class="wa-label">Tip dokumenta</label>
 
-        <!-- NOVO: combobox samo za novi (draft) prompt -->
         <ng-container *ngIf="isNewPrompt; else fixedDocTypeTpl">
           <select
             class="wa-input small wa-doc-type-select"
@@ -62,7 +59,6 @@
           </select>
         </ng-container>
 
-        <!-- Stari prikaz (pilula) za postojeće promptove -->
         <ng-template #fixedDocTypeTpl>
           <div class="pa-doc-type" [title]="docTypeLabel">
             {{ docTypeLabel }}
@@ -71,7 +67,6 @@
       </div>
     </div>
 
-    <!-- Desna kolona: akcije -->
     <div class="action-buttons-right" *ngIf="!isNewPrompt">
       <div class="pa-field pa-new-version">
         <label class="wa-label">&nbsp;</label>

@@ -8,6 +8,8 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { PromptVersion } from '../../models/prompt-version.model';
+import { ChatSessionService } from 'src/app/feature-modules/writting-assistant/services/chat-session.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'xp-prompt-version',
@@ -18,6 +20,11 @@ import { PromptVersion } from '../../models/prompt-version.model';
   ],
 })
 export class PromptVersionComponent implements OnChanges, OnDestroy {
+  constructor(
+    private chatSessionService: ChatSessionService,
+    private router: Router
+  ) {}
+
   @Input() version: PromptVersion | null = null;
 
   @Output() saveBasicInfo = new EventEmitter<{
@@ -141,12 +148,7 @@ export class PromptVersionComponent implements OnChanges, OnDestroy {
 
   onSaveNewVersion(): void {
     if (!this.version) return;
-    console.log('[xp] emit saveNewVersion', {
-      promptId: this.version.promptId,
-      name: this.nameDraft,
-      description: this.descriptionDraft,
-      promptText: this.promptTextDraft,
-    });
+
     this.saveNewVersion.emit({
       promptId: this.version.promptId,
       name: (this.nameDraft || '').trim(),
@@ -197,5 +199,13 @@ export class PromptVersionComponent implements OnChanges, OnDestroy {
       clearTimeout(this.textHideTimer);
       this.textHideTimer = null;
     }
+  }
+
+  @Output() goToTest = new EventEmitter<number>();
+
+  onGoToTestPage(): void {
+    if (!this.version || this.isNew) return;
+
+    this.goToTest.emit(this.version.id);
   }
 }

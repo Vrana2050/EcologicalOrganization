@@ -80,7 +80,6 @@ export class DocumentTypeManagementComponent implements OnInit {
         },
       });
     } else {
-      // UPDATE
       this.docTypeService.update(id, newName, this.descDraft).subscribe({
         next: () => {
           this.cancelEdit();

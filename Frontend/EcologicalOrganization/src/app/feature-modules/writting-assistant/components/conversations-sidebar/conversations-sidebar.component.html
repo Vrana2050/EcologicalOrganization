@@ -23,7 +23,10 @@
       </div>
 
       <div class="meta" (click)="onSelectConversation(c)">
-        <div class="title">{{ c.title || "(bez naslova)" }}</div>
+        <div class="title">
+          {{ c.title || "(bez naslova)" }}
+          <span class="chip test" *ngIf="c.isTestSession">TEST</span>
+        </div>
         <div class="sub">
           {{ c.updatedAt ? (c.updatedAt | date : "short") : "" }}
         </div>

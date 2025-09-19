@@ -10,6 +10,8 @@ import { Prompt } from '../../models/prompt.model';
 import { PromptVersion } from '../../models/prompt-version.model';
 import { DocumentType } from '../../models/document-type.model';
 import { DocumentTypeService } from '../../services/document-type.service';
+import { ChatSessionService } from 'src/app/feature-modules/writting-assistant/services/chat-session.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'pa-prompt-editor',
@@ -61,7 +63,6 @@ export class PromptEditorComponent implements OnChanges {
     description: string;
     promptText: string;
   }): void {
-    console.log('[editor] got saveNewVersion', ev);
     this.saveNewVersion.emit(ev);
   }
 
@@ -69,7 +70,11 @@ export class PromptEditorComponent implements OnChanges {
   loading = false;
   error?: string;
 
-  constructor(private documentTypeService: DocumentTypeService) {}
+  constructor(
+    private documentTypeService: DocumentTypeService,
+    private chatSessionService: ChatSessionService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadDocumentTypes();
@@ -139,5 +144,25 @@ export class PromptEditorComponent implements OnChanges {
 
   onDeletePromptVersion(versionId: number): void {
     this.deletePromptVersion.emit(versionId);
+  }
+
+  onGoToTest(versionId: number): void {
+    const now = new Date();
+    const promptName = this.prompt?.title || 'Prompt';
+    const versionName = this.selectedVersion?.name || 'Verzija';
+
+    const title = `Test - ${promptName} ${versionName} - ${now.toLocaleString(
+      'sr-RS'
+    )}`;
+
+    this.chatSessionService
+      .createTestSession({ testPromptVersionId: versionId, title })
+      .subscribe({
+        next: (sess) => this.router.navigate(['/writing-assistant', sess.id]),
+        error: (err) => {
+          console.error('Kreiranje test sesije nije uspelo', err);
+          alert('Kreiranje test sesije nije uspelo.');
+        },
+      });
   }
 }

@@ -18,13 +18,16 @@ class ChatSession(Base):
     )
 
     id: Mapped[int] = mapped_column(BigInteger, Identity(always=False), primary_key=True)
-    template_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    template_id: Mapped[int] = mapped_column(BigInteger, nullable=True)
     created_by: Mapped[int] = mapped_column(BigInteger, nullable=False)
     document_type_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     deleted: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0 '))
     title: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
     created_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(True), server_default=text('CURRENT_TIMESTAMP'))
     updated_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(True))
+
+    is_test_session: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0'))  
+    test_prompt_version_id: Mapped[Optional[int]] = mapped_column(BigInteger, nullable=True)
 
     user: Mapped['User'] = relationship('User', back_populates='chat_session')
     template: Mapped['Template'] = relationship('Template', back_populates='chat_session')

@@ -4,8 +4,9 @@ from typing import List
 from app.schema.session_overview_schema import SessionOverviewOut
 
 from app.core.container import Container
-from app.core.dependencies import get_current_user_id
-from app.schema.chat_session_schema import CreateChatSession, ChatSessionOut, ChatSessionPageOut, PatchChatSessionDocumentType, PatchChatSessionTitle
+from app.core.dependencies import get_current_user_id, require_admin
+from app.core.security import CurrentUser
+from app.schema.chat_session_schema import CreateChatSession, ChatSessionOut, CreateTestChatSession, ChatSessionPageOut, PatchChatSessionDocumentType, PatchChatSessionTitle
 from app.services.chat_session_service import ChatSessionService
 from app.services.session_section_service import SessionSectionService
 from app.core.middleware import inject  
@@ -75,3 +76,15 @@ def patch_chat_session_document_type(
     service: ChatSessionService = Depends(Provide[Container.chat_session_service]),
 ):
     return service.update_document_type(chat_session_id, payload.document_type_id, user_id)
+
+
+
+@router.post("/test", response_model=ChatSessionOut)
+@inject
+def create_test_chat_session(
+    payload: CreateTestChatSession,
+    _: CurrentUser = Depends(require_admin),                 
+    user_id: int = Depends(get_current_user_id),
+    service: ChatSessionService = Depends(Provide[Container.chat_session_service]),
+):
+    return service.add_test(payload, user_id)  

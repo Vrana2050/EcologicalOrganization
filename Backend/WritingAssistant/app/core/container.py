@@ -60,6 +60,7 @@ class Container(containers.DeclarativeContainer):
         repository=chat_session_repository,
         template_repository=template_repository,
         document_type_repository=document_type_repository,
+        prompt_version_repository=prompt_version_repository,
     )
 
 
@@ -93,6 +94,7 @@ class Container(containers.DeclarativeContainer):
         out_repo=model_output_repository,
         llm_service=providers.Singleton(LLMService),
         doc_type_service=document_type_service,   
+        pv_repo=prompt_version_repository,
     )
 
     prompt_service = providers.Factory(
