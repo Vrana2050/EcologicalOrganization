@@ -290,7 +290,67 @@ export class PromptAdminPageComponent implements OnInit {
   }
 
   onSetActiveVersion(versionId: number): void {
-    console.log('Set active version', versionId);
+    if (!this.activePrompt) return;
+
+    const currentPromptId = this.activePrompt.id;
+    const currentDocTypeId = this.activePrompt.documentTypeId;
+
+    this.promptVersionService.activateVersion(versionId).subscribe({
+      next: (activated) => {
+        // 1) U okviru TRENUTNOG prompta: označi samo ovu verziju kao aktivnu
+        this.versions = this.versions.map((v) => ({
+          ...v,
+          isActive: v.id === activated.id,
+        }));
+
+        // 2) Postavi activeVersion na editoru (merge da zadržimo eventualne lokalne izmene)
+        const newActiveLocal =
+          this.versions.find((v) => v.id === activated.id) ||
+          ({
+            id: activated.id,
+            promptId: activated.promptId,
+            name: activated.name,
+            description: activated.description,
+            promptText: activated.promptText,
+            isActive: true,
+            createdAt: activated.createdAt,
+            updatedAt: activated.updatedAt,
+          } as PromptVersion);
+
+        this.activePrompt = {
+          ...this.activePrompt!,
+          isActive: true,
+          activeVersion: { ...newActiveLocal, isActive: true },
+        };
+
+        // 3) U listi PROMPTA: po istom document_type setuj da je samo ovaj prompt aktivan
+        this.prompts = this.prompts.map((p) => {
+          if (p.documentTypeId !== currentDocTypeId) return p;
+
+          if (p.id === currentPromptId) {
+            // trenutno otvoren prompt -> aktivan
+            return {
+              ...p,
+              isActive: true,
+              activeVersion: this.activePrompt!.activeVersion ?? null,
+            };
+          } else {
+            // svi ostali sa istim doc type -> neaktivni
+            return { ...p, isActive: false, activeVersion: null };
+          }
+        });
+
+        // (opciono) ako želiš da “selected” verzija u sidebaru prati aktivnu:
+        const selected = this.versions.find((v) => v.id === activated.id);
+        if (selected) {
+          this.onVersionSelected(selected);
+        }
+      },
+      error: (err) => {
+        console.error('Greška pri aktivaciji verzije:', err);
+        alert('Aktivacija verzije nije uspela. Pokušaj ponovo.');
+      },
+    });
   }
 
   onSaveVersion(ev: {

@@ -1,14 +1,14 @@
 <aside class="sidebar">
   <div class="brand">
     <div class="dot"></div>
-    <h1>Prompt Admin</h1>
+    <a class="sidebar-title" href="/"><h1>Admin Dashboard</h1></a>
   </div>
 
   <button class="wa-btn primary" (click)="onCreateNewPrompt()">
     + Kreiraj novi prompt
   </button>
 
-  <div class="section-title">Prompti</div>
+  <div class="section-title">Promptovi</div>
 
   <div *ngIf="loading">Učitavanje...</div>
 

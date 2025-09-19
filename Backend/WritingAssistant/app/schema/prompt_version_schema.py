@@ -35,6 +35,9 @@ class CreatePromptVersion(BaseModel):
     rating_c5: int = 0
     stats_finalized_at: Optional[datetime] = None
 
+    class Config:
+        from_attributes = True
+
 
 class PromptVersionOut(BaseModel):
     id: int
@@ -58,6 +61,9 @@ class PromptVersionOut(BaseModel):
     rating_avg: Optional[float] = None
     rating_median: Optional[float] = None
     stats_finalized_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
 
 
 class PromptVersionQuery(BaseModel):
