@@ -60,7 +60,6 @@
 
     <tbody>
       <tr *ngFor="let dt of items">
-        <!-- VIEW MODE -->
         <ng-container *ngIf="editingId !== dt.id; else editRowTpl">
           <td>{{ dt.name }}</td>
           <td class="description-cell">{{ dt.description }}</td>
@@ -77,7 +76,6 @@
           </td>
         </ng-container>
 
-        <!-- EDIT MODE -->
         <ng-template #editRowTpl>
           <td>
             <div class="wa-edit-wrap full">

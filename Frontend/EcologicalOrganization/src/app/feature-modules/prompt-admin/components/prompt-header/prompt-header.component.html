@@ -49,7 +49,7 @@
         <ng-container *ngIf="isNewPrompt; else fixedDocTypeTpl">
           <select
             class="wa-input small wa-doc-type-select"
-            [disabled]="!documentTypes?.length"
+            [disabled]="!documentTypes.length"
             [ngModel]="documentTypeId"
             (ngModelChange)="onDocTypeChanged($event)"
           >

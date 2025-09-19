@@ -35,19 +35,17 @@
       <div class="wa-doc-type">
         <label class="wa-label">Tip dokumenta</label>
 
-        <!-- Ako je test session, samo prikaz -->
         <ng-container *ngIf="isTestSession; else selectTpl">
           <div class="pa-doc-type" [title]="selectedDocType?.description || ''">
             {{ selectedDocType?.name || "—" }}
           </div>
         </ng-container>
 
-        <!-- Inače combobox -->
         <ng-template #selectTpl>
           <select
             id="docTypeSelect"
             class="wa-input small wa-doc-type-select"
-            [disabled]="!documentTypes?.length"
+            [disabled]="!documentTypes.length"
             [ngModel]="documentTypeId"
             (ngModelChange)="onDocTypeChanged($event)"
           >
