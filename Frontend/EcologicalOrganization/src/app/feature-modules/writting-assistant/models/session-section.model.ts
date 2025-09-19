@@ -23,6 +23,7 @@ export interface SessionSectionWithLatest {
   name?: string | null;
   position?: number | null;
   latestIteration?: SectionIteration | null;
+  maxSeqNo?: number | null;
 }
 
 export interface SessionOverview {

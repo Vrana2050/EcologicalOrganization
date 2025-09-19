@@ -53,7 +53,10 @@ export class WritingAssistantPageComponent implements OnInit {
           const full = this.conversations.find(
             (c) => c.id === this.activeSession!.id
           );
-          if (full) this.activeSession = full;
+          if (full && full !== this.activeSession) {
+            // ili Object.assign(this.activeSession, full); ako ti odgovara mutacija
+            this.activeSession = { ...this.activeSession, ...full };
+          }
         }
       },
       error: (err) => {
@@ -108,8 +111,7 @@ export class WritingAssistantPageComponent implements OnInit {
 
   onSelectConversation(c: ChatSession): void {
     this.showTemplatesSidebar = false;
-    this.activeSession = c;
-    if (this.activeSession?.id !== c.id) this.activeSession = c;
+    if (this.activeSession?.id === c.id) return;
     this.router.navigate(['/writing-assistant', c.id]);
   }
 

@@ -134,12 +134,8 @@ export class ChatSessionService {
             latestGlobalInstructionText:
               raw.latest_global_instruction_text ?? '',
             sections: (raw.sections || []).map(
-              (x: any): SessionSectionWithLatest => ({
-                id: x.id,
-                sessionId: x.session_id,
-                name: x.name ?? null,
-                position: x.position ?? null,
-                latestIteration: x.latest_iteration
+              (x: any): SessionSectionWithLatest => {
+                const latest = x.latest_iteration
                   ? {
                       id: x.latest_iteration.id,
                       seqNo: x.latest_iteration.seq_no,
@@ -147,8 +143,9 @@ export class ChatSessionService {
                       sectionInstruction: x.latest_iteration.section_instruction
                         ? {
                             id: x.latest_iteration.section_instruction.id,
-                            text: x.latest_iteration.section_instruction
-                              .text_ /* ili .text */,
+                            text:
+                              x.latest_iteration.section_instruction.text_ ??
+                              x.latest_iteration.section_instruction.text,
                             createdAt:
                               x.latest_iteration.section_instruction
                                 .created_at ?? null,
@@ -163,8 +160,18 @@ export class ChatSessionService {
                           }
                         : null,
                     }
-                  : null,
-              })
+                  : null;
+
+                return {
+                  id: x.id,
+                  sessionId: x.session_id,
+                  name: x.name ?? null,
+                  position: x.position ?? null,
+                  latestIteration: latest,
+                  // ⬇⬇⬇ ključno: MAX iz overview-a = latest seq (ako postoji), inače 0
+                  maxSeqNo: latest?.seqNo ?? 0,
+                };
+              }
             ),
           })
         ),

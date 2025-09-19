@@ -84,4 +84,45 @@ export class SessionSectionService {
         }))
       );
   }
+
+  getIteration(
+    sectionId: number,
+    seqNo: number
+  ): Observable<{
+    id: number;
+    seqNo: number;
+    sessionSectionId: number;
+    sectionInstruction?: {
+      id: number;
+      text: string;
+      createdAt?: string | null;
+    } | null;
+    modelOutput?: { id: number; generatedText?: string | null } | null;
+  }> {
+    return this.http
+      .get<any>(`${this.baseUrl}/${sectionId}/iterations/${seqNo}`, {
+        headers: this.headers,
+      })
+      .pipe(
+        map((raw) => ({
+          id: raw.id,
+          seqNo: raw.seq_no,
+          sessionSectionId: raw.session_section_id,
+          sectionInstruction: raw.section_instruction
+            ? {
+                id: raw.section_instruction.id,
+                text:
+                  raw.section_instruction.text_ ?? raw.section_instruction.text,
+                createdAt: raw.section_instruction.created_at ?? null,
+              }
+            : null,
+          modelOutput: raw.model_output
+            ? {
+                id: raw.model_output.id,
+                generatedText: raw.model_output.generated_text ?? null,
+              }
+            : null,
+        }))
+      );
+  }
 }

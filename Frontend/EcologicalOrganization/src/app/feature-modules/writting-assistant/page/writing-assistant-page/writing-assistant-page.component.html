@@ -23,13 +23,13 @@
       </xp-welcome-screen>
 
       <wa-session-editor
-        *ngIf="activeSession"
+        *ngIf="activeSession && sessionOverview"
         [session]="activeSession"
         [documentTypes]="documentTypes"
+        [overview]="sessionOverview"
         (sessionTitleChanged)="onSessionTitleChanged($event)"
         (documentTypeChanged)="onSessionDocTypeChanged($event)"
-      >
-      </wa-session-editor>
+      ></wa-session-editor>
     </div>
   </main>
 </div>

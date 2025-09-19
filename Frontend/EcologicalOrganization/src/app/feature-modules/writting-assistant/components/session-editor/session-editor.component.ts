@@ -1,11 +1,4 @@
-import {
-  Component,
-  Input,
-  OnChanges,
-  SimpleChanges,
-  Output,
-  EventEmitter,
-} from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { ChatSession } from '../../models/chat-session.model';
 import {
   SessionOverview,
@@ -23,9 +16,10 @@ import { DocumentType } from 'src/app/feature-modules/prompt-admin/models/docume
     './session-editor.component.css',
   ],
 })
-export class SessionEditorComponent implements OnChanges {
+export class SessionEditorComponent {
   @Input() session?: ChatSession;
   @Input() documentTypes: DocumentType[] = [];
+  @Input() overview!: SessionOverview;
 
   @Output() sessionTitleChanged = new EventEmitter<{
     id: number;
@@ -37,33 +31,27 @@ export class SessionEditorComponent implements OnChanges {
     documentTypeId: number;
   }>();
 
-  get isTestSession(): boolean {
-    return !!this.session?.isTestSession;
-  }
-  onHeaderDocTypeChange(documentTypeId: number) {
-    if (!this.session) return;
-    this.documentTypeChanged.emit({ id: this.session.id, documentTypeId });
-  }
-
   loading = false;
   error?: string;
-  overview?: SessionOverview;
-
-  trackBySection = (_: number, s: any) => s._key || s.id;
-
-  isNewSection(s: any): boolean {
-    return !!s._isNew;
-  }
 
   constructor(
     private chatSessionService: ChatSessionService,
     private sectionService: SessionSectionService
   ) {}
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['session'] && this.session?.id) {
-      this.fetchOverview(this.session.id);
-    }
+  get isTestSession(): boolean {
+    return !!this.session?.isTestSession;
+  }
+
+  onHeaderDocTypeChange(documentTypeId: number) {
+    if (!this.session) return;
+    this.documentTypeChanged.emit({ id: this.session.id, documentTypeId });
+  }
+
+  trackBySection = (_: number, s: any) => s._key || s.id;
+
+  isNewSection(s: any): boolean {
+    return !!s._isNew;
   }
 
   private fetchOverview(sessionId: number): void {
@@ -170,6 +158,8 @@ export class SessionEditorComponent implements OnChanges {
                   }
                 : null,
             },
+            // ⬇ ključna linija: uvećaj max lokalno
+            maxSeqNo: Math.max(ev.section.maxSeqNo ?? 0, iteration.seq_no),
           };
 
           this.overview = {

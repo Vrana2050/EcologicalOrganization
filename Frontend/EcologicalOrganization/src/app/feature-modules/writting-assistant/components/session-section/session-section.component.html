@@ -26,11 +26,34 @@
     </div>
 
     <div class="wa-section-actions">
-      <!-- <button class="wa-btn">Rezultati</button> -->
-      <!-- <button class="wa-btn" (click)="trySaveTitle()">Sačuvaj</button> -->
+      <div class="iter-nav" *ngIf="showIterationNav">
+        <!-- levo -->
+        <button
+          class="wa-btn small"
+          [disabled]="loadingIter || currentSeq <= 1"
+          [ngStyle]="{ visibility: currentSeq > 1 ? 'visible' : 'hidden' }"
+          (click)="goPrev()"
+        >
+          ←
+        </button>
+
+        <span class="iter-indicator">{{ currentSeq }}/{{ maxSeq }}</span>
+
+        <!-- desno -->
+        <button
+          class="wa-btn small"
+          [disabled]="loadingIter || currentSeq >= maxSeq"
+          [ngStyle]="{ visibility: currentSeq < maxSeq ? 'visible' : 'hidden' }"
+          (click)="goNext()"
+        >
+          →
+        </button>
+      </div>
+
       <button class="wa-btn" (click)="onGenerate()">
         ⚡ Generiši sadržaj sekcije
       </button>
+
       <button class="wa-btn danger" (click)="onRemove()">Ukloni sekciju</button>
     </div>
   </div>

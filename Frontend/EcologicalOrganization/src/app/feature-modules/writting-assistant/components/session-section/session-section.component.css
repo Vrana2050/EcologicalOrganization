@@ -82,3 +82,17 @@
   font-size: 12px;
   line-height: 1;
 }
+
+.iter-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.iter-indicator {
+  opacity: 0.8;
+  font-size: 0.9rem;
+  min-width: 3.5ch;
+  text-align: center;
+}
