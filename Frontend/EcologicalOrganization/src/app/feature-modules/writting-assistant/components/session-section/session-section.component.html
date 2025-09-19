@@ -26,8 +26,8 @@
     </div>
 
     <div class="wa-section-actions">
+      <!-- Navigacija kroz iteracije -->
       <div class="iter-nav" *ngIf="showIterationNav">
-        <!-- levo -->
         <button
           class="wa-btn small"
           [disabled]="loadingIter || currentSeq <= 1"
@@ -39,7 +39,6 @@
 
         <span class="iter-indicator">{{ currentSeq }}/{{ maxSeq }}</span>
 
-        <!-- desno -->
         <button
           class="wa-btn small"
           [disabled]="loadingIter || currentSeq >= maxSeq"
@@ -70,12 +69,33 @@
     </div>
 
     <div class="wa-col">
-      <label class="wa-label">Rezultat</label>
+      <!-- Rezultat sa statusom i dugmetom -->
+      <div class="result-head">
+        <label class="wa-label">Rezultat</label>
+        <div class="result-actions" *ngIf="statusMessageResult">
+          <button
+            class="wa-btn success small"
+            type="button"
+            [disabled]="loadingIter || currentSeq === 0"
+            (click)="onSaveResult()"
+          >
+            Sačuvaj
+          </button>
+          <div
+            class="status"
+            [class.unsaved]="statusTypeResult === 'unsaved'"
+            [class.saved]="statusTypeResult === 'saved'"
+          >
+            {{ statusMessageResult }}
+          </div>
+        </div>
+      </div>
+
       <textarea
         class="wa-input"
-        [value]="section.latestIteration?.modelOutput?.generatedText || ''"
         rows="6"
-        readonly
+        [(ngModel)]="resultDraft"
+        (ngModelChange)="onResultChange()"
         placeholder="Još uvek nema rezultata…"
       ></textarea>
     </div>

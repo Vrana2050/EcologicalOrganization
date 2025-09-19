@@ -135,28 +135,35 @@ export class ChatSessionService {
               raw.latest_global_instruction_text ?? '',
             sections: (raw.sections || []).map(
               (x: any): SessionSectionWithLatest => {
-                const latest = x.latest_iteration
+                const li = x.latest_iteration;
+                const sectionInstruction = li?.section_instruction ?? null;
+                const modelOutput = li?.model_output ?? null;
+                const sectionDraft = li?.section_draft ?? null;
+
+                const latest = li
                   ? {
-                      id: x.latest_iteration.id,
-                      seqNo: x.latest_iteration.seq_no,
-                      sessionSectionId: x.latest_iteration.session_section_id,
-                      sectionInstruction: x.latest_iteration.section_instruction
+                      id: li.id,
+                      seqNo: li.seq_no,
+                      sessionSectionId: li.session_section_id,
+                      sectionInstruction: sectionInstruction
                         ? {
-                            id: x.latest_iteration.section_instruction.id,
+                            id: sectionInstruction.id,
                             text:
-                              x.latest_iteration.section_instruction.text_ ??
-                              x.latest_iteration.section_instruction.text,
-                            createdAt:
-                              x.latest_iteration.section_instruction
-                                .created_at ?? null,
+                              sectionInstruction.text_ ??
+                              sectionInstruction.text,
+                            createdAt: sectionInstruction.created_at ?? null,
                           }
                         : null,
-                      modelOutput: x.latest_iteration.model_output
+                      modelOutput: modelOutput
                         ? {
-                            id: x.latest_iteration.model_output.id,
-                            generatedText:
-                              x.latest_iteration.model_output.generated_text ??
-                              null,
+                            id: modelOutput.id,
+                            generatedText: modelOutput.generated_text ?? null,
+                          }
+                        : null,
+                      sectionDraft: sectionDraft
+                        ? {
+                            id: sectionDraft.id,
+                            content: sectionDraft.content ?? null,
                           }
                         : null,
                     }
@@ -168,7 +175,6 @@ export class ChatSessionService {
                   name: x.name ?? null,
                   position: x.position ?? null,
                   latestIteration: latest,
-                  // ⬇⬇⬇ ključno: MAX iz overview-a = latest seq (ako postoji), inače 0
                   maxSeqNo: latest?.seqNo ?? 0,
                 };
               }

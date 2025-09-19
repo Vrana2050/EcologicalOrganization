@@ -8,7 +8,7 @@ from app.schema.session_overview_schema import SessionSectionWithLatestOut, Sess
 
 from app.schema.section_iteration_schema import SectionIterationOut, SectionInstructionOut, ModelOutputOut
 from app.schema.session_section_schema import PatchSessionSectionTitle
-
+from app.schema.section_draft_schema import SectionDraftOut
 from datetime import datetime, timezone
 
 from app.model.session_section import SessionSection
@@ -72,6 +72,11 @@ class SessionSectionService(BaseService):
                     model_output=(
                         ModelOutputOut.model_validate(it.model_output)
                         if it.model_output and it.model_output.deleted == 0
+                        else None
+                    ),
+                    section_draft=(
+                        SectionDraftOut.model_validate(it.section_draft)
+                        if it.section_draft and it.section_draft.deleted == 0
                         else None
                     ),
                 )

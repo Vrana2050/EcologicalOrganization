@@ -48,6 +48,7 @@ class SessionSectionRepository(BaseRepository):
                 .options(
                     joinedload(SectionIteration.section_instruction),
                     joinedload(SectionIteration.model_output),
+                    joinedload(SectionIteration.section_draft),
                 )
                 .all()
             )

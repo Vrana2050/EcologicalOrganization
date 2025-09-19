@@ -9,6 +9,8 @@ from app.services.section_iteration_service import SectionIterationService
 from app.schema.section_iteration_schema import SectionIterationOut, GenerateIterationIn
 from app.core.security import CurrentUser
 from app.core.dependencies import get_current_user, get_current_user_id
+from app.schema.section_draft_schema import CreateSectionDraft
+from app.schema.section_draft_schema import SaveDraftIn
 
 router = APIRouter(prefix="/session-section", tags=["session-sections"])
 
@@ -66,3 +68,16 @@ def patch_chat_session_title(
     service: SessionSectionService = Depends(Provide[Container.session_section_service]),
 ):
     return service.update_title(session_section_id, payload.name, user_id)
+
+
+
+@router.put("/{section_id}/iterations/{seq_no}/draft", response_model=SectionIterationOut)
+@inject
+def upsert_draft(
+    section_id: int,
+    seq_no: int,
+    payload: SaveDraftIn,
+    user_id: int = Depends(get_current_user_id),
+    service: SectionIterationService = Depends(Provide[Container.section_iteration_service]),
+):
+    return service.upsert_draft_for_iteration(section_id, seq_no, payload.content, user_id)

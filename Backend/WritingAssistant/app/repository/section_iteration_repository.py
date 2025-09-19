@@ -13,19 +13,24 @@ class SectionIterationRepository(BaseRepository):
 
     def by_section_and_seq(self, section_id: int, seq_no: int) -> Optional[SectionIteration]:
         with self.session_factory() as s:
-            return (
+            it = (
                 s.query(SectionIteration)
-                 .filter(
+                .filter(
                     SectionIteration.session_section_id == section_id,
                     SectionIteration.seq_no == seq_no,
                     SectionIteration.deleted == 0,
-                 )
-                 .options(
+                )
+                .options(
                     joinedload(SectionIteration.section_instruction),
                     joinedload(SectionIteration.model_output),
-                 )
-                 .first()
+                    joinedload(SectionIteration.section_draft),
+                )
+                .first()
             )
+            if it:
+                s.refresh(it)      
+                s.expunge(it)      
+            return it
 
     def next_seq_for_section(self, section_id: int) -> int:
         with self.session_factory() as s:

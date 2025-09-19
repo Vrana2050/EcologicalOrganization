@@ -9,6 +9,8 @@ class ModelOutputOut(BaseModel):
     class Config:
         from_attributes = True
 
+
+
 class SectionInstructionOut(BaseModel):
     id: int
     text_: str
@@ -31,12 +33,23 @@ class CreateSectionIteration(BaseModel):
     model_output_id: Optional[int] = None
     section_draft_id: Optional[int] = None
 
+class SectionDraftOut(BaseModel):
+    id: int
+    created_by: Optional[int] = None
+    content: Optional[str] = None
+    model_output: Optional[int] = None
+    created_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
 class SectionIterationOut(BaseModel):
     id: int
     seq_no: int
     session_section_id: int
     section_instruction: Optional[SectionInstructionOut] = None
     model_output: Optional[ModelOutputOut] = None
+    section_draft: Optional[SectionDraftOut] = None  # ⬅ dodato
 
     class Config:
         from_attributes = True

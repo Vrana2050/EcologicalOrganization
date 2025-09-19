@@ -9,12 +9,19 @@ export interface SectionInstruction {
   createdAt?: string | null;
 }
 
+export interface SectionDraft {
+  id: number;
+  content?: string | null;
+  // createdAt?: string | null; // ako bude trebalo kasnije
+}
+
 export interface SectionIteration {
   id: number;
   seqNo: number;
   sessionSectionId: number;
   sectionInstruction?: SectionInstruction | null;
   modelOutput?: ModelOutput | null;
+  sectionDraft?: SectionDraft | null;
 }
 
 export interface SessionSectionWithLatest {

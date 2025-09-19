@@ -31,6 +31,11 @@ from app.model.session_section import SessionSection
 from app.model.chat_session import ChatSession
 from app.model.section_iteration import SectionIteration
 
+from app.repository.section_draft_repository import SectionDraftRepository
+from app.schema.section_draft_schema import CreateSectionDraft
+from app.model.section_draft import SectionDraft
+from app.schema.section_draft_schema import CreateSectionDraft, UpdateSectionDraft
+
 from app.core.security import CurrentUser
 
 
@@ -47,7 +52,8 @@ class SectionIterationService(BaseService):
         out_repo: ModelOutputRepository,
         llm_service: LLMService,
         doc_type_service: DocumentTypeService,
-        pv_repo: PromptVersionRepository,                      
+        pv_repo: PromptVersionRepository,   
+        draft_repo: SectionDraftRepository,                   
     ):
         super().__init__(repository)
         self._iter_repo = repository
@@ -61,6 +67,7 @@ class SectionIterationService(BaseService):
         self._llm = llm_service
         self._dt_service = doc_type_service
         self._pv_repo = pv_repo   
+        self._draft_repo = draft_repo
 
     def _compose_final_prompt(
         self,
@@ -96,7 +103,6 @@ class SectionIterationService(BaseService):
 
         if section.session.created_by != user_id:
             raise AuthError(detail="Forbidden")
-
         if section.deleted == 1:
             raise NotFoundError(detail="Section not found")
 
@@ -104,7 +110,7 @@ class SectionIterationService(BaseService):
         if not iteration:
             raise NotFoundError(detail="Iteration not found")
 
-        return iteration
+        return SectionIterationOut.model_validate(iteration)
 
     def _resolve_prompt_version(
         self,
@@ -264,3 +270,40 @@ class SectionIterationService(BaseService):
             ),
             model_output=ModelOutputOut.model_validate(out),
         )
+    
+
+    def upsert_draft_for_iteration(
+        self,
+        section_id: int,
+        seq_no: int,
+        content: str,
+        user_id: int,
+    ) -> SectionIterationOut:
+        section = self._sec_repo.read_by_id(section_id, eagers=[SessionSection.session])
+        if section.session.created_by != user_id:
+            raise AuthError(detail="Forbidden")
+        if section.deleted == 1:
+            raise NotFoundError(detail="Section not found")
+
+        it = self._iter_repo.by_section_and_seq(section_id, seq_no)
+        if not it:
+            raise NotFoundError(detail="Iteration not found")
+
+        if it.section_draft_id:
+            
+            self._draft_repo.update_attr(int(it.section_draft_id), "content", content)
+        else:
+
+            draft = self._draft_repo.create(
+                CreateSectionDraft(
+                    created_by=int(user_id),
+                    content=content,
+                    model_output=int(it.model_output_id) if it.model_output_id else None,
+                    deleted=0,
+                )
+            )
+            self._iter_repo.update_attr(int(it.id), "section_draft_id", int(draft.id))
+
+
+        it_updated = self._iter_repo.by_section_and_seq(section_id, seq_no)
+        return SectionIterationOut.model_validate(it_updated)

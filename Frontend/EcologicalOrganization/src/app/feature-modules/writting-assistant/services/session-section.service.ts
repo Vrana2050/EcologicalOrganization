@@ -98,6 +98,7 @@ export class SessionSectionService {
       createdAt?: string | null;
     } | null;
     modelOutput?: { id: number; generatedText?: string | null } | null;
+    sectionDraft?: { id: number; content?: string | null } | null;
   }> {
     return this.http
       .get<any>(`${this.baseUrl}/${sectionId}/iterations/${seqNo}`, {
@@ -120,6 +121,63 @@ export class SessionSectionService {
             ? {
                 id: raw.model_output.id,
                 generatedText: raw.model_output.generated_text ?? null,
+              }
+            : null,
+          sectionDraft: raw.section_draft
+            ? {
+                id: raw.section_draft.id,
+                content: raw.section_draft.content ?? null,
+              }
+            : null,
+        }))
+      );
+  }
+
+  saveDraft(
+    sectionId: number,
+    seqNo: number,
+    content: string
+  ): Observable<{
+    id: number;
+    seqNo: number;
+    sessionSectionId: number;
+    sectionInstruction?: {
+      id: number;
+      text: string;
+      createdAt?: string | null;
+    } | null;
+    modelOutput?: { id: number; generatedText?: string | null } | null;
+    sectionDraft?: { id: number; content?: string | null } | null;
+  }> {
+    return this.http
+      .put<any>(
+        `${this.baseUrl}/${sectionId}/iterations/${seqNo}/draft`,
+        { content },
+        { headers: this.headers }
+      )
+      .pipe(
+        map((raw) => ({
+          id: raw.id,
+          seqNo: raw.seq_no,
+          sessionSectionId: raw.session_section_id,
+          sectionInstruction: raw.section_instruction
+            ? {
+                id: raw.section_instruction.id,
+                text:
+                  raw.section_instruction.text_ ?? raw.section_instruction.text,
+                createdAt: raw.section_instruction.created_at ?? null,
+              }
+            : null,
+          modelOutput: raw.model_output
+            ? {
+                id: raw.model_output.id,
+                generatedText: raw.model_output.generated_text ?? null,
+              }
+            : null,
+          sectionDraft: raw.section_draft
+            ? {
+                id: raw.section_draft.id,
+                content: raw.section_draft.content ?? null,
               }
             : null,
         }))

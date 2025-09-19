@@ -15,7 +15,8 @@
 
 .wa-section-actions {
   display: flex;
-  gap: 15px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .wa-section-title {
@@ -46,11 +47,6 @@
   resize: vertical;
 }
 
-.wa-section-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
 .wa-title-wrap {
   display: flex;
   align-items: center;
@@ -95,4 +91,39 @@
   font-size: 0.9rem;
   min-width: 3.5ch;
   text-align: center;
+}
+
+.result-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.result-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  height: 20px;
+}
+
+.status.unsaved {
+  color: #b71c1c;
+  background: #ffcdd2;
+}
+
+.status.saved {
+  color: #1b5e20;
+  background: #c8e6c9;
 }

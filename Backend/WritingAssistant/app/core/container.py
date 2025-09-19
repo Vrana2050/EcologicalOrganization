@@ -14,6 +14,7 @@ from app.repository.prompt_repository import PromptRepository
 from app.repository.document_type_repository import DocumentTypeRepository
 from app.repository.prompt_version_repository import PromptVersionRepository
 from app.repository.template_repository import TemplateRepository
+from app.repository.section_draft_repository import SectionDraftRepository
 
 from app.services.chat_session_service import ChatSessionService
 from app.services.session_section_service import SessionSectionService
@@ -53,6 +54,7 @@ class Container(containers.DeclarativeContainer):
     document_type_repository = providers.Factory(DocumentTypeRepository, session_factory=db.provided.session)
     prompt_version_repository = providers.Factory(PromptVersionRepository, session_factory=db.provided.session)   
     template_repository = providers.Factory(TemplateRepository, session_factory=db.provided.session)
+    section_draft_repository = providers.Factory(SectionDraftRepository, session_factory=db.provided.session)
 
     # services
     chat_session_service = providers.Factory(
@@ -95,6 +97,7 @@ class Container(containers.DeclarativeContainer):
         llm_service=providers.Singleton(LLMService),
         doc_type_service=document_type_service,   
         pv_repo=prompt_version_repository,
+        draft_repo=section_draft_repository,
     )
 
     prompt_service = providers.Factory(

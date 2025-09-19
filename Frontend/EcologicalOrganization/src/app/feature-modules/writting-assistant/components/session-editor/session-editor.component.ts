@@ -231,4 +231,51 @@ export class SessionEditorComponent {
         });
       });
   }
+
+  onSaveEdited(ev: { sectionId: number; seqNo: number; text: string }) {
+    if (!this.overview) return;
+
+    this.sectionService.saveDraft(ev.sectionId, ev.seqNo, ev.text).subscribe({
+      next: (iter) => {
+        // imutabilno ažuriraj overview
+        this.overview = {
+          ...this.overview!,
+          sections: this.overview!.sections.map((s) => {
+            if (s.id !== ev.sectionId) return s;
+
+            const updatedLatest = {
+              id: iter.id,
+              seqNo: iter.seqNo,
+              sessionSectionId: iter.sessionSectionId,
+              sectionInstruction: iter.sectionInstruction
+                ? {
+                    id: iter.sectionInstruction.id,
+                    text: iter.sectionInstruction.text,
+                    createdAt: iter.sectionInstruction.createdAt ?? null,
+                  }
+                : null,
+              modelOutput: iter.modelOutput
+                ? {
+                    id: iter.modelOutput.id,
+                    generatedText: iter.modelOutput.generatedText ?? null,
+                  }
+                : null,
+              sectionDraft: iter.sectionDraft
+                ? {
+                    id: iter.sectionDraft.id,
+                    content: iter.sectionDraft.content ?? null,
+                  }
+                : null,
+            };
+
+            return { ...s, latestIteration: updatedLatest };
+          }),
+        };
+        // Child dobija novi Input i sam resetuje status kroz ngOnChanges/hydrateFromSection
+      },
+      error: (err) => {
+        console.error('Greška pri čuvanju drafta', err);
+      },
+    });
+  }
 }
