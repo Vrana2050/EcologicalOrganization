@@ -158,7 +158,6 @@ export class SessionEditorComponent {
                   }
                 : null,
             },
-            // ⬇ ključna linija: uvećaj max lokalno
             maxSeqNo: Math.max(ev.section.maxSeqNo ?? 0, iteration.seq_no),
           };
 
@@ -237,7 +236,6 @@ export class SessionEditorComponent {
 
     this.sectionService.saveDraft(ev.sectionId, ev.seqNo, ev.text).subscribe({
       next: (iter) => {
-        // imutabilno ažuriraj overview
         this.overview = {
           ...this.overview!,
           sections: this.overview!.sections.map((s) => {
@@ -271,7 +269,6 @@ export class SessionEditorComponent {
             return { ...s, latestIteration: updatedLatest };
           }),
         };
-        // Child dobija novi Input i sam resetuje status kroz ngOnChanges/hydrateFromSection
       },
       error: (err) => {
         console.error('Greška pri čuvanju drafta', err);

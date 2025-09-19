@@ -12,7 +12,6 @@ export interface SectionInstruction {
 export interface SectionDraft {
   id: number;
   content?: string | null;
-  // createdAt?: string | null; // ako bude trebalo kasnije
 }
 
 export interface SectionIteration {

@@ -54,7 +54,6 @@ export class WritingAssistantPageComponent implements OnInit {
             (c) => c.id === this.activeSession!.id
           );
           if (full && full !== this.activeSession) {
-            // ili Object.assign(this.activeSession, full); ako ti odgovara mutacija
             this.activeSession = { ...this.activeSession, ...full };
           }
         }
