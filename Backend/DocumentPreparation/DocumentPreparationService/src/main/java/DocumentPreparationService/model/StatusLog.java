@@ -34,11 +34,11 @@ public class StatusLog {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "prethodno_stanje")
-    private Status prethodnoStanje;
+    private TokStatus prethodnoStanje;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "novo_stanje")
-    private Status novoStanje;
+    private TokStatus novoStanje;
 
     public StatusLog(){}
 }
