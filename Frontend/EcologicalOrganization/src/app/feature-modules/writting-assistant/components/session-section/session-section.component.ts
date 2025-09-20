@@ -45,12 +45,10 @@ export class SessionSectionComponent implements OnInit, OnChanges {
   titleDraft = '';
   invalidTitle = false;
 
-  // Iter-navigacija
   currentSeq = 0;
   maxSeq = 0;
   loadingIter = false;
 
-  // Rezultat editable
   resultDraft = '';
   statusMessageResult: string | null = null;
   statusTypeResult: 'unsaved' | 'saved' | null = null;
@@ -68,7 +66,6 @@ export class SessionSectionComponent implements OnInit, OnChanges {
     }
   }
 
-  // === Helpers ===
   private getLatestInstruction(): string {
     return this.section?.latestIteration?.sectionInstruction?.text ?? '';
   }
@@ -106,7 +103,6 @@ export class SessionSectionComponent implements OnInit, OnChanges {
     this.resetStatus();
   }
 
-  // === Computed props ===
   get showIterationNav(): boolean {
     return !!this.currentSeq && this.maxSeq > 1 && !this.isNew;
   }
@@ -144,7 +140,6 @@ export class SessionSectionComponent implements OnInit, OnChanges {
     this.titleDraft = this.section?.name ?? '';
   }
 
-  // === Section actions ===
   onRemove() {
     this.remove.emit(this.section);
   }
@@ -156,7 +151,6 @@ export class SessionSectionComponent implements OnInit, OnChanges {
     });
   }
 
-  // === Result edit/save ===
   onResultChange() {
     if (this.currentSeq === 0) return;
     if (this.hasUnsavedResult) {
@@ -201,7 +195,6 @@ export class SessionSectionComponent implements OnInit, OnChanges {
     }
   }
 
-  // === Iteration navigation ===
   private fetch(seq: number) {
     this.loadingIter = true;
     this.sectionSvc.getIteration(this.section.id, seq).subscribe({

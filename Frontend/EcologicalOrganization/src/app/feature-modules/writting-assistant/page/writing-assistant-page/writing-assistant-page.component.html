@@ -11,6 +11,7 @@
     *ngIf="showTemplatesSidebar"
     (hide)="closeTemplates()"
     (created)="onSessionCreated($event)"
+    [documentTypes]="documentTypes"
   >
   </wa-templates-sidebar>
 

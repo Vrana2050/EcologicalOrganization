@@ -12,7 +12,9 @@
   </div>
 
   <div class="actions">
-    <button class="wa-btn full" type="button">+ Kreiraj novi šablon</button>
+    <button class="wa-btn full" type="button" (click)="openCreateModal()">
+      + Kreiraj novi šablon
+    </button>
   </div>
 
   <div *ngIf="loading" class="loading">Učitavanje…</div>
@@ -31,3 +33,12 @@
     </button>
   </div>
 </aside>
+
+<!-- Modal -->
+<xp-add-new-template
+  *ngIf="showCreateModal"
+  [documentTypes]="documentTypes"
+  (close)="onModalClose()"
+  (created)="onTemplateCreated($event)"
+>
+</xp-add-new-template>

@@ -8,6 +8,7 @@ import { SessionEditorComponent } from './components/session-editor/session-edit
 import { SessionHeaderComponent } from './components/session-header/session-header.component';
 import { SessionSectionComponent } from './components/session-section/session-section.component';
 import { FormsModule } from '@angular/forms';
+import { AddNewTemplateComponent } from './components/add-new-template/add-new-template.component';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { FormsModule } from '@angular/forms';
     SessionEditorComponent,
     SessionHeaderComponent,
     SessionSectionComponent,
+    AddNewTemplateComponent,
   ],
   imports: [CommonModule, FormsModule],
 })

@@ -36,4 +36,19 @@ export class TemplateService {
         }))
       );
   }
+
+  create(formData: FormData): Observable<Template> {
+    const headers = new HttpHeaders({ 'x-user-id': '2' });
+    return this.http.post<any>(this.baseUrl, formData, { headers }).pipe(
+      map(
+        (t: any): Template => ({
+          id: t.id,
+          name: t.name,
+          documentTypeId: t.document_type_id,
+          updatedAt: t.updated_at,
+          documentTypeName: t.document_type_name,
+        })
+      )
+    );
+  }
 }

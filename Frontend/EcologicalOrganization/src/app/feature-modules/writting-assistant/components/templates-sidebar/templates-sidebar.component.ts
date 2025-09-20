@@ -1,8 +1,9 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, Input } from '@angular/core';
 import { TemplateService } from '../../services/template.service';
 import { Template } from '../../models/template.model';
 import { ChatSessionService } from '../../services/chat-session.service';
 import { ChatSession } from '../../models/chat-session.model';
+import { DocumentType } from 'src/app/feature-modules/prompt-admin/models/document-type.model';
 
 @Component({
   selector: 'wa-templates-sidebar',
@@ -16,6 +17,10 @@ export class TemplatesSidebarComponent implements OnInit {
 
   @Output() hide = new EventEmitter<void>();
   @Output() created = new EventEmitter<ChatSession>();
+
+  @Input() documentTypes: DocumentType[] = [];
+
+  showCreateModal = false;
 
   constructor(
     private templateService: TemplateService,
@@ -52,5 +57,18 @@ export class TemplatesSidebarComponent implements OnInit {
         this.creating = false;
       },
     });
+  }
+
+  openCreateModal() {
+    console.log('open');
+    this.showCreateModal = true;
+  }
+  onModalClose() {
+    this.showCreateModal = false;
+  }
+  onTemplateCreated(tpl: Template) {
+    const dt = this.documentTypes.find((d) => d.id === tpl.documentTypeId);
+    tpl.documentTypeName = dt ? dt.name : '';
+    this.templates = [tpl, ...this.templates];
   }
 }

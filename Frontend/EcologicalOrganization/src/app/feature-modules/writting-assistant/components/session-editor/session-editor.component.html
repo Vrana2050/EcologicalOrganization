@@ -1,8 +1,8 @@
 <div class="wa-editor">
   <div class="wa-editor-inner" *ngIf="!loading && !error; else stateTpl">
     <wa-session-header
-      [title]="overview?.title || session?.title || ''"
-      [globalInstruction]="overview?.latestGlobalInstructionText || ''"
+      [title]="overview.title || session?.title || ''"
+      [globalInstruction]="overview.latestGlobalInstructionText || ''"
       [documentTypes]="documentTypes"
       [documentTypeId]="session?.documentTypeId || null"
       [isTestSession]="session?.isTestSession || false"

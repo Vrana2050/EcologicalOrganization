@@ -199,3 +199,8 @@ notes/
 /notes/**
 
 .idea/
+
+
+app/storage/
+
+app/stoorage/*
