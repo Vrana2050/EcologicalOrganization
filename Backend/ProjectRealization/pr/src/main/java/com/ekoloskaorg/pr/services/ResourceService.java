@@ -39,4 +39,6 @@ public class ResourceService extends AbstractCrudService<Resource, Long, Resourc
                 .orElseThrow(() -> new EntityNotFoundException("UnitOfMeasure %d not found".formatted(dto.unitOfMeasureId())));
         e.setUnitOfMeasure(uom);
     }
+
+
 }

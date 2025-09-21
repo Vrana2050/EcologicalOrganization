@@ -12,6 +12,9 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -39,4 +42,11 @@ public class StatusService extends AbstractCrudService<Status, Long, StatusDto> 
                 .orElseThrow(() -> new EntityNotFoundException("Project %d not found".formatted(dto.projectId())));
         e.setProject(p);
     }
+
+    @Transactional(readOnly = true)
+    public List<StatusDto> getAllowedNext(long projectId, long taskId) {
+        var entities = repo.findAllowedNextEntities(projectId, taskId);
+        return entities.stream().map(mapper::toDto).toList();
+    }
+
 }
