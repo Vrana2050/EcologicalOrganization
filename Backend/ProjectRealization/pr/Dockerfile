@@ -13,6 +13,6 @@ COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
 COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
 COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
 
-EXPOSE 8761
+EXPOSE 8006
 
-ENTRYPOINT ["java", "-cp", "app:app/lib/*", "rs.ac.uns.acs.nais.EurekaService.EurekaServiceApplication"]
+ENTRYPOINT ["java", "-cp", "app:app/lib/*", "com.ekoloskaorg.pr.PrApplication"]

@@ -54,8 +54,14 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
         </dependency>
-        
-        <dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+
+
+		<dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-contract-stub-runner</artifactId>
             <exclusions>
@@ -65,11 +71,13 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
-        <dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
+
+
 	</dependencies>
 
 	<build>

@@ -9,7 +9,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-
+/*
 
 @RequiredArgsConstructor
 public class AnalyticsRepository {
@@ -64,4 +64,4 @@ public class AnalyticsRepository {
                 )
         );
     }
-}
+}*/

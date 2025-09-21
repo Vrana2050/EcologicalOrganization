@@ -11,6 +11,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 
 public abstract class AbstractCrudController<D, ID> {
 
@@ -24,6 +26,7 @@ public abstract class AbstractCrudController<D, ID> {
     public ResponseEntity<Page<D>> list(Pageable pageable) {
         return ResponseEntity.ok(service.list(pageable));
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<D> get(@PathVariable ID id) {
