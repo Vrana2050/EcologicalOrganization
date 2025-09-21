@@ -1,49 +1,111 @@
 version: '3.8'
 
 services:
-  eureka-server:
-    build:
-      context: ./EurekaService
-      dockerfile: Dockerfile
-    image: eureka-server:latest
-    ports:
-      - "8761:8761"
 
   gateway-api:
     build:
       context: ./GatewayService
       dockerfile: Dockerfile
     image: gateway-api:latest
-    environment:
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
     depends_on:
-      - eureka-server
-      # - elastic-search-service
+      - user-management-service
       # - relational-service
       # - document-service
       #- graph-service
       #- timeseries-service
       # - columnar-key-value-service
-      - standalone
-      - vector-database-service
+      #- standalone
+      #- vector-database-service
+    environment:
+      GATEWAY_PORT: "9000"
+      WRITING_ASSISTANT_URL: "http://writing-assistant-service:8000/writing-assistant"
+      DOCUMENT_PREPARATION_URL: "http://document-preparation-service:8005/api/docPrep"
+      PROJECT_REALIZATION_URL: "http://project-realization-service:8006/project-realization"
+      DOCUMENT_MANAGEMENT_URL: "http://document-management-service:8080/document-management"
+      USER_MANAGEMENT_URL: "http://user-management-service:8007/"
+      USER_MGMT_AUTH_URL: "http://user-management-service:8007/auth/user-credentials"
     ports:
-      - "9003:9000"
+      - "9000:9000"
 
-  # relational-service:
-  #   build:
-  #     context: ./RelationalDatabaseService
-  #     dockerfile: Dockerfile
-  #   image: relational-service:latest
-  #   depends_on:
-  #     - postgresdb
-  #     - eureka-server
-  #   environment:
-  #     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
-  #     SPRING_DATASOURCE_URL: "jdbc:postgresql://postgresdb:5432/nais"
-  #     SPRING_DATASOURCE_USERNAME: nais
-  #     SPRING_DATASOURCE_PASSWORD: nais
-  #   ports:
-  #     - "9030:9030"
+  
+  user-management-service:
+     build:
+       context: ./UserManagement
+       dockerfile: Dockerfile
+     image: user-management-service:latest
+     depends_on:
+       - user-management-postgres
+     ports:
+       - "8007:8007"
+     environment:
+      DATABASE_URL: "postgresql+psycopg2://postgres:postgres@user-management-postgres:5432/UserManagement"
+
+
+  user-management-postgres:
+    image: postgres:16
+    container_name: user-management-postgres
+    restart: unless-stopped
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-UserManagement}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  project-realization-service:
+    build:
+      context: ./ProjectRealization/pr
+      dockerfile: ./Dockerfile
+    image: project-realization:latest
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@//host.docker.internal:1522/XEPDB1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8006:8006"
+  
+  document-preparation-service:
+    build:
+      context: ./DocumentPreparation/DocumentPreparationService
+      dockerfile: ./Dockerfile
+    image: document-preparation-service:latest
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@//host.docker.internal:1521/XEPDB1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8005:8005"
+
+  document-management-service:
+    build:
+      context: ./DocumentManagement/app
+      dockerfile: ./Dockerfile
+    image: document-management-service:latest
+    environment:
+      - DATABASE_URL=jdbc:oracle:thin:@//host.docker.internal:1521/XEPDB1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8080:8080"
+
+  
+  #writing-assistant-service:
+  #  build:
+  #    context: ./WritingAssistant
+  #    dockerfile: ./Dockerfile
+  #  image: writing-assistant-service:latest
+  #  environment:
+  #   - DATABASE_URL=jdbc:oracle:thin:@//host.docker.internal:1521/XEPDB1
+  #  extra_hosts:
+  #    - "host.docker.internal:host-gateway"
+  #  ports:
+  #    - "8000:8000"
+
+volumes:
+  pg_data:
+
 
   # document-service:
   #   build:
@@ -305,8 +367,3 @@ services:
   #     REDIS_HOST: redisdb
   #     REDIS_PORT: 6379
 
-
-volumes:
-  # data:
-  # influxdb-storage:
-  # grafana_storage: { }

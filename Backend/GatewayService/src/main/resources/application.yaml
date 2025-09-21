@@ -1,14 +1,10 @@
 server:
-  port: 9000
+  port: ${GATEWAY_PORT:9000}
 
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-      
 spring:
   application:
-    name: gateway-api
+
+    name: ${APP_NAME:gateway-api}
   cloud:
     gateway:
       discovery:
@@ -16,36 +12,35 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-        - id: relational-database-service
-          uri: http://relational-database-service
+        - id: writing-assistant-service
+          uri: ${WRITING_ASSISTANT_URL:http://localhost:8000/writing-assistant}
           predicates:
-            - Path=/relational-database-service/**
-        - id: document-database-service
-          uri: http://document-database-service
-          predicates:
-            - Path=/document-database-service/**
-        - id: graph-database-service
-          uri: http://graph-database-service
-          predicates:
-            - Path=/graph-database-service/**
-        - id: document-database-service
-          uri: http://document-database-service
-          predicates:
-            - Path=/document-database-service/**
-        - id: columnar-database-service
-          uri: http://columnar-database-service
-          predicates:
-            - Path=/columnar-database-service/**
-        - id: elasticsearch-database-service
-          uri: http://elasticsearch-database-service
-          predicates:
-            - Path=/elasticsearch-database-service/**
-        - id: timeseries-database-service
-          uri: http://timeseries-database-service
-          predicates:
-            - Path=/timeseries-database-service/**
-        - id: vector-database-service
-          uri: http://vector-database-service
-          predicates:
-            - Path=/vector-database-service
+            - Path=/writing-assistant/**
+          filters:
+            - name: UserManagementAuth
 
+        - id: document-preparation-service
+          uri: ${DOCUMENT_PREPARATION_URL:http://localhost:8005/api/docPrep}
+          predicates:
+            - Path=/api/docPrep/**
+          filters:
+            - name: UserManagementAuth
+
+        - id: project-realization-service
+          uri: ${PROJECT_REALIZATION_URL:http://localhost:8006/project-realization}
+          predicates:
+            - Path=/project-realization/**
+          filters:
+            - name: UserManagementAuth
+
+        - id: document-management-service
+          uri: ${DOCUMENT_MANAGEMENT_URL:http://localhost:8081/document-management}
+          predicates:
+            - Path=/document-management/**
+          filters:
+            - name: UserManagementAuth
+
+        - id: user-management-service
+          uri: ${USER_MANAGEMENT_URL:http://localhost:8007/}
+          predicates:
+            - Path=/auth/**
