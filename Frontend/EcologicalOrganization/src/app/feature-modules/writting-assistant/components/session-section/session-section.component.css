@@ -12,13 +12,11 @@
   gap: 12px;
   margin-bottom: 10px;
 }
-
 .wa-section-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
-
 .wa-section-title {
   margin: 0;
   font-size: 16px;
@@ -29,22 +27,36 @@
   flex-direction: column;
   gap: 12px;
 }
+.wa-col {
+  display: flex;
+  flex-direction: column;
+}
 
 .wa-label {
   font-size: 12px;
   color: var(--wa-muted);
-  display: block;
   margin-bottom: 6px;
 }
 
 .wa-input {
-  width: 98%;
+  display: block;
+  width: 100%;
   background: var(--wa-panel-2);
   color: var(--wa-text);
   border: 1px solid var(--wa-line);
   border-radius: 10px;
-  padding: 10px;
-  resize: vertical;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+textarea.wa-input.wa-result {
+  width: 100%;
+  min-height: 44px;
+  line-height: 1.4;
+  resize: none;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .wa-title-wrap {
@@ -52,7 +64,6 @@
   align-items: center;
   gap: 8px;
 }
-
 .wa-edit-icon {
   cursor: pointer;
   font-size: 14px;
@@ -61,7 +72,6 @@
 .wa-edit-icon:hover {
   color: var(--wa-accent);
 }
-
 .wa-edit-wrap {
   display: flex;
   align-items: center;
@@ -71,7 +81,6 @@
 .wa-input.invalid {
   border-color: #d32f2f;
 }
-
 .wa-btn.small {
   min-width: auto;
   padding: 6px 10px;
@@ -85,7 +94,6 @@
   gap: 0.5rem;
   margin-right: 0.5rem;
 }
-
 .iter-indicator {
   opacity: 0.8;
   font-size: 0.9rem;
@@ -100,7 +108,6 @@
   gap: 8px;
   margin-bottom: 6px;
 }
-
 .result-actions {
   display: flex;
   align-items: center;
@@ -117,12 +124,10 @@
   white-space: nowrap;
   height: 20px;
 }
-
 .status.unsaved {
   color: #b71c1c;
   background: #ffcdd2;
 }
-
 .status.saved {
   color: #1b5e20;
   background: #c8e6c9;

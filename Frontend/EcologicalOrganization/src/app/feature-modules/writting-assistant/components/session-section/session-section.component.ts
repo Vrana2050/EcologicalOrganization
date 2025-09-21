@@ -19,6 +19,8 @@ import {
   OnChanges,
   OnInit,
   SimpleChanges,
+  ViewChild,
+  ElementRef,
 } from '@angular/core';
 import { SessionSectionService } from '../../services/session-section.service';
 import { SessionSectionWithLatest } from '../../models/session-section.model';
@@ -52,11 +54,12 @@ export class SessionSectionComponent implements OnInit, OnChanges {
     seqNo: number;
     text: string;
   }>();
-
   @Output() iterationChanged = new EventEmitter<{
     sectionId: number;
     iteration: IterationPayload;
   }>();
+
+  @ViewChild('resultArea') resultArea!: ElementRef<HTMLTextAreaElement>;
 
   instructionText = '';
   editingTitle = false;
@@ -76,12 +79,27 @@ export class SessionSectionComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.hydrateFromSection();
+    setTimeout(() => this.autoGrowFromRef(), 0);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['section']) {
       this.hydrateFromSection();
+      setTimeout(() => this.autoGrowFromRef(), 0);
     }
+  }
+
+  autoGrow(evt?: Event): void {
+    const el =
+      (evt?.target as HTMLTextAreaElement) ?? this.resultArea?.nativeElement;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.overflowY = 'hidden';
+    el.style.height = el.scrollHeight + 'px';
+  }
+
+  private autoGrowFromRef(): void {
+    if (this.resultArea?.nativeElement) this.autoGrow();
   }
 
   private getLatestInstruction(): string {
@@ -90,13 +108,7 @@ export class SessionSectionComponent implements OnInit, OnChanges {
 
   private getLatestResultText(): string {
     const it = this.section?.latestIteration;
-    return (
-      it?.sectionDraft?.content ??
-      it?.sectionDraft?.content ??
-      it?.modelOutput?.generatedText ??
-      it?.modelOutput?.generatedText ??
-      ''
-    );
+    return it?.sectionDraft?.content ?? it?.modelOutput?.generatedText ?? '';
   }
 
   private resetStatus(): void {
@@ -109,7 +121,6 @@ export class SessionSectionComponent implements OnInit, OnChanges {
     const latest = this.section?.latestIteration;
 
     this.instructionText = this.getLatestInstruction();
-
     this.editingTitle = this.isNew || !!(this.section as any)._isNew;
     this.titleDraft = this.section?.name ?? '';
 
@@ -117,7 +128,6 @@ export class SessionSectionComponent implements OnInit, OnChanges {
     this.maxSeq = this.section?.maxSeqNo ?? latest?.seqNo ?? 0;
 
     this.resultDraft = this.getLatestResultText();
-
     this.resetStatus();
   }
 
@@ -170,6 +180,7 @@ export class SessionSectionComponent implements OnInit, OnChanges {
   }
 
   onResultChange() {
+    this.autoGrowFromRef();
     if (this.currentSeq === 0) return;
     if (this.hasUnsavedResult) {
       this.clearResultTimer();
@@ -223,6 +234,8 @@ export class SessionSectionComponent implements OnInit, OnChanges {
         this.resetStatus();
         this.loadingIter = false;
 
+        setTimeout(() => this.autoGrowFromRef(), 0);
+
         this.iterationChanged.emit({
           sectionId: this.section.id,
           iteration: {
@@ -244,7 +257,6 @@ export class SessionSectionComponent implements OnInit, OnChanges {
   goPrev() {
     if (this.currentSeq > 1) this.fetch(this.currentSeq - 1);
   }
-
   goNext() {
     if (this.currentSeq < this.maxSeq) this.fetch(this.currentSeq + 1);
   }

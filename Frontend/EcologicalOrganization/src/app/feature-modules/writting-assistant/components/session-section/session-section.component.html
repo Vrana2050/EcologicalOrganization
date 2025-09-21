@@ -35,9 +35,7 @@
         >
           ←
         </button>
-
         <span class="iter-indicator">{{ currentSeq }}/{{ maxSeq }}</span>
-
         <button
           class="wa-btn small"
           [disabled]="loadingIter || currentSeq >= maxSeq"
@@ -51,7 +49,6 @@
       <button class="wa-btn" (click)="onGenerate()">
         ⚡ Generiši sadržaj sekcije
       </button>
-
       <button class="wa-btn danger" (click)="onRemove()">Ukloni sekciju</button>
     </div>
   </div>
@@ -90,10 +87,10 @@
       </div>
 
       <textarea
-        class="wa-input"
-        rows="6"
+        #resultArea
+        class="wa-input wa-result"
         [(ngModel)]="resultDraft"
-        (ngModelChange)="onResultChange()"
+        (input)="autoGrow($event)"
         placeholder="Još uvek nema rezultata…"
       ></textarea>
     </div>
