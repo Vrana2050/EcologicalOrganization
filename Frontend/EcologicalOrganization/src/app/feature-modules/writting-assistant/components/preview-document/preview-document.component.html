@@ -1,0 +1,16 @@
+<div class="wa-preview">
+  <div class="wa-preview-bar">
+    <button class="wa-btn" (click)="close.emit()">← Nazad na uređivanje</button>
+  </div>
+
+  <article class="doc">
+    <h1 class="doc-title">{{ title || "Dokument" }}</h1>
+
+    <ng-container *ngFor="let s of sections; trackBy: trackById">
+      <section class="doc-section" *ngIf="(s.name || '').trim() || getText(s)">
+        <h2 class="doc-section-title">{{ s.name || "Sekcija" }}</h2>
+        <div class="doc-text">{{ getText(s) || "—" }}</div>
+      </section>
+    </ng-container>
+  </article>
+</div>

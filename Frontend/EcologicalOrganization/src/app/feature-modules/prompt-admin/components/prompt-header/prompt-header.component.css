@@ -1,4 +1,3 @@
-/* Kartica */
 .pa-card {
   border: 1px solid var(--wa-line);
   background: var(--wa-panel);
@@ -6,13 +5,11 @@
   padding: 16px;
 }
 
-/* Naslov sekcije */
 .pa-card-title {
   margin: 0 0 12px 0;
   font-size: 14px;
 }
 
-/* Labela */
 .wa-label {
   font-size: 12px;
   color: var(--wa-muted);
@@ -20,7 +17,6 @@
   margin-bottom: 6px;
 }
 
-/* Layout: leva i desna kolona */
 .pa-grid-3 {
   display: flex;
   justify-content: space-between;
@@ -33,7 +29,6 @@
   gap: 20px;
 }
 
-/* Input polje */
 .wa-input {
   width: 100%;
   background: var(--wa-panel-2);
@@ -45,18 +40,15 @@
   box-sizing: border-box;
 }
 
-/* Naziv prompta input širina */
 .wa-input.name {
   max-width: 300px;
 }
 
-/* Disabled state */
 .pa-field .wa-input[disabled] {
   opacity: 0.8;
   cursor: not-allowed;
 }
 
-/* Pilula za tip dokumenta (prikaz za postojeće) */
 .pa-doc-type {
   height: 36px;
   display: inline-flex;
@@ -71,9 +63,7 @@
   box-sizing: border-box;
 }
 
-/* Select za tip dokumenta (za draft) */
 .wa-doc-type-select {
-  /* koristi postojeći .wa-input.small styling; dodatni detalji: */
   appearance: none;
   -moz-appearance: none;
   -webkit-appearance: none;
@@ -84,10 +74,9 @@
     calc(100% - 12px) calc(50% - 3px);
   background-size: 6px 6px, 6px 6px;
   background-repeat: no-repeat;
-  padding-right: 28px; /* prostor za strelicu */
+  padding-right: 28px;
 }
 
-/* Naslov i edit wrapovi */
 .wa-title-wrap {
   display: flex;
   align-items: center;
@@ -107,7 +96,6 @@
   flex: 1;
 }
 
-/* Mali input (za edit naziva i select) */
 .wa-input.small {
   flex: 0 0 auto;
   max-width: 180px;
@@ -117,13 +105,11 @@
   border-color: #d32f2f;
 }
 
-/* Akcije u headeru (desno) */
 .action-buttons-right {
   display: flex;
   gap: 5px;
 }
 
-/* Utility */
 .wa-actions {
   display: flex;
   gap: 12px;

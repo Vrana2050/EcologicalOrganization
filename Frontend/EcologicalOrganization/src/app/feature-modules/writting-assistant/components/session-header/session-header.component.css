@@ -11,11 +11,10 @@
   margin-bottom: 10px;
 }
 
-/* grupa: naslov + combobox */
 .wa-header-left {
   display: flex;
   align-items: flex-end;
-  gap: 20px; /* razmak između naslova i comboboxa */
+  gap: 20px;
   flex: 1;
 }
 
@@ -101,7 +100,6 @@
   line-height: 1;
 }
 
-/* readonly prikaz tipa dokumenta (za test sesije) */
 .pa-doc-type {
   height: 36px;
   display: inline-flex;

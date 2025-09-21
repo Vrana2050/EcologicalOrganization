@@ -1,3 +1,16 @@
+type IterationPayload = {
+  id: number;
+  seqNo: number;
+  sessionSectionId: number;
+  sectionInstruction?: {
+    id: number;
+    text: string;
+    createdAt?: string | null;
+  } | null;
+  modelOutput?: { id: number; generatedText?: string | null } | null;
+  sectionDraft?: { id: number; content?: string | null } | null;
+};
+
 import {
   Component,
   EventEmitter,
@@ -38,6 +51,11 @@ export class SessionSectionComponent implements OnInit, OnChanges {
     sectionId: number;
     seqNo: number;
     text: string;
+  }>();
+
+  @Output() iterationChanged = new EventEmitter<{
+    sectionId: number;
+    iteration: IterationPayload;
   }>();
 
   instructionText = '';
@@ -201,11 +219,23 @@ export class SessionSectionComponent implements OnInit, OnChanges {
       next: (it) => {
         this.currentSeq = it.seqNo;
         this.section.latestIteration = { ...it };
-
         this.resultDraft = this.getLatestResultText();
         this.resetStatus();
-
         this.loadingIter = false;
+
+        this.iterationChanged.emit({
+          sectionId: this.section.id,
+          iteration: {
+            id: it.id,
+            seqNo: it.seqNo,
+            sessionSectionId: it.sessionSectionId,
+            sectionInstruction: it.sectionInstruction
+              ? { ...it.sectionInstruction }
+              : null,
+            modelOutput: it.modelOutput ? { ...it.modelOutput } : null,
+            sectionDraft: it.sectionDraft ? { ...it.sectionDraft } : null,
+          },
+        });
       },
       error: () => (this.loadingIter = false),
     });

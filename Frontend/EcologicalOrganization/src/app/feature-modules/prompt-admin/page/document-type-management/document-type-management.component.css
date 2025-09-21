@@ -1,11 +1,9 @@
-/* Ograniči širinu cele tabele */
 .doc-type-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 16px;
 }
 
-/* Tabela */
 .wa-table {
   width: 100%;
   border-collapse: collapse;
@@ -118,7 +116,7 @@ textarea.wa-input {
 }
 
 .header-row .wa-btn.small {
-  padding: 6px 12px; /* više prostora za tekst */
+  padding: 6px 12px;
   height: auto;
   min-width: auto;
 }

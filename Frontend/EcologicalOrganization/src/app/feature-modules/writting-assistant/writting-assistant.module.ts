@@ -9,6 +9,7 @@ import { SessionHeaderComponent } from './components/session-header/session-head
 import { SessionSectionComponent } from './components/session-section/session-section.component';
 import { FormsModule } from '@angular/forms';
 import { AddNewTemplateComponent } from './components/add-new-template/add-new-template.component';
+import { PreviewDocumentComponent } from './components/preview-document/preview-document.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import { AddNewTemplateComponent } from './components/add-new-template/add-new-t
     SessionHeaderComponent,
     SessionSectionComponent,
     AddNewTemplateComponent,
+    PreviewDocumentComponent,
   ],
   imports: [CommonModule, FormsModule],
 })

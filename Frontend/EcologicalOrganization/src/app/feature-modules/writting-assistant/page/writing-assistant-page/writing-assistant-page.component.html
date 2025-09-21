@@ -25,12 +25,23 @@
 
       <wa-session-editor
         *ngIf="activeSession && sessionOverview"
+        [hidden]="showPreview"
         [session]="activeSession"
         [documentTypes]="documentTypes"
         [overview]="sessionOverview"
         (sessionTitleChanged)="onSessionTitleChanged($event)"
         (documentTypeChanged)="onSessionDocTypeChanged($event)"
+        (overviewChanged)="onOverviewChanged($event)"
+        (openPreview)="showPreview = true"
       ></wa-session-editor>
+
+      <wa-preview-document
+        *ngIf="activeSession && sessionOverview"
+        [hidden]="!showPreview"
+        [title]="sessionOverview.title || activeSession?.title || 'Dokument'"
+        [overview]="sessionOverview"
+        (close)="showPreview = false"
+      ></wa-preview-document>
     </div>
   </main>
 </div>

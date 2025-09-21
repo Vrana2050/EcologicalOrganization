@@ -20,6 +20,7 @@ export class SessionHeaderComponent {
   @Output() addSection = new EventEmitter<void>();
   @Output() globalInstructionChange = new EventEmitter<string>();
   @Output() documentTypeChange = new EventEmitter<number>();
+  @Output() viewDocument = new EventEmitter<void>();
 
   @Input() title = '';
   @Input() globalInstruction = '';

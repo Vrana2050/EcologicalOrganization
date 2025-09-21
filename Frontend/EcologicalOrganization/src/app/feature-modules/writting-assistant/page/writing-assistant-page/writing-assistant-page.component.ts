@@ -18,6 +18,8 @@ export class WritingAssistantPageComponent implements OnInit {
   loading = true;
 
   showTemplatesSidebar = false;
+  showPreview = false;
+
   activeSession: ChatSession | null = null;
   sessionOverview: SessionOverview | null = null;
 
@@ -88,7 +90,6 @@ export class WritingAssistantPageComponent implements OnInit {
         next: () => {},
         error: (err) => {
           console.error('Error patching document type:', err);
-
           this.activeSession = { ...this.activeSession!, documentTypeId: prev };
         },
       });
@@ -96,6 +97,7 @@ export class WritingAssistantPageComponent implements OnInit {
 
   openTemplates(): void {
     this.showTemplatesSidebar = true;
+    this.showPreview = false;
   }
   closeTemplates(): void {
     this.showTemplatesSidebar = false;
@@ -104,17 +106,20 @@ export class WritingAssistantPageComponent implements OnInit {
   onSessionCreated(session: ChatSession): void {
     this.conversations = [session, ...this.conversations];
     this.showTemplatesSidebar = false;
+    this.showPreview = false;
     this.activeSession = session;
     this.router.navigate(['/writing-assistant', session.id]);
   }
 
   onSelectConversation(c: ChatSession): void {
     this.showTemplatesSidebar = false;
+    this.showPreview = false;
     if (this.activeSession?.id === c.id) return;
     this.router.navigate(['/writing-assistant', c.id]);
   }
 
   private openSession(id: number): void {
+    this.showPreview = false;
     const found = this.conversations.find((x) => x.id === id);
     this.activeSession = found ?? {
       id,
@@ -185,10 +190,18 @@ export class WritingAssistantPageComponent implements OnInit {
         if (this.activeSession?.id === c.id) {
           this.activeSession = null;
           this.sessionOverview = null;
+          this.showPreview = false;
           this.router.navigate(['/writing-assistant']);
         }
       },
       error: (err) => console.error('Error deleting conversation:', err),
     });
+  }
+
+  onOverviewChanged(ov: SessionOverview) {
+    this.sessionOverview = {
+      ...ov,
+      sections: [...(ov.sections ?? [])],
+    };
   }
 }

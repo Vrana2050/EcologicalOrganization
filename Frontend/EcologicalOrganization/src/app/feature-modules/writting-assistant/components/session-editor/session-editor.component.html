@@ -10,6 +10,7 @@
       (addSection)="onAddSection()"
       (globalInstructionChange)="onGlobalInstructionChange($event)"
       (documentTypeChange)="onHeaderDocTypeChange($event)"
+      (viewDocument)="onHeaderOpenPreview()"
     >
     </wa-session-header>
 
@@ -22,6 +23,7 @@
         (remove)="onRemoveSection($event)"
         (generate)="onGenerateSection($event)"
         (saveEdited)="onSaveEdited($event)"
+        (iterationChanged)="onIterationChanged($event)"
       ></wa-session-section>
     </div>
   </div>

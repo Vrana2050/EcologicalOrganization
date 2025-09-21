@@ -1,6 +1,6 @@
 .app {
   display: grid;
-  grid-template-columns: 320px 1fr; /* default: samo sidebar + main */
+  grid-template-columns: 320px 1fr;
   height: 100vh;
 }
 

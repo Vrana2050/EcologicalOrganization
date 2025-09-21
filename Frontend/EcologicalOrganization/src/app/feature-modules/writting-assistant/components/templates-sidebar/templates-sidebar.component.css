@@ -1,4 +1,3 @@
-/* Koren – slično conversations sidebar, ali sa panel-2 pozadinom */
 .sidebar2 {
   background: var(--wa-panel-2);
   border-right: 1px solid var(--wa-line);
@@ -10,7 +9,6 @@
   height: 100%;
 }
 
-/* Header */
 .templates-head {
   display: flex;
   align-items: center;
@@ -18,7 +16,6 @@
   padding: 6px 4px;
 }
 
-/* Dugme za zatvaranje (❌) */
 .wa-btn.ghost.smallbtn {
   width: 30px;
   height: 30px;
