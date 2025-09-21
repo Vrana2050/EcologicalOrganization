@@ -7,3 +7,5 @@ sqlacodegen
 dependency-injector
 loguru
 python-multipart
+openai
+python-dotenv

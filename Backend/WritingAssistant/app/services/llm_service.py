@@ -1,7 +1,7 @@
-from datetime import datetime
+from __future__ import annotations
 from typing import Optional
 from decimal import Decimal
-
+from app.services.llm_client.client import LLMClient
 
 class LLMResult:
     def __init__(
@@ -24,20 +24,48 @@ class LLMResult:
         self.cost_usd = cost_usd
         self.duration_ms = duration_ms or 0
 
-
 class LLMService:
-    def __init__(self):
-        pass
+    def __init__(self, backend: LLMClient):
+        self._backend = backend
+
+    @property
+    def provider(self) -> str:
+        return getattr(self._backend, "provider", "unknown")
+
+    @property
+    def model(self) -> str:
+        return getattr(self._backend, "model", "unknown")
 
     def generate(self, final_prompt: str) -> LLMResult:
-        fake_output = f"[mock-output] {final_prompt[:200]}..."  
-        return LLMResult(
-            generated_text=fake_output,
-            status="ok",
-            error_code=None,
-            error_message=None,
-            prompt_tokens=len(final_prompt.split()),  
-            output_tokens=len(fake_output.split()),   
-            cost_usd=Decimal("0.001"),                
-            duration_ms=50,                           
+        try:
+            text, meta = self._backend.generate_text(final_prompt)
+            usage = meta.get("usage") or {}
+            return LLMResult(
+                generated_text=text,
+                status="ok",
+                prompt_tokens=usage.get("input_tokens"),
+                output_tokens=usage.get("output_tokens"),
+                cost_usd=None,
+                duration_ms=None,
+            )
+        except Exception as e:
+            return LLMResult(
+                generated_text="",
+                status="failed",
+                error_code="AI_CLIENT_ERROR",
+                error_message=str(e),
+            )
+
+    def compute_cost_usd(
+        self,
+        prompt_tokens: int | None,
+        output_tokens: int | None,
+        prompt_token_usd_per_million: Decimal,
+        completion_token_usd_per_million: Decimal,
+    ) -> Decimal:
+        return self._backend.compute_cost_usd(
+            prompt_tokens,
+            output_tokens,
+            prompt_token_usd_per_million,
+            completion_token_usd_per_million,
         )

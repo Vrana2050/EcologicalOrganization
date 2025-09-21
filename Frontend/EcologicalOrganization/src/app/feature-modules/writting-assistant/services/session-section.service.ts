@@ -13,7 +13,10 @@ export class SessionSectionService {
   constructor(private http: HttpClient) {}
 
   private get headers(): HttpHeaders {
-    return new HttpHeaders({ 'x-user-id': '2' });
+    return new HttpHeaders({
+      'x-user-id': '2',
+      'x-user-role': 'ADMIN',
+    });
   }
 
   create(payload: CreateSessionSectionIn): Observable<{

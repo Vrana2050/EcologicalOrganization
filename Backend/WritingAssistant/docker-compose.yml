@@ -11,6 +11,8 @@ services:
       - oracle-db
     environment:
       DATABASE_URL: oracle+oracledb://system:MyPassword123@oracle-db:1521/XEPDB1
+    env_file:
+      - .env
     volumes:
       - .:/app
 

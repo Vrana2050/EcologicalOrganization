@@ -16,6 +16,7 @@ from app.repository.prompt_version_repository import PromptVersionRepository
 from app.repository.template_repository import TemplateRepository
 from app.repository.section_draft_repository import SectionDraftRepository
 from app.repository.template_file_repository import TemplateFileRepository
+from app.repository.model_pricing_repository import ModelPricingRepository
 
 from app.services.chat_session_service import ChatSessionService
 from app.services.session_section_service import SessionSectionService
@@ -26,6 +27,10 @@ from app.services.prompt_service import PromptService
 from app.services.prompt_version_service import PromptVersionService
 from app.services.template_service import TemplateService
 from app.services.document_type_service import DocumentTypeService
+from app.services.model_pricing_service import ModelPricingService
+
+from app.services.llm_client.openai_client import OpenAIClient
+from app.services.llm_client.mock_client import MockLLMClient
 
 
 class Container(containers.DeclarativeContainer):
@@ -56,6 +61,7 @@ class Container(containers.DeclarativeContainer):
     template_repository = providers.Factory(TemplateRepository, session_factory=db.provided.session)
     section_draft_repository = providers.Factory(SectionDraftRepository, session_factory=db.provided.session)
     template_file_repository = providers.Factory(TemplateFileRepository, session_factory=db.provided.session)
+    model_pricing_repository = providers.Factory(ModelPricingRepository, session_factory=db.provided.session)
 
     chat_session_service = providers.Factory(
         ChatSessionService,
@@ -84,6 +90,16 @@ class Container(containers.DeclarativeContainer):
         repository=document_type_repository,
     )
 
+    ai_client = providers.Singleton(OpenAIClient)   
+    # ai_client = providers.Singleton(MockLLMClient) 
+
+    llm_service = providers.Singleton(LLMService, backend=ai_client)
+
+    model_pricing_service = providers.Factory(
+        ModelPricingService,
+        repository=model_pricing_repository,
+)
+
     section_iteration_service = providers.Factory(
         SectionIterationService,
         repository=section_iteration_repository,
@@ -94,10 +110,11 @@ class Container(containers.DeclarativeContainer):
         si_repo=section_instruction_repository,
         exec_repo=prompt_execution_repository,
         out_repo=model_output_repository,
-        llm_service=providers.Singleton(LLMService),
+        llm_service=llm_service,   
         doc_type_service=document_type_service,
         pv_repo=prompt_version_repository,
         draft_repo=section_draft_repository,
+        pricing_service=model_pricing_service,
     )
 
     prompt_service = providers.Factory(
@@ -120,3 +137,7 @@ class Container(containers.DeclarativeContainer):
         file_repository=template_file_repository,
         session_factory=db.provided.session,
     )
+
+
+
+

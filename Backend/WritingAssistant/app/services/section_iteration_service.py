@@ -1,5 +1,8 @@
 from datetime import datetime, timezone
 
+from decimal import Decimal
+from typing import Optional, List
+
 from app.services.base_service import BaseService
 from app.services.llm_service import LLMService
 from app.services.document_type_service import DocumentTypeService
@@ -13,6 +16,8 @@ from app.repository.section_instruction_repository import SectionInstructionRepo
 from app.repository.prompt_execution_repository import PromptExecutionRepository
 from app.repository.model_output_repository import ModelOutputRepository
 from app.repository.prompt_version_repository import PromptVersionRepository
+
+from app.services.model_pricing_service import ModelPricingService
 
 from app.core.exceptions import AuthError, NotFoundError
 from app.schema.global_instruction_schema import CreateGlobalInstruction
@@ -53,7 +58,8 @@ class SectionIterationService(BaseService):
         llm_service: LLMService,
         doc_type_service: DocumentTypeService,
         pv_repo: PromptVersionRepository,   
-        draft_repo: SectionDraftRepository,                   
+        draft_repo: SectionDraftRepository,
+        pricing_service: ModelPricingService,                   
     ):
         super().__init__(repository)
         self._iter_repo = repository
@@ -68,35 +74,56 @@ class SectionIterationService(BaseService):
         self._dt_service = doc_type_service
         self._pv_repo = pv_repo   
         self._draft_repo = draft_repo
+        self._pricing = pricing_service
+
+    def _get_section(self, section_id: int) -> SessionSection:
+        section = self._sec_repo.read_by_id(section_id)
+        if not section or getattr(section, "deleted", 0) == 1:
+            raise NotFoundError(detail="Section not found")
+        return section
+
+    def _get_session_with_sections(self, session_id: int) -> ChatSession:
+        session = self._sess_repo.read_by_id(
+            session_id,
+            eagers=[ChatSession.session_section]
+        )
+        return session
+
+    def _assert_session_owner(self, session: ChatSession, user_id: int) -> None:
+        if int(session.created_by) != int(user_id):
+            raise AuthError(detail="Forbidden")
+
+    def _require_document_type_id(self, session: ChatSession) -> int:
+        if session.document_type_id is None:
+            raise NotFoundError(detail="Session missing document type")
+        return int(session.document_type_id)
+
+    def _active_sections(self, session: ChatSession) -> List[SessionSection]:
+        return [s for s in (session.session_section or []) if getattr(s, "deleted", 0) == 0]
+
 
     def _compose_final_prompt(
         self,
+        section: SessionSection,
+        session_sections: List[SessionSection],
         base_prompt: str | None,
         global_text: str | None,
         section_text: str | None,
     ) -> str:
-        parts = []
-        for p in (base_prompt, global_text, section_text):
-            p = (p or "").strip()
-            if p:
-                parts.append(p)
-        return "\n\n".join(parts)
+        current_section_name = (section.name or "").strip()
 
-    def _assert_ownership_and_doc_type(
-        self, section_id: int, user_id: int
-    ) -> tuple[SessionSection, ChatSession, int]:
-        section = self._sec_repo.read_by_id(section_id)
-        session = self._sess_repo.read_by_id(
-            section.session_id
+        section_names = ", ".join(
+            [s.name.strip() for s in session_sections if getattr(s, "name", None)]
         )
 
-        if int(session.created_by) != int(user_id):
-            raise AuthError(detail="Forbidden")
+        prompt = (base_prompt or "")
+        prompt = prompt.replace("{CURRENT_SECTION_NAME}", current_section_name)
+        prompt = prompt.replace("{SECTION_NAMES}", section_names)
+        prompt = prompt.replace("{GLOBAL_INSTRUCTION}", (global_text or "").strip())
+        prompt = prompt.replace("{SECTION_INSTRUCTION}", (section_text or "").strip())
 
-        if session.document_type_id is None:
-            raise NotFoundError(detail="Session missing document type")
+        return prompt.strip()
 
-        return section, session, int(session.document_type_id)
 
     def get_by_seq(self, section_id: int, seq_no: int, user_id: int):
         section = self._sec_repo.read_by_id(section_id, eagers=[SessionSection.session])
@@ -118,6 +145,7 @@ class SectionIterationService(BaseService):
         document_type_id: int,
         current_user: CurrentUser,
     ):
+        print("current user ", current_user)
         is_test = int(getattr(session_obj, "is_test_session", 0) or 0) == 1
         if is_test:
             if current_user.role != "ADMIN":
@@ -182,47 +210,81 @@ class SectionIterationService(BaseService):
         )
         return int(si.id)
 
+
     def generate(
         self,
         section_id: int,
         payload: GenerateIterationIn,
         user_id: int,
-        current_user: CurrentUser,
+        current_user,
     ) -> SectionIterationOut:
-        section, session_obj, document_type_id = self._assert_ownership_and_doc_type(section_id, user_id)
-        now = datetime.now(timezone.utc)
+        section = self._get_section(section_id)
+        session = self._get_session_with_sections(section.session_id)
 
-        prompt_version = self._resolve_prompt_version(session_obj, document_type_id, current_user)
+        # 2) provere/autorizacija
+        self._assert_session_owner(session, user_id)
+        document_type_id = self._require_document_type_id(session)
+
+        # 3) priprema podataka
+        now = datetime.now(timezone.utc)
+        prompt_version = self._resolve_prompt_version(session, document_type_id, current_user)
         base_prompt = prompt_version.prompt_text or ""
+        active_sections = self._active_sections(session)
 
         final_prompt = self._compose_final_prompt(
+            section=section
+            session_sections=active_sections,
             base_prompt=base_prompt,
             global_text=payload.global_instruction,
             section_text=payload.section_instruction,
         )
 
-        start_time = datetime.now(timezone.utc)
+        # --- LLM call (ostavljeno kako ti je ranije bilo)
+        start_time = datetime.now(timezone.utc).replace(tzinfo=None)
         llm_res = self._llm.generate(final_prompt)
-        end_time = datetime.now(timezone.utc)
+        end_time = datetime.now(timezone.utc).replace(tzinfo=None)
         duration_ms = int((end_time - start_time).total_seconds() * 1000)
         next_seq = self._iter_repo.next_seq_for_section(section_id)
 
+        # --- pricing
+        cost_usd: Optional[Decimal] = None
+        pricing_id: Optional[int] = None
+        try:
+            pricing = self._pricing.get_active(
+                provider=self._llm.provider,
+                model=self._llm.model,
+                when=end_time,
+            )
+            if pricing:
+                pricing_id = int(pricing.id)
+            if pricing and llm_res.status == "ok":
+                cost_usd = self._llm.compute_cost_usd(
+                    prompt_tokens=llm_res.prompt_tokens,
+                    output_tokens=llm_res.output_tokens,
+                    prompt_token_usd_per_million=pricing.prompt_token_usd or Decimal("0"),
+                    completion_token_usd_per_million=pricing.completion_token_usd or Decimal("0"),
+                )
+        except Exception:
+            pricing_id = None
+            cost_usd = None
+
+        # --- instrukcije
         global_instruction_id = self._create_global_instruction(
-            session_id=int(session_obj.id),
+            session_id=int(session.id),
             text_value=payload.global_instruction,
             now=now,
         )
-
         section_instruction_id = self._create_section_instruction(
             section_id=int(section_id),
             text_value=payload.section_instruction,
             now=now,
         )
 
+        # --- exec
         exec_ = self._exec_repo.create(
             CreatePromptExecution(
                 prompt_version_id=int(prompt_version.id),
-                session_id=int(session_obj.id),
+                session_id=int(session.id),
                 status="ok" if llm_res.status == "ok" else "failed",
                 created_by=int(user_id),
                 deleted=0,
@@ -233,13 +295,15 @@ class SectionIterationService(BaseService):
                 error_message=llm_res.error_message,
                 prompt_tokens=llm_res.prompt_tokens,
                 output_tokens=llm_res.output_tokens,
-                cost_usd=0,
+                cost_usd=(cost_usd if cost_usd is not None else 0),
                 started_at=start_time,
                 finished_at=end_time,
+                pricing_id=pricing_id,
                 duration_ms=duration_ms,
             )
         )
 
+        # --- output
         out = self._out_repo.create(
             CreateModelOutput(
                 prompt_execution_id=int(exec_.id),
@@ -247,10 +311,11 @@ class SectionIterationService(BaseService):
             )
         )
 
+        # --- iteration
         iteration = self._iter_repo.create(
             CreateSectionIteration(
                 seq_no=next_seq,
-                session_id=int(session_obj.id),
+                session_id=int(session.id),
                 session_section_id=int(section_id),
                 deleted=0,
                 section_instruction_id=section_instruction_id,
@@ -265,12 +330,10 @@ class SectionIterationService(BaseService):
             session_section_id=iteration.session_section_id,
             section_instruction=(
                 SectionInstructionOut.model_validate(self._si_repo.read_by_id(section_instruction_id))
-                if section_instruction_id
-                else None
+                if section_instruction_id else None
             ),
             model_output=ModelOutputOut.model_validate(out),
         )
-    
 
     def upsert_draft_for_iteration(
         self,

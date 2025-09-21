@@ -90,6 +90,7 @@
         #resultArea
         class="wa-input wa-result"
         [(ngModel)]="resultDraft"
+        (ngModelChange)="onResultChange()"
         (input)="autoGrow($event)"
         placeholder="Još uvek nema rezultata…"
       ></textarea>

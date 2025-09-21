@@ -34,7 +34,7 @@ class PromptExecution(Base):
     error_message: Mapped[Optional[str]] = mapped_column(Text)
     prompt_tokens: Mapped[Optional[int]] = mapped_column(Integer)
     output_tokens: Mapped[Optional[int]] = mapped_column(Integer)
-    cost_usd: Mapped[Optional[decimal.Decimal]] = mapped_column(NUMBER(10, 4, True))
+    cost_usd: Mapped[Optional[decimal.Decimal]] = mapped_column(NUMBER(19, 8, True))
     pricing_id: Mapped[Optional[int]] = mapped_column(BigInteger)
     started_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(True))
     finished_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(True))
