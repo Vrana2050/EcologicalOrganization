@@ -33,6 +33,8 @@ public class Projekat {
 
     @Column(name = "rok_zavrsetka", nullable = false)
     private LocalDate rokZavrsetka;
+    @Column(name = "procenat_zavrsenosti")
+    private Float procenatZavrsenosti;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tok_projekta_id")

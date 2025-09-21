@@ -496,6 +496,14 @@ INSERT INTO korisnik_dokument(korisnik_id, dokument_id)
 VALUES (1005, 1003);
 INSERT INTO korisnik_dokument(korisnik_id, dokument_id)
 VALUES (1004, 1003);
+INSERT INTO korisnik_dokument(korisnik_id, dokument_id)
+VALUES (1003, 1008);
+INSERT INTO korisnik_dokument(korisnik_id, dokument_id)
+VALUES (1004, 1009);
+INSERT INTO korisnik_dokument(korisnik_id, dokument_id)
+VALUES (1003, 1010);
+INSERT INTO korisnik_dokument(korisnik_id, dokument_id)
+VALUES (1004, 1011);
 
 
 --DOKUMENT ZAVISNOST
@@ -720,3 +728,139 @@ VALUES (1027, 'Dodeljen ti je novi dokument', 6, 0, 1003);
 INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
 VALUES (1028, 'Dodeljen ti je novi dokument', 5, 0, 1003);
 
+
+
+---------------------------------------------------------------------------------------------------------
+
+-- LOGOVI
+
+--TODO                          ZA PROJEKAT 1002
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1000, SYSTIMESTAMP, 1000, 1000, 1002, NULL, 1003);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1001, SYSTIMESTAMP, 1000, 1001, 1002, NULL, 1003);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1002, SYSTIMESTAMP, 1000, 1002, 1002, NULL, 1003);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1003, SYSTIMESTAMP, 1000, 1003, 1002, NULL, 1003);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1004, SYSTIMESTAMP, 1000, 1004, 1002, NULL, 1003);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1005, SYSTIMESTAMP, 1000, 1005, 1002, NULL, 1003);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1006, SYSTIMESTAMP, 1000, 1006, 1002, NULL, 1003);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1007, SYSTIMESTAMP, 1000, 1007, 1002, NULL, 1003);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1008, SYSTIMESTAMP + INTERVAL '1' DAY, 1000, 1001, 1002, 1003, 1004);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1009, SYSTIMESTAMP + INTERVAL '1' DAY, 1000, 1002, 1002, 1003, 1004);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1010, SYSTIMESTAMP + INTERVAL '1' DAY, 1000, 1003, 1002, 1003, 1004);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1011, SYSTIMESTAMP + INTERVAL '1' DAY, 1000, 1004, 1002, 1003, 1004);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1012, SYSTIMESTAMP + INTERVAL '1' DAY, 1000, 1005, 1002, 1003, 1004);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1013, SYSTIMESTAMP + INTERVAL '1' DAY, 1000, 1006, 1002, 1003, 1004);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1014, SYSTIMESTAMP + INTERVAL '1' DAY, 1000, 1007, 1002, 1003, 1004);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1015, SYSTIMESTAMP + INTERVAL '2' DAY, 1001, 1002, 1002, 1003, 1005);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1016, SYSTIMESTAMP + INTERVAL '3' DAY, 1001, 1003, 1002, 1004, 1005);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1017, SYSTIMESTAMP + INTERVAL '3' DAY, 1006, 1004, 1002, 1004, 1005);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1018, SYSTIMESTAMP + INTERVAL '2' DAY, 1006, 1005, 1002, 1004, 1005);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1019, SYSTIMESTAMP + INTERVAL '11' DAY, 1006, 1006, 1002, 1004, 1005);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1020, SYSTIMESTAMP + INTERVAL '12' DAY, 1006, 1007, 1002, 1004, 1005);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1021, SYSTIMESTAMP + INTERVAL '5' DAY, 1001, 1003, 1002, 1005, 1006);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1022, SYSTIMESTAMP+ INTERVAL '20' DAY, 1006, 1007, 1002, 1005, 1006);
+
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1023, SYSTIMESTAMP+ INTERVAL '5' DAY, 1006, 1004, 1002, 1005, 1006);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1024, SYSTIMESTAMP + INTERVAL '5' DAY, 1006, 1005, 1002, 1005, 1006);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1025, SYSTIMESTAMP + INTERVAL '15' DAY, 1000, 1004, 1002, 1006, 1005);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1026, SYSTIMESTAMP + INTERVAL '13' DAY, 1000, 1005, 1002, 1006, 1005);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1027, SYSTIMESTAMP + INTERVAL '22' DAY, 1006, 1004, 1002, 1005, 1006);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1028, SYSTIMESTAMP + INTERVAL '20' DAY, 1006, 1005, 1002, 1005, 1006);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1029, SYSTIMESTAMP + INTERVAL '30' DAY, 1000, 1004, 1002, 1006, 1007);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1030, SYSTIMESTAMP + INTERVAL '40' DAY, 1000, 1005, 1002, 1006, 1007);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1031, SYSTIMESTAMP + INTERVAL '50' DAY, 1000, 1005, 1002, 1007, 1008);
+
+
+--PODOKUKEMTNI LOGOVI PROJEKAT 1002
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1032, SYSTIMESTAMP + INTERVAL '2' DAY, 1001, 1008, 1002, NULL, 1000);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1033, SYSTIMESTAMP + INTERVAL '2' DAY, 1001, 1009, 1002, NULL, 1000);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1034, SYSTIMESTAMP + INTERVAL '2' DAY, 1006, 1010, 1002, NULL, 1000);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1035, SYSTIMESTAMP + INTERVAL '3' DAY, 1006, 1011, 1002, NULL, 1000);
+
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1036, SYSTIMESTAMP + INTERVAL '3' DAY, 1003, 1008, 1002, 1000, 1001);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1037, SYSTIMESTAMP + INTERVAL '3' DAY, 1003, 1010, 1002, 1000, 1001);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1038, SYSTIMESTAMP + INTERVAL '3' DAY, 1004, 1011, 1002, 1000, 1001);
+
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1039, SYSTIMESTAMP + INTERVAL '18' DAY, 1003, 1010, 1002, 1001, 1002);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1040, SYSTIMESTAMP + INTERVAL '4' DAY, 1004, 1011, 1002, 1001, 1002);

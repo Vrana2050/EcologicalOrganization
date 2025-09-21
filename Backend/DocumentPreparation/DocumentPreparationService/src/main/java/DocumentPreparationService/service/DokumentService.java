@@ -161,6 +161,7 @@ public class DokumentService extends CrudService<Dokument,Long> implements IDoku
         KorisnikProjekat korisnikProjekat = korisnikProjekatService.findByUserAndProjekat(userId,oldDokument.getProjekat().getId()).orElseThrow(() -> new NotFoundException("User not found on project"));
         if(oldDokument.hasEditPermission(korisnikProjekat))
         {
+            newDokument.setIzmenaOd(korisnikProjekat);
             Dokument savedDokument = update(newDokument);
             if(!savedDokument.getPripremna_verzija() && oldDokument.getPripremna_verzija()) {
                 obavestenjeService.creatNewDokumentObavestenje(savedDokument.getDodeljeniKorisnici(),newDokument);

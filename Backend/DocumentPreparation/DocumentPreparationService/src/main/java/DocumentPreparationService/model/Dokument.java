@@ -40,6 +40,16 @@ public class Dokument {
     @Column(name = "rok_zavrsetka", nullable = false)
     private LocalDate rokZavrsetka;
 
+    @Column(name = "posledjna_izmena")
+    private LocalDate poslednjaIzmena;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "izmena_od")
+    private KorisnikProjekat izmenaOd;
+
+    @Column(name = "procenat_zavrsenosti")
+    private Float procenatZavrsenosti;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tok_izrade_dokumenta")
     private Tok tokIzradeDokumenta;
@@ -115,8 +125,7 @@ public class Dokument {
         validateVlasnik();
         List<String> errors = isInDraft();
         boolean isInPripremna_verzija = !errors.isEmpty();
-        if (pripremna_verzija != null && !pripremna_verzija && isInPripremna_verzija)
-            throw new InvalidRequestDataException(errors.toString());
+        if (pripremna_verzija != null && !pripremna_verzija && isInPripremna_verzija) throw new InvalidRequestDataException(errors.toString());
         this.setPripremna_verzija(isInPripremna_verzija);
     }
 
@@ -183,6 +192,7 @@ public class Dokument {
         this.opis = newDokument.getOpis();
         this.prioritet = newDokument.getPrioritet();
         this.vlasnik = newDokument.getVlasnik();
+        this.poslednjaIzmena = LocalDate.now();
         if(!updateStatus(newDokument.getStatus())) throw new InvalidRequestDataException("Status not valid");
         validate();
     }
