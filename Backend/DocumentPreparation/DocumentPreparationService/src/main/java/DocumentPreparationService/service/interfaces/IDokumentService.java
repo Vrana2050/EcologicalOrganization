@@ -22,4 +22,8 @@ public interface IDokumentService extends ICrudService<Dokument,Long> {
     Set<Fajl> getDokumentSveFajlove(Long dokumentId, Long userId);
 
     Set<Fajl> getDokumentAktivneFajlove(Long dokumentId, Long userId);
+
+    Set<Dokument> findAllBoardDocumentsByProjectId(Long userId, Long projectId);
+
+    Set<Dokument> findAllBoardDocumentsByParentDocumentId(Long userId, Long parentDocumentId);
 }

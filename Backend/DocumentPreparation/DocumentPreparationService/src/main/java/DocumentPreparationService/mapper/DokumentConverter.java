@@ -3,10 +3,16 @@ package DocumentPreparationService.mapper;
 import DocumentPreparationService.dto.*;
 import DocumentPreparationService.mapper.interfaces.IDokumentConverter;
 import DocumentPreparationService.model.Dokument;
+import DocumentPreparationService.model.KorisnikProjekat;
 import DocumentPreparationService.model.Projekat;
+import jakarta.persistence.Column;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -61,6 +67,8 @@ public class DokumentConverter extends BaseMapper<Dokument, DokumentDto> impleme
         dokument.setOpis(dto.getOpis());
         dokument.setPrioritet(dto.getPrioritet());
         dokument.setRokZavrsetka(dto.getRokZavrsetka());
+        dokument.setPoslednjaIzmena(dto.getPoslednjaIzmena());
+        dokument.setProcenatZavrsenosti(dto.getProcenatZavrsenosti());
 
         if (dto.getProjekat() != null) {
             dokument.setProjekat(getProjekatConverter().ToEntity(dto.getProjekat()));
@@ -80,6 +88,9 @@ public class DokumentConverter extends BaseMapper<Dokument, DokumentDto> impleme
 
         if (dto.getVlasnik() != null) {
             dokument.setVlasnik(getKorisnikConverter().ToEntity(dto.getVlasnik()));
+        }
+        if (dto.getIzmenaOd() != null) {
+            dokument.setIzmenaOd(getKorisnikConverter().ToEntity(dto.getIzmenaOd()));
         }
 
         if (dto.getGlavniFajl() != null) {
@@ -118,6 +129,9 @@ public class DokumentConverter extends BaseMapper<Dokument, DokumentDto> impleme
         dto.setNaziv(dokument.getNaziv());
         dto.setOpis(dokument.getOpis());
         dto.setPrioritet(dokument.getPrioritet());
+        dto.setPripremna_verzija(dokument.getPripremna_verzija());
+        dto.setPoslednjaIzmena(dokument.getPoslednjaIzmena());
+        dto.setProcenatZavrsenosti(dokument.getProcenatZavrsenosti());
 
         if (Hibernate.isInitialized(dokument.getProjekat())) {
             dto.setProjekat(getProjekatConverter().ToDto(dokument.getProjekat()));
@@ -159,6 +173,13 @@ public class DokumentConverter extends BaseMapper<Dokument, DokumentDto> impleme
             KorisnikProjekatDto vlasnikDto = new KorisnikProjekatDto();
             vlasnikDto.setId(dokument.getVlasnik().getId());
             dto.setVlasnik(vlasnikDto);
+        }
+        if (Hibernate.isInitialized(dokument.getIzmenaOd())) {
+            dto.setIzmenaOd(getKorisnikConverter().ToDto(dokument.getIzmenaOd()));
+        } else if (dokument.getIzmenaOd() != null) {
+            KorisnikProjekatDto izmenaOdDto = new KorisnikProjekatDto();
+            izmenaOdDto.setId(dokument.getIzmenaOd().getId());
+            dto.setIzmenaOd(izmenaOdDto);
         }
 
         if (Hibernate.isInitialized(dokument.getGlavniFajl())) {

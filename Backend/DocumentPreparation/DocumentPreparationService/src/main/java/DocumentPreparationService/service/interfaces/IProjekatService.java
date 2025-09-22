@@ -12,4 +12,6 @@ public interface IProjekatService extends ICrudService<Projekat,Long>{
     public boolean delete(Long id,Long userId);
     public Optional<Projekat> findById(Long id,Long userId);
     public Set<Projekat> findAll(Long userId);
+
+    Optional<Projekat> findProjectBoardById(Long userId, Long id);
 }

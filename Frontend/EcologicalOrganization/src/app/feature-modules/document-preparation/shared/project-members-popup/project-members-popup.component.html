@@ -1,0 +1,16 @@
+<div class="overlay">
+  <div class="popup">
+    <h2 class ="popup-title">{{project.name}}</h2>
+    <div class="members-list">
+      <div *ngFor="let member of projectMembers" class="member-item">
+        <div class="member-info">
+          <img [src]="member.sex === 'Male' ? 'assets/man.png' : 'assets/woman.png'" alt="{{ member.name }}" class="member-avatar">
+          <p class="member-name">{{ member.name }}</p>
+        </div>
+        <p class="member-role">{{ member.role }}</p>
+      </div>
+    </div>
+    <button class="close-button" (click)="closePopup()">OK</button>
+  </div>
+</div>
+

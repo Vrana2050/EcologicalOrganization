@@ -1,0 +1,19 @@
+
+<div class ="home-container">
+  <div class="header">
+    <h1>Projects</h1>
+    <button class="add-project-button"><img src="assets/plus.png" alt="Add Project"></button>
+  </div>
+  <div class="project-items">
+    <div *ngFor="let project of projects" class="project-item">
+      <p class="project-name">{{ project.name }}</p>
+      <p class="project-status" [ngClass]="{'in-progress': project.isInProgress(), 'completed': project.isCompleted(), 'abandoned': project.isAbandoned()}">{{ project.getStatusLabel() }}</p>
+      <document-preparation-progress-bar *ngIf="project.completionPercentage !== undefined" [percentage]="project.completionPercentage" class="progress-bar"/>
+      <p class="project-members" (click)="viewProjectMembers(project)">{{ project.getNumberOfMembers() }} Members</p>
+      <button class="view-project-button" (click)="viewProject(project)">
+        <img class ="view-project-icon" src="assets/next.png" alt="View Project">
+      </button>
+    </div>
+  </div>
+</div>
+<project-members-popup *ngIf="isViewMembersVisible" (close)="closeViewMembers()" [project]="selectedProject"></project-members-popup>

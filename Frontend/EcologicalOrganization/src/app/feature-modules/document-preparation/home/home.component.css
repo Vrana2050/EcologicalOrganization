@@ -1,0 +1,98 @@
+.home-container {
+  padding: 1%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  box-sizing: border-box;
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1%;
+}
+.add-project-button {
+  margin-left: auto;
+  width: 70px;
+  height: 40px;
+  background-color: #26A69A;
+  border: none;
+  border-radius: 15px;
+}
+
+.project-items {
+  height: 100%;
+  display: flex;
+  gap: 3%;
+  flex-direction: column;
+  align-items: center;
+}
+
+.project-item {
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 8px;
+  width: 80%;
+  box-sizing: border-box;
+  background-color: #F5F5F5;
+  padding: 15px;
+  display: flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.project-item p {
+  margin: 0;
+}
+h1{
+  margin-bottom:0;
+}
+.project-name{
+  font-size: 20px;
+   white-space: nowrap;   /* sprečava prelazak u novi red */
+  overflow: hidden;      /* sakriva tekst koji izlazi iz širine */
+  text-overflow: ellipsis;
+  color:#1B5E20;
+  width:35%;
+}
+.project-status{
+  font-size:16px;
+}
+.project-members{
+  font-size:16px;
+  color:#212121;
+  text-decoration:underline;
+  cursor:pointer;
+}
+.view-project-button{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#26A69A;
+  border:none;
+  padding:2px;
+  border-radius:90%;
+  cursor:pointer;
+}
+.view-project-icon{
+  border-radius:90%;
+  margin-left:4px;
+}
+.progress-bar{
+  width:20%;
+  height:80%;
+}
+.in-progress {
+  color: orange;
+}
+.completed {
+  color: green;
+}
+.abandoned {
+  color: red;
+}

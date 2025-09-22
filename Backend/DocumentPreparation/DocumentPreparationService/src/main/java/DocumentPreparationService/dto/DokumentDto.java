@@ -6,6 +6,10 @@ import DocumentPreparationService.model.KorisnikProjekat;
 import DocumentPreparationService.model.TokStatus;
 import DocumentPreparationService.model.enumeration.Prioritet;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.Column;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,6 +33,11 @@ public class DokumentDto {
     private TokStatusDto status;
 
     private Prioritet prioritet;
+    private LocalDate poslednjaIzmena;
+    private KorisnikProjekatDto izmenaOd;
+    private Float procenatZavrsenosti;
+    private Boolean pripremna_verzija;
+
 
     private DokumentDto roditeljDokument;
     private FajlDto glavniFajl;

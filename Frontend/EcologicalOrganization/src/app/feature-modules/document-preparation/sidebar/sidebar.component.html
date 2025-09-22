@@ -1,0 +1,12 @@
+<div class="sidebar-wrapper">
+  <div class ="actions">
+    <div class ="action-item" (click)="clickProject()" [ngClass]="{'active': isProjectClicked}">
+      <img class ="project-icon" src="assets/project-management.png" alt="Upload Icon">
+      <span>Projects</span>
+    </div>
+    <div class ="action-item" (click)="clickNews()" [ngClass]="{'active': isNewsClicked}">
+      <img class ="bell-icon" src="assets/bell.png" alt="Upload Icon">
+      <span>News</span>
+    </div>
+  </div>
+</div>

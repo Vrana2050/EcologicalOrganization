@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -151,6 +152,7 @@ public class DokumentService extends CrudService<Dokument,Long> implements IDoku
         }
         KorisnikProjekat korisnikProjekat = korisnikProjekatService.findByUserAndProjekat(userId,newDokument.getProjekat().getId()).orElseThrow(() -> new NotFoundException("User not found on project"));
         newDokument.setVlasnik(korisnikProjekat);
+        newDokument.setIzmenaOd(korisnikProjekat);
         return create(newDokument);
     }
 
@@ -217,5 +219,22 @@ public class DokumentService extends CrudService<Dokument,Long> implements IDoku
         Dokument dokument = repository.findByIdWithAktivniFajlovi(dokumentId).orElseThrow(() -> new NotFoundException("Document not found"));
         korisnikProjekatService.findByUserAndProjekat(userId,dokument.getProjekat().getId()).orElseThrow(() -> new ForbiddenException("Cannot read document on other projects"));
         return dokument.getAktivniFajlovi();
+    }
+
+    @Override
+    public Set<Dokument> findAllBoardDocumentsByProjectId(Long userId, Long projekatId) {
+        korisnikProjekatService.findByUserAndProjekat(userId,projekatId).orElseThrow(() -> new ForbiddenException("Cannot read document on other projects"));
+        Set<Dokument> boardDocuments = repository.getAllBoardDocumentsByProjectId(projekatId);
+        return boardDocuments;
+    }
+
+    @Override
+    public Set<Dokument> findAllBoardDocumentsByParentDocumentId(Long userId, Long parentDocumentId) {
+            Set<Dokument> boardDocuments = repository.getAllBoardDocumentsByParentDocumentId(parentDocumentId);
+            if(boardDocuments.isEmpty()){
+                return new HashSet<>();
+            }
+            korisnikProjekatService.findByUserAndProjekat(userId, boardDocuments.stream().findFirst().get().getProjekat().getId()).orElseThrow(() -> new ForbiddenException("Cannot read document on other projects"));
+            return boardDocuments;
     }
 }

@@ -13,7 +13,6 @@ import { DocumentManagementModule } from './feature-modules/document-management/
 import { DocumentPreparationModule } from './feature-modules/document-preparation/document-preparation.module';
 import { WrittingAssistantModule } from './feature-modules/writting-assistant/writting-assistant.module';
 import { ProjectRealizationModule } from './feature-modules/project-realization/project-realization.module';
-
 @NgModule({
   declarations: [AppComponent],
   imports: [

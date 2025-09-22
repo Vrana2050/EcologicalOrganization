@@ -1,0 +1,52 @@
+.sidebar-wrapper {
+  background-color: #E0F4E1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  align-items: center;
+  justify-content:center;
+  position: relative;
+  min-width:5vw;
+  max-width:60px;
+  left:0;
+  top:0;
+  border-right: 1px solid red;
+  overflow: hidden;
+}
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items:center;
+  justify-content: center;
+  width: 70%;
+  padding: 10px;
+}
+.action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding: 10%;
+  border-radius: 10%;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  width: 100%;
+  margin-bottom: 20%;
+}
+.action-item:hover {
+  background-color: rgba(38, 166, 154, 0.5); /* poslednji parametar = alpha (0-1) */
+  transform: scale(1.05);
+}
+.project-icon {
+  width: 70%;
+  height: 70%;
+  margin-bottom: 1%;
+}
+.bell-icon {
+  width: 70%;
+  height: 70%;
+  margin-bottom: 1%;
+}
+.active{
+    background-color: #26A69A;
+
+}

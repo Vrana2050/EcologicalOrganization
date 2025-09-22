@@ -1,0 +1,10 @@
+.layout-wrapper{
+  background-color: #E0F4E1;
+  height: 91.5vh;
+  display: flex;
+
+}
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+}
