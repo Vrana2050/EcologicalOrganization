@@ -61,5 +61,15 @@ public class DokumentController  {
         Dokument updatedEntity = dokumentService.updateStatus(entity,userId);
         return ResponseEntity.ok(mapper.ToDto(updatedEntity));
     }
+    @GetMapping("/board/project/{projekatId}")
+    public ResponseEntity<Set<DokumentDto>> getBoardDocumentsByProjectId(@RequestHeader(name = "X-USER-ID") Long userId, @PathVariable Long projekatId) {
+        Set<Dokument> entities = dokumentService.findAllBoardDocumentsByProjectId(userId,projekatId);
+        return ResponseEntity.ok(mapper.ToDtos(entities));
+    }
+    @GetMapping("/board/document/{roditeljDokumentId}")
+    public ResponseEntity<Set<DokumentDto>> getBoardDocumentsByParentDocumentId(@RequestHeader(name = "X-USER-ID") Long userId, @PathVariable Long roditeljDokumentId) {
+        Set<Dokument> entities = dokumentService.findAllBoardDocumentsByParentDocumentId(userId,roditeljDokumentId);
+        return ResponseEntity.ok(mapper.ToDtos(entities));
+    }
 
 }

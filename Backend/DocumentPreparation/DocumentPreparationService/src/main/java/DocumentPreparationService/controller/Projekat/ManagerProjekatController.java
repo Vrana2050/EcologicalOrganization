@@ -26,7 +26,7 @@ public class ManagerProjekatController {
         return new ResponseEntity<>(mapper.ToDto(savedEntity), HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
+    /*@GetMapping("/{id}")
     public ResponseEntity<ProjekatDto> getById(@RequestHeader(name = "X-USER-ID") Long userId, @PathVariable Long id) {
         return projekatService.findById(id,userId)
                 .map(entity -> ResponseEntity.ok(mapper.ToDto(entity)))
@@ -37,7 +37,7 @@ public class ManagerProjekatController {
     public ResponseEntity<Set<ProjekatDto>> getAll(@RequestHeader(name = "X-USER-ID") Long userId) {
         Set<Projekat> entities = projekatService.findAll(userId);
         return ResponseEntity.ok(mapper.ToDtos(entities));
-    }
+    }*/
 
     @PutMapping
     public ResponseEntity<ProjekatDto> update(@RequestHeader(name = "X-USER-ID") Long userId, @RequestBody Projekat entity) {

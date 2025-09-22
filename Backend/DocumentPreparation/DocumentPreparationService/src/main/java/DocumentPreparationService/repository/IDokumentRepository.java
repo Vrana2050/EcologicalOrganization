@@ -52,4 +52,14 @@ public interface IDokumentRepository extends ICrudRepository<Dokument, Long> {
             "LEFT JOIN FETCH d.aktivniFajlovi "+
             "WHERE d.id = :dokumentId")
     Optional<Dokument> findByIdWithAktivniFajlovi(Long dokumentId);
+    @Query("SELECT d FROM Dokument d " +
+            "LEFT JOIN FETCH d.glavniFajl " +
+            "LEFT JOIN FETCH d.zavisiOd " +
+            "WHERE d.projekat.id = :projekatId and d.roditeljDokument is null")
+    Set<Dokument> getAllBoardDocumentsByProjectId(long projekatId);
+    @Query("SELECT d FROM Dokument d " +
+            "LEFT JOIN FETCH d.glavniFajl " +
+            "LEFT JOIN FETCH d.zavisiOd " +
+            "WHERE d.roditeljDokument.id = :parentDocumentId")
+    Set<Dokument> getAllBoardDocumentsByParentDocumentId(Long parentDocumentId);
 }

@@ -116,17 +116,17 @@ UPDATE tok_status SET sledece_stanje = 1011 WHERE id = 1013;
 -------------------------------------------------------------------------------------------------------------------
 -- PROJEKAT         1002 i 1003 su bitni
 
-INSERT INTO projekat(id, naziv, status, rok_zavrsetka, tok_projekta_id)
-VALUES (1000, 'Wetland Restoration Project', 'zavrsen', TO_DATE('2021-10-31','YYYY-MM-DD'),1002);
+INSERT INTO projekat(id, naziv, status, rok_zavrsetka, tok_projekta_id,procenat_zavrsenosti)
+VALUES (1000, 'Wetland Restoration Project', 'zavrsen', TO_DATE('2021-10-31','YYYY-MM-DD'),1002,100);
 
-INSERT INTO projekat(id, naziv, status, rok_zavrsetka, tok_projekta_id)
-VALUES (1001, 'Large-Scale Solar Farm Installation', 'obustavljen', TO_DATE('2020-10-31','YYYY-MM-DD'), 1002);
+INSERT INTO projekat(id, naziv, status, rok_zavrsetka, tok_projekta_id,procenat_zavrsenosti)
+VALUES (1001, 'Large-Scale Solar Farm Installation', 'obustavljen', TO_DATE('2020-10-31','YYYY-MM-DD'), 1002,20);
 
-INSERT INTO projekat(id, naziv, status, rok_zavrsetka, tok_projekta_id)
-VALUES (1002, 'Urban Air Pollution Reduction Program', 'u_toku', TO_DATE('2030-10-31','YYYY-MM-DD'), 1001);
+INSERT INTO projekat(id, naziv, status, rok_zavrsetka, tok_projekta_id,procenat_zavrsenosti)
+VALUES (1002, 'Urban Air Pollution Reduction Program', 'u_toku', TO_DATE('2030-10-31','YYYY-MM-DD'), 1001,12.5);
 
-INSERT INTO projekat(id, naziv, status, rok_zavrsetka, tok_projekta_id)
-VALUES (1003, 'Forest Ecosystem Restoration and Tree Planting', 'u_toku', TO_DATE('2027-10-31','YYYY-MM-DD'), 1001);
+INSERT INTO projekat(id, naziv, status, rok_zavrsetka, tok_projekta_id,procenat_zavrsenosti)
+VALUES (1003, 'Forest Ecosystem Restoration and Tree Planting', 'u_toku', TO_DATE('2027-10-31','YYYY-MM-DD'), 1001,0);
 
 
 
@@ -420,44 +420,44 @@ VALUES (1059, UTL_RAW.CAST_TO_RAW('Sample data 12'), 2, SYSTIMESTAMP + INTERVAL 
 
 -- GLAVNI DOKUMENTI
 
-INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija)
-VALUES (1000, 1002, 'Emission Sources Inventory', 'Lists and categorizes all major sources of air pollution in the urban area.', 1000, 1003, 'visok', NULL, NULL, 1000,TO_DATE('2027-6-15','YYYY-MM-DD'),1);
+INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija, posledjna_izmena,izmena_od,procenat_zavrsenosti)
+VALUES (1000, 1002, 'Emission Sources Inventory', 'Lists and categorizes all major sources of air pollution in the urban area.', 1000, 1003, 'visok', NULL, NULL, 1000,TO_DATE('2027-6-15','YYYY-MM-DD'),1,SYSTIMESTAMP,1000,0);
 
-INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija)
-VALUES (1001, 1002, 'Air Quality Monitoring Plan', 'Defines locations, methods, and frequency of air quality measurements.', 1000, 1004, 'srednji', NULL, NULL, 1000,TO_DATE('2029-6-15','YYYY-MM-DD'),0);
+INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija, posledjna_izmena,izmena_od,procenat_zavrsenosti)
+VALUES (1001, 1002, 'Air Quality Monitoring Plan', 'Defines locations, methods, and frequency of air quality measurements.', 1000, 1004, 'srednji', NULL, NULL, 1000,TO_DATE('2029-6-15','YYYY-MM-DD'),0,SYSTIMESTAMP,1000,0);
 
-INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija)
-VALUES (1002, 1002, 'Impact Assessment Report', 'Evaluates the effects of current pollution levels on health and the environment.', 1000, 1005, 'mali', NULL, 1002, 1000,TO_DATE('2026-6-15','YYYY-MM-DD'),0);
+INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija, posledjna_izmena,izmena_od,procenat_zavrsenosti)
+VALUES (1002, 1002, 'Impact Assessment Report', 'Evaluates the effects of current pollution levels on health and the environment.', 1000, 1005, 'mali', NULL, 1002, 1000,TO_DATE('2026-6-15','YYYY-MM-DD'),0,SYSTIMESTAMP,1000,33);
 
-INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija)
-VALUES (1003, 1002, 'Mitigation Strategies Proposal', 'Suggests actionable measures to reduce emissions and improve air quality.', 1000, 1006, 'visok', NULL, 1003, 1000,TO_DATE('2028-6-15','YYYY-MM-DD'),0);
+INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija, posledjna_izmena,izmena_od,procenat_zavrsenosti)
+VALUES (1003, 1002, 'Mitigation Strategies Proposal', 'Suggests actionable measures to reduce emissions and improve air quality.', 1000, 1006, 'visok', NULL, 1003, 1000,TO_DATE('2028-6-15','YYYY-MM-DD'),0,SYSTIMESTAMP,1000,100);
 
-INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija)
-VALUES (1004, 1002, 'Implementation Schedule', 'Provides a detailed timeline and sequence for executing mitigation actions.', 1001, 1007, 'srednji', NULL, 1004, 1000,TO_DATE('2026-2-15','YYYY-MM-DD'),0);
+INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija, posledjna_izmena,izmena_od,procenat_zavrsenosti)
+VALUES (1004, 1002, 'Implementation Schedule', 'Provides a detailed timeline and sequence for executing mitigation actions.', 1001, 1007, 'srednji', NULL, 1004, 1000,TO_DATE('2026-2-15','YYYY-MM-DD'),0,SYSTIMESTAMP,1000,100);
 
-INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija)
-VALUES (1005, 1002, 'Stakeholder Consultation Report', 'Summarizes feedback and input gathered from community and stakeholders.', 1000, 1008, 'mali', NULL, 1005, 1000,TO_DATE('2026-3-15','YYYY-MM-DD'),0);
+INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija, posledjna_izmena,izmena_od,procenat_zavrsenosti)
+VALUES (1005, 1002, 'Stakeholder Consultation Report', 'Summarizes feedback and input gathered from community and stakeholders.', 1000, 1008, 'mali', NULL, 1005, 1000,TO_DATE('2026-3-15','YYYY-MM-DD'),0,SYSTIMESTAMP,1000,100);
 
-INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija)
-VALUES (1006, 1002, 'Progress and Evaluation Reports', 'Tracks progress and measures the effectiveness of implemented strategies.', 1001, 1005, 'visok', NULL, 1006, 1000,TO_DATE('2027-8-15','YYYY-MM-DD'),0);
+INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija, posledjna_izmena,izmena_od,procenat_zavrsenosti)
+VALUES (1006, 1002, 'Progress and Evaluation Reports', 'Tracks progress and measures the effectiveness of implemented strategies.', 1001, 1005, 'visok', NULL, 1006, 1000,TO_DATE('2027-8-15','YYYY-MM-DD'),0,SYSTIMESTAMP,1000,0);
 
-INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija)
-VALUES (1007, 1002, 'Regulatory Compliance Report', 'Confirms that program activities meet all relevant legal and environmental standards.', 1001, 1006, 'srednji', NULL, 1007, 1000,TO_DATE('2027-9-15','YYYY-MM-DD'),0);
+INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija, posledjna_izmena,izmena_od,procenat_zavrsenosti)
+VALUES (1007, 1002, 'Regulatory Compliance Report', 'Confirms that program activities meet all relevant legal and environmental standards.', 1001, 1006, 'srednji', NULL, 1007, 1000,TO_DATE('2027-9-15','YYYY-MM-DD'),0,SYSTIMESTAMP,1000,100);
 
 
 -- PODDOKUMENTI
 
-INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija)
-VALUES (1008, 1002, 'Emission Reduction Technology Assessment', 'Evaluates available technologies and methods to reduce emissions from key sources.', NULL, 1001, 'visok', 1002, 1008, 1001,TO_DATE('2025-11-15','YYYY-MM-DD'),0);
+INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija, posledjna_izmena,izmena_od,procenat_zavrsenosti)
+VALUES (1008, 1002, 'Emission Reduction Technology Assessment', 'Evaluates available technologies and methods to reduce emissions from key sources.', NULL, 1001, 'visok', 1002, 1008, 1001,TO_DATE('2025-11-15','YYYY-MM-DD'),0,SYSTIMESTAMP,1001,0);
 
-INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija)
-VALUES (1009, 1002, 'Public Awareness Campaign Plan', 'Outlines strategies to inform and engage the public on air quality issues and pollution reduction.', NULL, 1000, 'mali', 1002, NULL, 1001,TO_DATE('2025-12-15','YYYY-MM-DD'),0);
+INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija, posledjna_izmena,izmena_od,procenat_zavrsenosti)
+VALUES (1009, 1002, 'Public Awareness Campaign Plan', 'Outlines strategies to inform and engage the public on air quality issues and pollution reduction.', NULL, 1000, 'mali', 1002, NULL, 1001,TO_DATE('2025-12-15','YYYY-MM-DD'),0,SYSTIMESTAMP,1001,0);
 
-INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija)
-VALUES (1010, 1002, 'Cost-Benefit Analysis Report', 'Analyzes the financial implications and expected benefits of proposed mitigation measures.', NULL, 1002, 'srednji', 1002, 1010, 1006,TO_DATE('2026-1-15','YYYY-MM-DD'),0);
+INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija, posledjna_izmena,izmena_od,procenat_zavrsenosti)
+VALUES (1010, 1002, 'Cost-Benefit Analysis Report', 'Analyzes the financial implications and expected benefits of proposed mitigation measures.', NULL, 1002, 'srednji', 1002, 1010, 1006,TO_DATE('2026-1-15','YYYY-MM-DD'),0,SYSTIMESTAMP,1006,100);
 
-INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija)
-VALUES (1011, 1002, 'Emergency Response Plan', 'Defines procedures to address acute air pollution events and protect public health.', NULL, 1002, 'visok', 1003, 1011, 1006,TO_DATE('2027-6-15','YYYY-MM-DD'),0);
+INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija, posledjna_izmena,izmena_od,procenat_zavrsenosti)
+VALUES (1011, 1002, 'Emergency Response Plan', 'Defines procedures to address acute air pollution events and protect public health.', NULL, 1002, 'visok', 1003, 1011, 1006,TO_DATE('2027-6-15','YYYY-MM-DD'),0,SYSTIMESTAMP,1006,100);
 
 
 

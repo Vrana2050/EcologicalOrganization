@@ -20,5 +20,6 @@ public class ProjekatDto {
     private TokDto tokProjekta;
     private Set<DokumentDto> dokumenti;
     private Set<KorisnikProjekatDto>  korisniciProjekta;
+    private Float procenatZavrsenosti;
 
 }

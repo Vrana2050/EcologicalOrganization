@@ -1,0 +1,88 @@
+/* Tamna pozadina */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popup {
+  background-color: #F5F5F5;
+  padding: 20px 30px;
+  border-radius: 15px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+.popup-title {
+  margin: 0;
+  color: #1B5E20;
+}
+.close-button {
+  margin-left: auto;
+  width: 70px;
+  height: 40px;
+  background-color: #26A69A;
+  border: none;
+  border-radius: 15px;
+  font-size: 18px;
+  color: white;
+}
+.members-list {
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+}
+.member-item {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 10px;
+  width: 70%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.member-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #26A69A;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+p{
+  margin: 0;
+}
+.member-name {
+  font-size: 18px;
+  color: #212121;
+}
+.member-role {
+  font-size: 16px;
+  color: #1B5E20;
+  flex:1;
+}
+.member-info{
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 70%;
+
+}

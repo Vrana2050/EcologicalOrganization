@@ -58,6 +58,17 @@ export class AuthService {
     }
     this.setUser();
   }
+  isUserManager(): boolean {
+    return this.user$.value.role === 'MANAGER';
+  }
+
+  isUserAdmin(): boolean {
+    return this.user$.value.role === 'ADMIN';
+  }
+
+  isUserEmployee(): boolean {
+    return this.user$.value.role === 'EMPLOYEE';
+  }
 
   private setUser(): void {
     const jwtHelperService = new JwtHelperService();

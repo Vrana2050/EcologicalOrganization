@@ -36,6 +36,7 @@ public class ProjekatService extends CrudService<Projekat,Long> implements IProj
     public Projekat create(Projekat projekat) {
         try {
             //Proveriti usera
+            projekat.setProcenatZavrsenosti((float) 0);
             projekat.validate();
             if(!tokService.findById(projekat.getTokProjekta().getId()).isPresent()){
                 throw new NotFoundException("Workflow not found");
@@ -91,6 +92,16 @@ public class ProjekatService extends CrudService<Projekat,Long> implements IProj
     @Override
     public Set<Projekat> findAll(Long userId) {
         return iProjekatRepository.findDistinctByKorisniciProjekta_KorisnikId(userId);
+    }
+
+    @Override
+    public Optional<Projekat> findProjectBoardById(Long userId, Long id) {
+        Optional<Projekat> projekat = findById(id,userId);
+        if (!projekat.isPresent()) {
+            return Optional.empty();
+        }
+        projekat.get().setTokProjekta(tokService.findById(projekat.get().getTokProjekta().getId()).get());
+        return projekat;
     }
 
     @Override
