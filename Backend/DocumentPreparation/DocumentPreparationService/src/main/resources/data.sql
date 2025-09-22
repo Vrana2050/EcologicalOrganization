@@ -136,80 +136,80 @@ VALUES (1003, 'Forest Ecosystem Restoration and Tree Planting', 'u_toku', TO_DAT
 --TODO                      TRECI PROJEKAT 1002
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1000, 1, 1002, 'menadzer');
+VALUES (1000, 1001, 1002, 'menadzer');
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1001, 2, 1002, 'vodja');
+VALUES (1001, 1002, 1002, 'vodja');
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1002, 3, 1002, 'clan');
+VALUES (1002, 1003, 1002, 'clan');
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1003, 4, 1002, 'clan');
+VALUES (1003, 1004, 1002, 'clan');
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1004, 5, 1002, 'clan');
+VALUES (1004, 1005, 1002, 'clan');
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1005, 6, 1002, 'clan');
+VALUES (1005, 1006, 1002, 'clan');
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1006, 7, 1002, 'vodja');
+VALUES (1006, 1007, 1002, 'vodja');
 
 
 --TODO                      CETVRTI PROJEKAT 1003
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1007, 10, 1003, 'menadzer');
+VALUES (1007, 1010, 1003, 'menadzer');
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1008, 3, 1003, 'vodja');
+VALUES (1008, 1003, 1003, 'vodja');
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1009, 7, 1003, 'clan');
+VALUES (1009, 1007, 1003, 'clan');
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1010, 8, 1003, 'clan');
+VALUES (1010, 1008, 1003, 'clan');
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1011, 9, 1003, 'clan');
+VALUES (1011, 1009, 1003, 'clan');
 
 --TODO                      PRVI PROJEKAT 1000
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1012, 1, 1000, 'menadzer');
+VALUES (1012, 1001, 1000, 'menadzer');
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1013, 2, 1000, 'vodja');
+VALUES (1013, 1002, 1000, 'vodja');
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1014, 3, 1000, 'clan');
+VALUES (1014, 1003, 1000, 'clan');
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1015, 4, 1000, 'clan');
+VALUES (1015, 1004, 1000, 'clan');
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1016, 5, 1000, 'vodja');
+VALUES (1016, 1005, 1000, 'vodja');
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1017, 6, 1000, 'clan');
+VALUES (1017, 1006, 1000, 'clan');
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1018, 7, 1000, 'clan');
+VALUES (1018, 1007, 1000, 'clan');
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1019, 8, 1000, 'clan');
+VALUES (1019, 1008, 1000, 'clan');
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1020, 9, 1000, 'vodja');
+VALUES (1020, 1009, 1000, 'vodja');
 
 --TODO                      DRUGI PROJEKAT 1001
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1021, 1, 1001, 'menadzer');
+VALUES (1021, 1001, 1001, 'menadzer');
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1022, 4, 1001, 'vodja');
+VALUES (1022, 1004, 1001, 'vodja');
 
 
 

@@ -18,12 +18,14 @@ services:
       #- vector-database-service
     environment:
       GATEWAY_PORT: "9000"
-      WRITING_ASSISTANT_URL: "http://writing-assistant-service:8000/writing-assistant"
-      DOCUMENT_PREPARATION_URL: "http://document-preparation-service:8005/api/docPrep"
+      WRITING_ASSISTANT_URL: "http://host.docker.internal:8000/writing-assistant"
+      DOCUMENT_PREPARATION_URL: "http://host.docker.internal:8005/api/docPrep"
       PROJECT_REALIZATION_URL: "http://project-realization-service:8006/project-realization"
-      DOCUMENT_MANAGEMENT_URL: "http://document-management-service:8080/document-management"
+      DOCUMENT_MANAGEMENT_URL: "http://host.docker.internal:8080/document-management"
       USER_MANAGEMENT_URL: "http://user-management-service:8007/"
       USER_MGMT_AUTH_URL: "http://user-management-service:8007/auth/user-credentials"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "9000:9000"
 

@@ -16,7 +16,7 @@ public class RoleInterceptor implements HandlerInterceptor {
             HandlerMethod method = (HandlerMethod) handler;
             RequireRole requireRole = method.getBeanType().getAnnotation(RequireRole.class);
             if (requireRole != null) {
-                String userRole = request.getHeader("X-User-Role");
+                String userRole = request.getHeader("X-USER-ROLE");
                 if (userRole == null || !requireRole.value().toLowerCase().contains(userRole.toLowerCase())) {
                     response.sendError(HttpStatus.UNAUTHORIZED.value(), "Unauthorized");
                     return false;
