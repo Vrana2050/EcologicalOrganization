@@ -211,49 +211,19 @@ class SectionIterationService(BaseService):
         return int(si.id)
 
 
-    def generate(
+    def _calculate_pricing(
         self,
-        section_id: int,
-        payload: GenerateIterationIn,
-        user_id: int,
-        current_user,
-    ) -> SectionIterationOut:
-        section = self._get_section(section_id)
-        session = self._get_session_with_sections(section.session_id)
-
-        # 2) provere/autorizacija
-        self._assert_session_owner(session, user_id)
-        document_type_id = self._require_document_type_id(session)
-
-        # 3) priprema podataka
-        now = datetime.now(timezone.utc)
-        prompt_version = self._resolve_prompt_version(session, document_type_id, current_user)
-        base_prompt = prompt_version.prompt_text or ""
-        active_sections = self._active_sections(session)
-
-        final_prompt = self._compose_final_prompt(
-            section=section
-            session_sections=active_sections,
-            base_prompt=base_prompt,
-            global_text=payload.global_instruction,
-            section_text=payload.section_instruction,
-        )
-
-        # --- LLM call (ostavljeno kako ti je ranije bilo)
-        start_time = datetime.now(timezone.utc).replace(tzinfo=None)
-        llm_res = self._llm.generate(final_prompt)
-        end_time = datetime.now(timezone.utc).replace(tzinfo=None)
-        duration_ms = int((end_time - start_time).total_seconds() * 1000)
-        next_seq = self._iter_repo.next_seq_for_section(section_id)
-
-        # --- pricing
+        llm_res,
+        when: datetime,
+    ) -> tuple[Optional[int], Optional[Decimal]]:
         cost_usd: Optional[Decimal] = None
         pricing_id: Optional[int] = None
+
         try:
             pricing = self._pricing.get_active(
                 provider=self._llm.provider,
                 model=self._llm.model,
-                when=end_time,
+                when=when,
             )
             if pricing:
                 pricing_id = int(pricing.id)
@@ -268,7 +238,43 @@ class SectionIterationService(BaseService):
             pricing_id = None
             cost_usd = None
 
-        # --- instrukcije
+        return pricing_id, cost_usd
+
+    def generate(
+        self,
+        section_id: int,
+        payload: GenerateIterationIn,
+        user_id: int,
+        current_user,
+    ) -> SectionIterationOut:
+        section = self._get_section(section_id)
+        session = self._get_session_with_sections(section.session_id)
+
+        self._assert_session_owner(session, user_id)
+        document_type_id = self._require_document_type_id(session)
+
+        now = datetime.now(timezone.utc)
+        prompt_version = self._resolve_prompt_version(session, document_type_id, current_user)
+        base_prompt = prompt_version.prompt_text or ""
+        active_sections = self._active_sections(session)
+
+        final_prompt = self._compose_final_prompt(
+            section=section,
+            session_sections=active_sections,
+            base_prompt=base_prompt,
+            global_text=payload.global_instruction,
+            section_text=payload.section_instruction,
+        )
+
+        start_time = datetime.now(timezone.utc).replace(tzinfo=None)
+        llm_res = self._llm.generate(final_prompt)
+        end_time = datetime.now(timezone.utc).replace(tzinfo=None)
+        duration_ms = int((end_time - start_time).total_seconds() * 1000)
+        next_seq = self._iter_repo.next_seq_for_section(section_id)
+
+        
+        pricing_id, cost_usd = self._calculate_pricing(llm_res, end_time)   
+
         global_instruction_id = self._create_global_instruction(
             session_id=int(session.id),
             text_value=payload.global_instruction,
@@ -321,6 +327,7 @@ class SectionIterationService(BaseService):
                 section_instruction_id=section_instruction_id,
                 model_output_id=int(out.id),
                 section_draft_id=None,
+
             )
         )
 

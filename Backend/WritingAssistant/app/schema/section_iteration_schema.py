@@ -49,7 +49,8 @@ class SectionIterationOut(BaseModel):
     session_section_id: int
     section_instruction: Optional[SectionInstructionOut] = None
     model_output: Optional[ModelOutputOut] = None
-    section_draft: Optional[SectionDraftOut] = None  # ⬅ dodato
+    section_draft: Optional[SectionDraftOut] = None  
+
 
     class Config:
         from_attributes = True

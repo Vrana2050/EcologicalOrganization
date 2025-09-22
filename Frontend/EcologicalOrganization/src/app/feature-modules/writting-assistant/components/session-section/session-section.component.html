@@ -46,6 +46,15 @@
         </button>
       </div>
 
+      <button
+        class="wa-btn small"
+        type="button"
+        *ngIf="section?.latestIteration?.modelOutput?.id"
+        (click)="openFeedbackModal()"
+      >
+        ⭐ Oceni
+      </button>
+
       <button class="wa-btn" (click)="onGenerate()">
         ⚡ Generiši sadržaj sekcije
       </button>
@@ -97,3 +106,12 @@
     </div>
   </div>
 </section>
+
+<wa-add-output-feedback
+  *ngIf="feedbackModalOpen"
+  [modelOutputId]="section?.latestIteration?.modelOutput?.id || 0"
+  [sectionName]="section?.name || 'Sekcija'"
+  [seqNo]="currentSeq"
+  (close)="closeFeedbackModal()"
+  (submitted)="onFeedbackSubmitted($event)"
+></wa-add-output-feedback>

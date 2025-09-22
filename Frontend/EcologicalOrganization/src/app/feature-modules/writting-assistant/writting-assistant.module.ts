@@ -10,6 +10,7 @@ import { SessionSectionComponent } from './components/session-section/session-se
 import { FormsModule } from '@angular/forms';
 import { AddNewTemplateComponent } from './components/add-new-template/add-new-template.component';
 import { PreviewDocumentComponent } from './components/preview-document/preview-document.component';
+import { AddOutputFeedbackComponent } from './components/add-output-feedback/add-output-feedback.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { PreviewDocumentComponent } from './components/preview-document/preview-
     SessionSectionComponent,
     AddNewTemplateComponent,
     PreviewDocumentComponent,
+    AddOutputFeedbackComponent,
   ],
   imports: [CommonModule, FormsModule],
 })

@@ -24,6 +24,8 @@ import {
 } from '@angular/core';
 import { SessionSectionService } from '../../services/session-section.service';
 import { SessionSectionWithLatest } from '../../models/session-section.model';
+import { OutputFeedbackService } from '../../services/output-feedback.service';
+import { CreateOutputFeedback } from '../../models/output-feedback.model';
 
 @Component({
   selector: 'wa-session-section',
@@ -65,6 +67,7 @@ export class SessionSectionComponent implements OnInit, OnChanges {
   editingTitle = false;
   titleDraft = '';
   invalidTitle = false;
+  feedbackModalOpen = false;
 
   currentSeq = 0;
   maxSeq = 0;
@@ -75,7 +78,10 @@ export class SessionSectionComponent implements OnInit, OnChanges {
   statusTypeResult: 'unsaved' | 'saved' | null = null;
   private resultTimer: any = null;
 
-  constructor(private sectionSvc: SessionSectionService) {}
+  constructor(
+    private sectionSvc: SessionSectionService,
+    private feedbackSvc: OutputFeedbackService
+  ) {}
 
   ngOnInit(): void {
     this.hydrateFromSection();
@@ -259,5 +265,22 @@ export class SessionSectionComponent implements OnInit, OnChanges {
   }
   goNext() {
     if (this.currentSeq < this.maxSeq) this.fetch(this.currentSeq + 1);
+  }
+
+  openFeedbackModal(): void {
+    if (!this.section?.latestIteration?.modelOutput?.id) return;
+    this.feedbackModalOpen = true;
+  }
+  closeFeedbackModal(): void {
+    this.feedbackModalOpen = false;
+  }
+
+  onFeedbackSubmitted(payload: CreateOutputFeedback): void {
+    this.feedbackSvc.create(payload).subscribe({
+      next: () => {
+        this.feedbackModalOpen = false;
+      },
+      error: (err) => console.error('Greška pri slanju ocene', err),
+    });
   }
 }

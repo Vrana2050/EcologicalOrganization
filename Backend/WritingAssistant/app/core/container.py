@@ -17,6 +17,7 @@ from app.repository.template_repository import TemplateRepository
 from app.repository.section_draft_repository import SectionDraftRepository
 from app.repository.template_file_repository import TemplateFileRepository
 from app.repository.model_pricing_repository import ModelPricingRepository
+from app.repository.output_feedback_repository import OutputFeedbackRepository
 
 from app.services.chat_session_service import ChatSessionService
 from app.services.session_section_service import SessionSectionService
@@ -28,6 +29,7 @@ from app.services.prompt_version_service import PromptVersionService
 from app.services.template_service import TemplateService
 from app.services.document_type_service import DocumentTypeService
 from app.services.model_pricing_service import ModelPricingService
+from app.services.output_feedback_service import OutputFeedbackService
 
 from app.services.llm_client.openai_client import OpenAIClient
 from app.services.llm_client.mock_client import MockLLMClient
@@ -42,6 +44,7 @@ class Container(containers.DeclarativeContainer):
             "app.api.v1.endpoints.prompt_version",
             "app.api.v1.endpoints.template",
             "app.api.v1.endpoints.document_type",
+            "app.api.v1.endpoints.output_feedback",
         ]
     )
 
@@ -62,6 +65,7 @@ class Container(containers.DeclarativeContainer):
     section_draft_repository = providers.Factory(SectionDraftRepository, session_factory=db.provided.session)
     template_file_repository = providers.Factory(TemplateFileRepository, session_factory=db.provided.session)
     model_pricing_repository = providers.Factory(ModelPricingRepository, session_factory=db.provided.session)
+    output_feedback_repository = providers.Factory(OutputFeedbackRepository, session_factory=db.provided.session)
 
     chat_session_service = providers.Factory(
         ChatSessionService,
@@ -136,6 +140,14 @@ class Container(containers.DeclarativeContainer):
         repository=template_repository,
         file_repository=template_file_repository,
         session_factory=db.provided.session,
+    )
+    
+    output_feedback_service = providers.Factory(
+        OutputFeedbackService,
+        repository=output_feedback_repository,
+        model_output_repo=model_output_repository,
+        prompt_exec_repo=prompt_execution_repository,
+        chat_session_repo=chat_session_repository,
     )
 
 
