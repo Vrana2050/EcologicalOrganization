@@ -46,18 +46,11 @@ class AppCreator:
             )
             components = openapi_schema.setdefault("components", {})
             security_schemes = components.setdefault("securitySchemes", {})
-            security_schemes["XUserId"] = {
-                "type": "apiKey",
-                "name": "x-user-id",
-                "in": "header",
-            }
-            security_schemes["XUserRole"] = {
-                "type": "apiKey",
-                "name": "x-user-role",
-                "in": "header",
-            }
+            security_schemes["XUserId"] = {"type": "apiKey", "name": "x-user-id", "in": "header"}
+            security_schemes["XUserRole"] = {"type": "apiKey", "name": "x-user-role", "in": "header"}
+            security_schemes["XUserEmail"] = {"type": "apiKey", "name": "x-user-email", "in": "header"}
 
-            openapi_schema["security"] = [{"XUserId": [], "XUserRole": []}]
+            openapi_schema["security"] = [{"XUserId": [], "XUserRole": [], "XUserEmail": []}]   
             self.app.openapi_schema = openapi_schema
             return self.app.openapi_schema
 

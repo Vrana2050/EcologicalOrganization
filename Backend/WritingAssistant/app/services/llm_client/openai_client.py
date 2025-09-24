@@ -1,4 +1,3 @@
-# app/services/llm_client/openai_client.py
 from __future__ import annotations
 from typing import Any, Dict, Tuple, List
 from decimal import Decimal, ROUND_HALF_UP
@@ -47,7 +46,6 @@ class OpenAIClient:
                 "input_tokens_details": usage_obj.get("input_tokens_details"),
                 "output_tokens_details": usage_obj.get("output_tokens_details"),
             }
-        # objekat – čitaj preko getattr
         return {
             "input_tokens": getattr(usage_obj, "input_tokens", None),
             "output_tokens": getattr(usage_obj, "output_tokens", None),

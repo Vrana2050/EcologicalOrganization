@@ -286,7 +286,6 @@ class SectionIterationService(BaseService):
             now=now,
         )
 
-        # --- exec
         exec_ = self._exec_repo.create(
             CreatePromptExecution(
                 prompt_version_id=int(prompt_version.id),
@@ -309,7 +308,6 @@ class SectionIterationService(BaseService):
             )
         )
 
-        # --- output
         out = self._out_repo.create(
             CreateModelOutput(
                 prompt_execution_id=int(exec_.id),
@@ -317,7 +315,6 @@ class SectionIterationService(BaseService):
             )
         )
 
-        # --- iteration
         iteration = self._iter_repo.create(
             CreateSectionIteration(
                 seq_no=next_seq,

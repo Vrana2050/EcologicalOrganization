@@ -1,7 +1,14 @@
+// prompt-evaluation.component.ts
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { finalize } from 'rxjs/operators';
+import { Subscription, Observable, EMPTY } from 'rxjs';
 import { AnalyticsService } from '../../services/analytics.service';
+import { FeedbackService } from '../../services/feedback.service';
 import { AnalyticsOut } from '../../models/analytics.model';
+import {
+  OutputFeedbackItem,
+  OutputFeedbackPage,
+} from '../../models/feedback.model';
 
 type ScopeMode = 'prompt' | 'version';
 type SectionTab = 'feedback' | 'analytics';
@@ -17,49 +24,68 @@ export class PromptEvaluationComponent implements OnChanges {
 
   sectionTab: SectionTab = 'analytics';
   scopeMode: ScopeMode = 'prompt';
+
+  // zajednički loading/error za karticu koja je aktivna
   loading = false;
   error?: string;
 
+  // ANALYTICS
   data: AnalyticsOut | null = null;
-
-  /** sprečava duple fetch pozive */
   private lastLoadedKey: string | null = null;
 
-  constructor(private analytics: AnalyticsService) {}
+  // FEEDBACK (centralizovan)
+  fbItems: OutputFeedbackItem[] = [];
+  fbTotal = 0;
+  fbPage = 1;
+  readonly fbPerPage = 5;
+  private fbLastLoadedKey: string | null = null;
+  private fbSub?: Subscription;
+
+  constructor(
+    private analytics: AnalyticsService,
+    private feedback: FeedbackService
+  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    // Kad god se promeni prompt ili verzija -> refetch po trenutnom scope-u
     if (changes['promptId'] || changes['versionId']) {
-      this.fetchCurrent();
+      this.fetchAnalytics();
+      this.fbPage = 1;
+      this.fetchFeedback();
     }
   }
 
   onSectionSwitch(tab: SectionTab): void {
     if (this.sectionTab === tab) return;
     this.sectionTab = tab;
-    // I na promeni taba uvek osveži podatke (analitika i feedback koriste isti payload)
-    this.fetchCurrent();
+    if (tab === 'analytics') this.fetchAnalytics();
+    else this.fetchFeedback();
   }
 
   onScopeSwitch(mode: ScopeMode): void {
     if (this.scopeMode === mode) return;
     this.scopeMode = mode;
-    this.fetchCurrent();
+    this.fetchAnalytics();
+    this.fbPage = 1;
+    this.fetchFeedback();
   }
 
-  /** Uvek vuče podatke za aktuelni scope (prompt / version) bez obzira na tab */
-  private fetchCurrent(): void {
-    const key = `${this.scopeMode}:${this.promptId ?? 'null'}:${
+  // === ANALYTICS ===
+  private analyticsKey(): string {
+    return `${this.scopeMode}:${this.promptId ?? 'null'}:${
       this.versionId ?? 'null'
     }`;
-    if (this.lastLoadedKey === key) return; // nema promene, nema poziva
+  }
+
+  private fetchAnalytics(): void {
+    const key = this.analyticsKey();
+    if (this.lastLoadedKey === key) return;
 
     if (this.scopeMode === 'prompt') {
       if (!this.promptId) return;
-      this.loading = true;
+      this.loading = this.sectionTab === 'analytics';
       this.error = undefined;
       this.analytics
-        .getPromptAnalytics(this.promptId, 10)
+        .getPromptAnalytics(this.promptId)
         .pipe(finalize(() => (this.loading = false)))
         .subscribe({
           next: (res) => {
@@ -68,16 +94,17 @@ export class PromptEvaluationComponent implements OnChanges {
           },
           error: (err) => {
             console.error('[FE] prompt analytics error', err);
-            this.error = 'Učitavanje nije uspelo.';
+            if (this.sectionTab === 'analytics')
+              this.error = 'Učitavanje nije uspelo.';
             this.data = null;
           },
         });
     } else {
       if (!this.versionId) return;
-      this.loading = true;
+      this.loading = this.sectionTab === 'analytics';
       this.error = undefined;
       this.analytics
-        .getVersionAnalytics(this.versionId, 10)
+        .getVersionAnalytics(this.versionId)
         .pipe(finalize(() => (this.loading = false)))
         .subscribe({
           next: (res) => {
@@ -86,10 +113,79 @@ export class PromptEvaluationComponent implements OnChanges {
           },
           error: (err) => {
             console.error('[FE] version analytics error', err);
-            this.error = 'Učitavanje nije uspelo.';
+            if (this.sectionTab === 'analytics')
+              this.error = 'Učitavanje nije uspelo.';
             this.data = null;
           },
         });
     }
+  }
+
+  // === FEEDBACK ===
+  private feedbackKey(): string {
+    return `${this.scopeMode}:${this.promptId ?? 'null'}:${
+      this.versionId ?? 'null'
+    }:${this.fbPage}`;
+  }
+
+  private fetchFeedback(): void {
+    if (this.sectionTab !== 'feedback') return;
+
+    const key = this.feedbackKey();
+    if (this.fbLastLoadedKey === key) return;
+
+    this.fbSub?.unsubscribe();
+
+    let obs: Observable<OutputFeedbackPage> = EMPTY;
+    if (this.scopeMode === 'prompt') {
+      if (this.promptId)
+        obs = this.feedback.getForPrompt(
+          this.promptId,
+          this.fbPage,
+          this.fbPerPage
+        );
+    } else {
+      if (this.versionId)
+        obs = this.feedback.getForVersion(
+          this.versionId,
+          this.fbPage,
+          this.fbPerPage
+        );
+    }
+
+    if (obs === EMPTY) return;
+
+    this.loading = true;
+    this.error = undefined;
+
+    this.fbSub = obs.pipe(finalize(() => (this.loading = false))).subscribe({
+      next: (res) => {
+        this.fbItems = res.items ?? [];
+        this.fbTotal = res.meta?.total_count ?? 0;
+        this.fbLastLoadedKey = key;
+      },
+      error: (err) => {
+        console.error('[FE] feedback load error', err);
+        this.error = 'Učitavanje ocena nije uspelo.';
+        this.fbItems = [];
+        this.fbTotal = 0;
+      },
+    });
+  }
+
+  pageCount(): number {
+    return Math.max(1, Math.ceil(this.fbTotal / this.fbPerPage));
+  }
+
+  goFbPrev(): void {
+    if (this.fbPage <= 1) return;
+    this.fbPage--;
+    this.fetchFeedback();
+  }
+
+  goFbNext(): void {
+    if (this.fbPage >= this.pageCount()) return;
+    this.fbPage++;
+    this.fetchFeedback();
   }
 }

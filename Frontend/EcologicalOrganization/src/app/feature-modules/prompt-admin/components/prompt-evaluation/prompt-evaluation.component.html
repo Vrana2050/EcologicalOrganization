@@ -1,3 +1,4 @@
+<!-- prompt-evaluation.component.html -->
 <div class="pe">
   <div class="pe-head">
     <div class="pe-tabs">
@@ -44,7 +45,14 @@
     </ng-container>
 
     <ng-container *ngIf="sectionTab === 'feedback'">
-      <xp-prompt-feedback [data]="data"></xp-prompt-feedback>
+      <xp-prompt-feedback
+        [items]="fbItems"
+        [page]="fbPage"
+        [perPage]="fbPerPage"
+        [total]="fbTotal"
+        (prev)="goFbPrev()"
+        (next)="goFbNext()"
+      ></xp-prompt-feedback>
     </ng-container>
   </div>
 

@@ -1,9 +1,82 @@
+<!-- prompt-feedback.component.html -->
 <div class="pf">
-  <!-- SUMMARY iz analytics podataka -->
-  <xp-feedback-summary [data]="data"></xp-feedback-summary>
+  <div class="pf-list">
+    <div class="pf-empty muted" *ngIf="items.length === 0">
+      Nema ocena za prikaz.
+    </div>
 
-  <!-- Ovde kasnije ide lista komentara / pojedinačne ocene -->
-  <div class="pf-comments">
-    <span class="muted">Ovde će ići lista komentara…</span>
+    <div class="pf-card" *ngFor="let it of items">
+      <div class="pf-row pf-head">
+        <div class="pf-user">
+          <span class="pf-avatar">👤</span>
+          <span class="pf-name">
+            {{ it.created_by_email || "Korisnik #" + it.created_by }}
+          </span>
+        </div>
+
+        <div class="pf-stars" [attr.title]="it.rating_value || 0">
+          <span
+            class="star"
+            *ngFor="let s of [1, 2, 3, 4, 5]"
+            [class.filled]="s <= (it.rating_value || 0)"
+            >★</span
+          >
+          <span class="pf-date">{{
+            it.created_at | date : "dd-MM-yyyy HH:mm"
+          }}</span>
+        </div>
+      </div>
+
+      <div class="pf-comment" *ngIf="it.comment_text">
+        {{ it.comment_text }}
+      </div>
+
+      <button class="pf-toggle" (click)="toggleDetails(it)">
+        {{
+          it._expanded
+            ? "▼ Sakrij konačan prompt i izlaz"
+            : "▶ Prikaži konačan prompt i izlaz"
+        }}
+      </button>
+
+      <div class="pf-details" *ngIf="it._expanded">
+        <div class="pf-details-loading" *ngIf="loadingDetailsId === it.id">
+          Učitavam…
+        </div>
+
+        <div class="pf-columns" *ngIf="loadingDetailsId !== it.id">
+          <div class="pf-col">
+            <div class="pf-col-title">Konacan prompt</div>
+            <pre class="pf-pre">{{ it.details?.final_prompt || "—" }}</pre>
+          </div>
+          <div class="pf-col">
+            <div class="pf-col-title">Rezultat</div>
+            <pre class="pf-pre">{{ it.details?.generated_text || "—" }}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pf-nav" *ngIf="pageCount() > 1">
+      <button
+        class="pf-btn small"
+        [disabled]="page <= 1"
+        [style.visibility]="page > 1 ? 'visible' : 'hidden'"
+        (click)="goPrev()"
+      >
+        ←
+      </button>
+
+      <span class="pf-indicator">{{ page }} / {{ pageCount() }}</span>
+
+      <button
+        class="pf-btn small"
+        [disabled]="page >= pageCount()"
+        [style.visibility]="page < pageCount() ? 'visible' : 'hidden'"
+        (click)="goNext()"
+      >
+        →
+      </button>
+    </div>
   </div>
 </div>

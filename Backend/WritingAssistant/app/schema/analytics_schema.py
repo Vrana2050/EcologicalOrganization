@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 
 class AnalyticsOut(BaseModel):
-    scope: str  # "version" | "prompt"
+    scope: str  
     promptId: Optional[int] = None
     promptVersionId: Optional[int] = None
 

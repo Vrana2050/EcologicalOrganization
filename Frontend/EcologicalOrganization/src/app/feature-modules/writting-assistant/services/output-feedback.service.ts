@@ -13,7 +13,10 @@ export class OutputFeedbackService {
   constructor(private http: HttpClient) {}
 
   private get headers(): HttpHeaders {
-    return new HttpHeaders({ 'x-user-id': '2' });
+    return new HttpHeaders({
+      'x-user-id': '2',
+      'x-user-email': 'user@example.com',
+    });
   }
 
   create(payload: CreateOutputFeedback): Observable<OutputFeedback> {

@@ -13,21 +13,17 @@ export class AnalyticsService {
     return new HttpHeaders({ 'x-user-id': '2', 'x-user-role': 'ADMIN' });
   }
 
-  getPromptAnalytics(promptId: number, c = 10): Observable<AnalyticsOut> {
-    return this.http
-      .get<AnalyticsOut>(`${this.baseUrl}/prompts/${promptId}`, {
-        params: { c },
-        headers: this.headers,
-      })
-      .pipe(map((x) => ({ ...x })));
+  getPromptAnalytics(promptId: number) {
+    return this.http.get<AnalyticsOut>(
+      `http://localhost:8000/api/v1/analytics/prompts/${promptId}`,
+      { headers: this.headers }
+    );
   }
 
-  getVersionAnalytics(versionId: number, c = 10): Observable<AnalyticsOut> {
-    return this.http
-      .get<AnalyticsOut>(`${this.baseUrl}/prompt-versions/${versionId}`, {
-        params: { c },
-        headers: this.headers,
-      })
-      .pipe(map((x) => ({ ...x })));
+  getVersionAnalytics(versionId: number) {
+    return this.http.get<AnalyticsOut>(
+      `http://localhost:8000/api/v1/analytics/prompt-versions/${versionId}`,
+      { headers: this.headers }
+    );
   }
 }
