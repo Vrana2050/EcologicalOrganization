@@ -1,0 +1,10 @@
+.pf-placeholder {
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px dashed #d1d5db;
+  border-radius: 10px;
+}
+.muted {
+  color: #6b7280;
+  font-size: 13px;
+}

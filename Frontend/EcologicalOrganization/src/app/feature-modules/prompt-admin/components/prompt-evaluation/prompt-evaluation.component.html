@@ -1,0 +1,55 @@
+<div class="pe">
+  <div class="pe-head">
+    <div class="pe-tabs">
+      <button
+        class="pe-tab"
+        [class.active]="sectionTab === 'analytics'"
+        (click)="onSectionSwitch('analytics')"
+      >
+        Analitika
+      </button>
+      <button
+        class="pe-tab"
+        [class.active]="sectionTab === 'feedback'"
+        (click)="onSectionSwitch('feedback')"
+      >
+        Ocene i komentari
+      </button>
+    </div>
+
+    <div class="pe-tabs">
+      <button
+        class="pe-tab"
+        [class.active]="scopeMode === 'prompt'"
+        (click)="onScopeSwitch('prompt')"
+      >
+        Sve verzije
+      </button>
+      <button
+        class="pe-tab"
+        [class.active]="scopeMode === 'version'"
+        [disabled]="!versionId"
+        (click)="onScopeSwitch('version')"
+      >
+        Samo ova verzija
+      </button>
+    </div>
+  </div>
+
+  <div class="pe-body">
+    <ng-container *ngIf="sectionTab === 'analytics'">
+      <ng-container *ngIf="!loading && !error; else stateTpl">
+        <xp-prompt-analytics [data]="data"></xp-prompt-analytics>
+      </ng-container>
+    </ng-container>
+
+    <ng-container *ngIf="sectionTab === 'feedback'">
+      <xp-prompt-feedback></xp-prompt-feedback>
+    </ng-container>
+  </div>
+
+  <ng-template #stateTpl>
+    <div class="pe-state" *ngIf="loading">Učitavam…</div>
+    <div class="pe-state error" *ngIf="!loading && error">{{ error }}</div>
+  </ng-template>
+</div>

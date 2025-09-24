@@ -18,6 +18,7 @@ from app.repository.section_draft_repository import SectionDraftRepository
 from app.repository.template_file_repository import TemplateFileRepository
 from app.repository.model_pricing_repository import ModelPricingRepository
 from app.repository.output_feedback_repository import OutputFeedbackRepository
+from app.repository.analytics_repository import AnalyticsRepository
 
 from app.services.chat_session_service import ChatSessionService
 from app.services.session_section_service import SessionSectionService
@@ -30,6 +31,7 @@ from app.services.template_service import TemplateService
 from app.services.document_type_service import DocumentTypeService
 from app.services.model_pricing_service import ModelPricingService
 from app.services.output_feedback_service import OutputFeedbackService
+from app.services.analytics_service import AnalyticsService
 
 from app.services.llm_client.openai_client import OpenAIClient
 from app.services.llm_client.mock_client import MockLLMClient
@@ -45,6 +47,7 @@ class Container(containers.DeclarativeContainer):
             "app.api.v1.endpoints.template",
             "app.api.v1.endpoints.document_type",
             "app.api.v1.endpoints.output_feedback",
+            "app.api.v1.endpoints.analytics"
         ]
     )
 
@@ -66,6 +69,7 @@ class Container(containers.DeclarativeContainer):
     template_file_repository = providers.Factory(TemplateFileRepository, session_factory=db.provided.session)
     model_pricing_repository = providers.Factory(ModelPricingRepository, session_factory=db.provided.session)
     output_feedback_repository = providers.Factory(OutputFeedbackRepository, session_factory=db.provided.session)
+    analytics_repository = providers.Factory(AnalyticsRepository, session_factory=db.provided.session)
 
     chat_session_service = providers.Factory(
         ChatSessionService,
@@ -148,6 +152,13 @@ class Container(containers.DeclarativeContainer):
         model_output_repo=model_output_repository,
         prompt_exec_repo=prompt_execution_repository,
         chat_session_repo=chat_session_repository,
+    )
+
+    analytics_service = providers.Factory(
+        AnalyticsService,
+        analytics_repo=analytics_repository,
+        prompt_version_repository=prompt_version_repository,
+        prompt_active_history_repository=prompt_active_history_repository,
     )
 
 

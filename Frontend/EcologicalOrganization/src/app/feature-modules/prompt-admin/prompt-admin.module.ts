@@ -8,6 +8,10 @@ import { PromptEditorComponent } from './components/prompt-editor/prompt-editor.
 import { PromptVersionComponent } from './components/prompt-version/prompt-version.component';
 import { FormsModule } from '@angular/forms';
 import { DocumentTypeManagementComponent } from './page/document-type-management/document-type-management.component';
+import { PromptAnalyticsComponent } from './components/prompt-analytics/prompt-analytics.component';
+import { PromptFeedbackComponent } from './components/prompt-feedback/prompt-feedback.component';
+import { PromptEvaluationComponent } from './components/prompt-evaluation/prompt-evaluation.component';
+import { FeedbackSummaryComponent } from './components/feedback-summary/feedback-summary.component';
 
 @NgModule({
   declarations: [
@@ -18,6 +22,10 @@ import { DocumentTypeManagementComponent } from './page/document-type-management
     PromptEditorComponent,
     PromptVersionComponent,
     DocumentTypeManagementComponent,
+    PromptAnalyticsComponent,
+    PromptFeedbackComponent,
+    PromptEvaluationComponent,
+    FeedbackSummaryComponent,
   ],
   imports: [CommonModule, FormsModule],
 })
