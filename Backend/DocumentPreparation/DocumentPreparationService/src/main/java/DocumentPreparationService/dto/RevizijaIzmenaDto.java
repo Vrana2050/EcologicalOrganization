@@ -16,4 +16,6 @@ public class RevizijaIzmenaDto {
     private String izmena;
     private Boolean ispravljena;
     private LocalDate datumIspravljanja;
+    private Long fajlId;
+    private Boolean ispravka_odobrena;
 }

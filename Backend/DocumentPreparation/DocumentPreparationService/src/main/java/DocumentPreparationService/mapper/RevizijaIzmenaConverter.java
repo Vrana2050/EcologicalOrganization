@@ -7,10 +7,7 @@ import DocumentPreparationService.dto.RevizijaIzmenaDto;
 import DocumentPreparationService.mapper.interfaces.IDokumentRevizijaConverter;
 import DocumentPreparationService.mapper.interfaces.IKorisnikProjekatConverter;
 import DocumentPreparationService.mapper.interfaces.IRevizijaIzmenaConverter;
-import DocumentPreparationService.model.Dokument;
-import DocumentPreparationService.model.DokumentRevizija;
-import DocumentPreparationService.model.KorisnikProjekat;
-import DocumentPreparationService.model.RevizijaIzmena;
+import DocumentPreparationService.model.*;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 
@@ -33,11 +30,17 @@ public class RevizijaIzmenaConverter extends BaseMapper<RevizijaIzmena, Revizija
         entity.setIzmena(dto.getIzmena());
         entity.setIspravljena(dto.getIspravljena());
         entity.setDatumIspravljanja(dto.getDatumIspravljanja());
+        entity.setIspravkaOdobrena(dto.getIspravka_odobrena());
 
         if (dto.getDokumentRevizijaId() != null) {
             DokumentRevizija dokumentRevizija = new  DokumentRevizija();
             dokumentRevizija.setId(dto.getDokumentRevizijaId());
             entity.setRevizija(dokumentRevizija);
+        }
+        if (dto.getFajlId() != null) {
+            Fajl fajl = new Fajl();
+            fajl.setId(dto.getFajlId());
+            entity.setFajl(fajl);
         }
 
         return entity;
@@ -53,6 +56,8 @@ public class RevizijaIzmenaConverter extends BaseMapper<RevizijaIzmena, Revizija
         dto.setIspravljena(entity.getIspravljena());
         dto.setDokumentRevizijaId(entity.getRevizija().getId());
         dto.setDatumIspravljanja(entity.getDatumIspravljanja());
+        dto.setFajlId(entity.getFajl().getId());
+        dto.setIspravka_odobrena(entity.getIspravkaOdobrena());
 
         return dto;
     }

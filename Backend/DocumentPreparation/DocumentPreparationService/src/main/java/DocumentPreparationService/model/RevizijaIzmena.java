@@ -32,6 +32,13 @@ public class RevizijaIzmena {
     @Column(name = "datum_ispravljanja", nullable = false)
     private LocalDate datumIspravljanja;
 
+    @Column(name = "ispravka_odobrena")
+    private Boolean ispravkaOdobrena;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fajl_id")
+    private Fajl fajl;
+
     public RevizijaIzmena() {}
     public void validate(){
         if(this.izmena == null) throw new InvalidRequestDataException("Change is required");
@@ -47,5 +54,6 @@ public class RevizijaIzmena {
         if(izmena.getIspravljena()) {
             this.setDatumIspravljanja(izmena.getDatumIspravljanja());
         }
+        this.setIspravkaOdobrena(izmena.getIspravkaOdobrena());
     }
 }

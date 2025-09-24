@@ -12,4 +12,8 @@ public interface IFajlService extends ICrudService<Fajl,Long> {
     Set<Fajl> findAllByDokument(Long dokumentId, Long userId);
 
     Set<Fajl> findAllActiveByDokument(Long dokumentId, Long userId);
+
+    Set<Fajl> findAllByDokumentForRevizija(Long dokumentId, Long userId);
+
+    Set<Fajl> findAllFileVersions(Long aktivniFajlId, Long userId,int page, int size);
 }

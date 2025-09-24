@@ -19,4 +19,15 @@ public class FajlDto {
     private LocalDateTime datumKreiranja;
     private String naziv;
     private String ekstenzija;
+
+    public FajlDto(Long id, String naziv, Long verzija, LocalDateTime datumKreiranja, String ekstenzija, byte[] bytes) {
+        this.id = id;
+        this.naziv = naziv;
+        this.verzija = verzija;
+        this.datumKreiranja = datumKreiranja;
+        this.ekstenzija = ekstenzija;
+        this.podatak = bytes;
+
+    }
+    public FajlDto() {}
 }

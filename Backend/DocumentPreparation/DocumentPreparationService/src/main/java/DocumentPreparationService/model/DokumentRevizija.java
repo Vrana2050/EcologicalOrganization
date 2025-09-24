@@ -52,7 +52,19 @@ public class DokumentRevizija {
         if(!trenutniStatus.getTrenutnoStanje().getPotrebnoOdobrenjeZaPrelazak()) throw new InvalidRequestDataException("Cannot review in current state");
         validatePregledac();
         setOdobreno(getIzmene().isEmpty());
+        if(odobreno)
+        {
+            this.approveAllIzmene();
+        }
+
     }
+
+    private void approveAllIzmene() {
+        for(RevizijaIzmena revizijaIzmena : this.getIzmene()) {
+            revizijaIzmena.setIspravkaOdobrena(true);
+        }
+    }
+
     private void validatePregledac() {
         if(pregledac==null) throw new InvalidRequestDataException("Reviewer is required");
         if(!dokument.isKorisnikVlasnik(pregledac)) throw  new ForbiddenException("Reviewer is not document owner");

@@ -209,7 +209,7 @@ INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
 VALUES (1021, 1001, 1001, 'menadzer');
 
 INSERT INTO korisnik_projekat(id, korisnik_id, projekat_id, uloga_u_projektu)
-VALUES (1022, 1004, 1001, 'vodja');
+VALUES (1022, 10034, 1001, 'vodja');
 
 
 
@@ -460,6 +460,16 @@ INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status,
 VALUES (1011, 1002, 'Emergency Response Plan', 'Defines procedures to address acute air pollution events and protect public health.', NULL, 1002, 'visok', 1003, 1011, 1006,TO_DATE('2027-6-15','YYYY-MM-DD'),0,SYSTIMESTAMP,1006,100);
 
 
+--TODO              DOKUMENTI ZA PROJEKAT 1000 ZA IZVESTAJ
+INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija, posledjna_izmena,izmena_od,procenat_zavrsenosti)
+VALUES (1012, 1000, 'Emission Sources Inventory', 'Lists and categorizes all major sources of air pollution in the urban area.', 1000, 1012, 'visok', NULL, NULL, 1012,TO_DATE('2016-6-15','YYYY-MM-DD'),0,SYSTIMESTAMP,1012,100);
+
+INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija, posledjna_izmena,izmena_od,procenat_zavrsenosti)
+VALUES (1013, 1000, 'Air Quality Monitoring Plan', 'Defines locations, methods, and frequency of air quality measurements.', 1000, 1012, 'srednji', NULL, NULL, 1012,TO_DATE('2018-6-15','YYYY-MM-DD'),0,SYSTIMESTAMP,1012,100);
+
+INSERT INTO dokument(id, projekat_id, naziv, opis, tok_izrade_dokumenta, status, prioritet, roditelj_dokument_id, glavni_fajl_id, vlasnik, rok_zavrsetka,pripremna_verzija, posledjna_izmena,izmena_od,procenat_zavrsenosti)
+VALUES (1014, 1000, 'Impact Assessment Report', 'Evaluates the effects of current pollution levels on health and the environment.', 1000, 1012, 'mali', NULL, NULL, 1012,TO_DATE('2019-6-15','YYYY-MM-DD'),0,SYSTIMESTAMP,1012,100);
+
 
 
 ---KORISNIK DOKUMENT
@@ -513,6 +523,12 @@ VALUES (1009, 1008);
 INSERT INTO dokument_zavisnost(dokument_id, zavisi_od)
 VALUES (1001, 1003);
 
+--ZA PROJEKAT 1000 ZA IZVESTAJ
+INSERT INTO dokument_zavisnost(dokument_id, zavisi_od)
+VALUES (1013, 1012);
+INSERT INTO dokument_zavisnost(dokument_id, zavisi_od)
+VALUES (1014, 1013);
+
 
 --DOKUMENT REVIZIJA
 
@@ -526,18 +542,6 @@ INSERT INTO dokument_revizija(id, dokument_id, odobreno, trenutni_status, pregle
 VALUES (1003, 1005, 1, 1006, 1000);
 
 
---REVIZIJA IZMENA
-
-INSERT INTO revizija_izmena(id, revizija_id, izmena, ispravljena,datum_ispravljanja)
-VALUES (1000, 1000, 'Remove duplicate paragraph in conclusion', 1,SYSTIMESTAMP);
-INSERT INTO revizija_izmena(id, revizija_id, izmena, ispravljena,datum_ispravljanja)
-VALUES (1001, 1000, 'Adjust table alignment in appendix', 1,SYSTIMESTAMP + INTERVAL '1' DAY);
-INSERT INTO revizija_izmena(id, revizija_id, izmena, ispravljena,datum_ispravljanja)
-VALUES (1002, 1000, 'Update outdated references', 1,SYSTIMESTAMP + INTERVAL '2' DAY);
-INSERT INTO revizija_izmena(id, revizija_id, izmena, ispravljena,datum_ispravljanja)
-VALUES (1003, 1001, 'Fix grammatical errors in introduction', 1,SYSTIMESTAMP + INTERVAL '3' DAY);
-INSERT INTO revizija_izmena(id, revizija_id, izmena, ispravljena,datum_ispravljanja)
-VALUES (1004, 1001, 'Correct title formatting', 1,SYSTIMESTAMP + INTERVAL '4' DAY);
 
 
 -----------------------------------------------------------------------------------------------------------------
@@ -547,45 +551,45 @@ VALUES (1004, 1001, 'Correct title formatting', 1,SYSTIMESTAMP + INTERVAL '4' DA
 -- TODO                 AKTIVNI FAJLOVI PROJEKAT 1002
 
 -- Dokument 1002
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1002, 1002);
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1002, 1016);
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1002, 1010);
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1002, 1024);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1000,1002, 1002);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1001,1002, 1016);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1002,1002, 1010);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1003,1002, 1024);
 
 -- Dokument 1003
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1003, 1003);
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1003, 1017);
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1003, 1011);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1004,1003, 1003);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1005,1003, 1017);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1006,1003, 1011);
 
 -- Dokument 1004
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1004, 1004);
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1004, 1018);
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1004, 1000);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1007,1004, 1004);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1008,1004, 1018);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1009,1004, 1000);
 
 -- Dokument 1005
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1005, 1005);
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1005, 1019);
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1005, 1001);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1010,1005, 1005);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1011,1005, 1019);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1012,1005, 1001);
 
 -- Dokument 1006
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1006, 1006);
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1006, 1020);
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1006, 1009);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1013,1006, 1006);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1014,1006, 1020);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1015,1006, 1009);
 
 -- Dokument 1007
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1007, 1007);
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1007, 1021);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1016,1007, 1007);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1017,1007, 1021);
 
 -- Dokument 1008
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1008, 1008);
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1008, 1022);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1018,1008, 1008);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1019,1008, 1022);
 
 -- Dokument 1010
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1010, 1010);
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1010, 1024);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1020,1010, 1010);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1021,1010, 1024);
 
 -- Dokument 1011
-INSERT INTO dokument_aktivni_fajl(dokument_id, fajl_id) VALUES (1011, 1011);
+INSERT INTO dokument_aktivni_fajl(id,dokument_id, fajl_id) VALUES (1022,1011, 1011);
 
 -- TODO                     SVI FAJLOVI PROJEKTA 1002
 
@@ -644,13 +648,26 @@ INSERT INTO dokument_fajl(dokument_id, fajl_id) VALUES (1011, 1056);
 -- Dokument 1010
 INSERT INTO dokument_fajl(dokument_id, fajl_id) VALUES (1010, 1010);
 INSERT INTO dokument_fajl(dokument_id, fajl_id) VALUES (1010, 1024);
-INSERT INTO dokument_fajl(dokument_id, fajl_id) VALUES (1011, 1058);
+INSERT INTO dokument_fajl(dokument_id, fajl_id) VALUES (1010, 1058);
+INSERT INTO dokument_fajl(dokument_id, fajl_id) VALUES (1010, 1020);
 
 -- Dokument 1011
 INSERT INTO dokument_fajl(dokument_id, fajl_id) VALUES (1011, 1011);
 INSERT INTO dokument_fajl(dokument_id, fajl_id) VALUES (1011, 1059);
 
 --------------------------------------------------------------------------------------------------
+--REVIZIJA IZMENA PROJKAT 1002
+
+INSERT INTO revizija_izmena(id, revizija_id, izmena, ispravljena,datum_ispravljanja,aktivni_fajl_id,ispravka_odobrena)
+VALUES (1000, 1000, 'Remove duplicate paragraph in conclusion', 1,SYSTIMESTAMP,1007,1);
+INSERT INTO revizija_izmena(id, revizija_id, izmena, ispravljena,datum_ispravljanja,aktivni_fajl_id,ispravka_odobrena)
+VALUES (1001, 1000, 'Adjust table alignment in appendix', 1,SYSTIMESTAMP + INTERVAL '1' DAY,1007,1);
+INSERT INTO revizija_izmena(id, revizija_id, izmena, ispravljena,datum_ispravljanja,aktivni_fajl_id,ispravka_odobrena)
+VALUES (1002, 1000, 'Update outdated references', 1,SYSTIMESTAMP + INTERVAL '2' DAY,1007,1);
+INSERT INTO revizija_izmena(id, revizija_id, izmena, ispravljena,datum_ispravljanja,aktivni_fajl_id,ispravka_odobrena)
+VALUES (1003, 1001, 'Fix grammatical errors in introduction', 1,SYSTIMESTAMP + INTERVAL '3' DAY,1010,1);
+INSERT INTO revizija_izmena(id, revizija_id, izmena, ispravljena,datum_ispravljanja,aktivni_fajl_id,ispravka_odobrena)
+VALUES (1004, 1001, 'Correct title formatting', 1,SYSTIMESTAMP + INTERVAL '4' DAY,1010,1);
 
 -- OBAVESTENJA
 
@@ -864,3 +881,65 @@ VALUES (1039, SYSTIMESTAMP + INTERVAL '18' DAY, 1003, 1010, 1002, 1001, 1002);
 
 INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
 VALUES (1040, SYSTIMESTAMP + INTERVAL '4' DAY, 1004, 1011, 1002, 1001, 1002);
+
+--TODO                  ZA PROJEKAT 1000 ZA IZVESTAJ
+
+
+-- =========================
+-- DOKUMENT 1012 (rok: 2016-06-15) – završen PRE roka
+-- =========================
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1055, TO_TIMESTAMP('2016-05-20 09:00', 'YYYY-MM-DD HH24:MI'), 1012, 1012, 1000, NULL, 1009);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1056, TO_TIMESTAMP('2016-05-25 10:00', 'YYYY-MM-DD HH24:MI'), 1012, 1012, 1000, 1009, 1010);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1057, TO_TIMESTAMP('2016-06-01 11:00', 'YYYY-MM-DD HH24:MI'), 1012, 1012, 1000, 1010, 1011);
+
+-- terminalno stanje pre roka
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1058, TO_TIMESTAMP('2016-06-10 12:00', 'YYYY-MM-DD HH24:MI'), 1012, 1012, 1000, 1011, 1012);
+
+
+-- =========================
+-- DOKUMENT 1013 (rok: 2018-06-15) – ima odbijanje, ali završen PRE roka
+-- zavisi od 1012: start > 2016-06-10
+-- =========================
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1059, TO_TIMESTAMP('2017-01-10 09:15', 'YYYY-MM-DD HH24:MI'), 1012, 1013, 1000, NULL, 1009);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1060, TO_TIMESTAMP('2018-05-20 10:20', 'YYYY-MM-DD HH24:MI'), 1012, 1013, 1000, 1009, 1010);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1061, TO_TIMESTAMP('2018-06-01 11:25', 'YYYY-MM-DD HH24:MI'), 1012, 1013, 1000, 1010, 1011);
+
+-- odbijanje: 1011 -> 1013 (status_nakon_odbijanja)
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1062, TO_TIMESTAMP('2018-06-05 14:00', 'YYYY-MM-DD HH24:MI'), 1003, 1013, 1000, 1011, 1013);
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1063, TO_TIMESTAMP('2018-06-08 09:40', 'YYYY-MM-DD HH24:MI'), 1012, 1013, 1000, 1013, 1011);
+
+-- terminalno stanje pre roka
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1064, TO_TIMESTAMP('2018-06-12 16:30', 'YYYY-MM-DD HH24:MI'), 1012, 1013, 1000, 1011, 1012);
+
+
+-- =========================
+-- DOKUMENT 1014 (rok: 2019-06-15) – PROBIJA ROK
+-- zavisi od 1013: start > 2018-06-12
+-- =========================
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1065, TO_TIMESTAMP('2018-06-13 10:00', 'YYYY-MM-DD HH24:MI'), 1012, 1014, 1000, NULL, 1009);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1066, TO_TIMESTAMP('2019-05-01 09:30', 'YYYY-MM-DD HH24:MI'), 1012, 1014, 1000, 1009, 1010);
+
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1067, TO_TIMESTAMP('2019-06-10 15:45', 'YYYY-MM-DD HH24:MI'), 1012, 1014, 1000, 1010, 1011);
+
+-- terminalno stanje POSLE roka (probija rok)
+INSERT INTO status_log(id, datum, izvrsilac, dokument, projekat_id, prethodno_stanje, novo_stanje)
+VALUES (1068, TO_TIMESTAMP('2019-06-20 08:10', 'YYYY-MM-DD HH24:MI'), 1012, 1014, 1000, 1011, 1012);
+COMMIT;

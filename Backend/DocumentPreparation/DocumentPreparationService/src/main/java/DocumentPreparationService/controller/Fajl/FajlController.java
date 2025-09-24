@@ -41,6 +41,18 @@ public class FajlController {
         Set<Fajl> entities = fajlService.findAllByDokument(dokumentId,userId);
         return ResponseEntity.ok(mapper.ToDtos(entities));
     }
+    @GetMapping("/all/review/{dokumentId}")
+    public ResponseEntity<Set<FajlDto>> getAllFilesForReview(@RequestHeader(name = "X-USER-ID") Long userId, @PathVariable Long dokumentId) {
+        Set<Fajl> entities = fajlService.findAllByDokumentForRevizija(dokumentId,userId);
+        return ResponseEntity.ok(mapper.ToDtos(entities));
+    }
+    @GetMapping("/versions/{aktivni_fajl_id}")
+    public ResponseEntity<Set<FajlDto>> getAllFileVersions(@RequestHeader(name = "X-USER-ID") Long userId, @PathVariable Long aktivni_fajl_id,
+                                                           @RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "20") int size){
+        Set<Fajl> entities = fajlService.findAllFileVersions(aktivni_fajl_id,userId,page,size);
+        return ResponseEntity.ok(mapper.ToDtos(entities));
+    }
 
     /*@DeleteMapping("/{id}")
     public ResponseEntity<Boolean> delete(@RequestHeader(name = "X-USER-ID") Long userId,@PathVariable Long id) {
