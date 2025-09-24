@@ -38,7 +38,7 @@
       <wa-preview-document
         *ngIf="activeSession && sessionOverview"
         [hidden]="!showPreview"
-        [title]="sessionOverview.title || activeSession?.title || 'Dokument'"
+        [title]="sessionOverview.title || activeSession.title || 'Dokument'"
         [overview]="sessionOverview"
         (close)="showPreview = false"
       ></wa-preview-document>

@@ -1,1 +1,62 @@
-<p>feedback-summary works!</p>
+<div class="fs" *ngIf="data as d">
+  <div class="fs-wrap">
+    <div class="fs-left">
+      <div class="fs-line">
+        <div class="fs-label">Prosek:</div>
+        <div class="fs-stars" [style.--pct.%]="starPct(d.ratingAvg)">
+          <div class="stars-bg">★★★★★</div>
+          <div class="stars-fg" [style.width.%]="starPct(d.ratingAvg)">
+            ★★★★★
+          </div>
+        </div>
+        <div class="fs-val num">
+          <span class="fs-muted">({{ d.ratingCount }})</span>
+          {{ d.ratingAvg | number : "1.2-2" }}
+        </div>
+      </div>
+
+      <div
+        class="fs-line"
+        *ngIf="d.bayesScore !== null && d.bayesScore !== undefined"
+      >
+        <div class="fs-label">Ponderisan Bajesov prosek:</div>
+        <div class="fs-stars" [style.--pct.%]="starPct(d.bayesScore)">
+          <div class="stars-bg">★★★★★</div>
+          <div class="stars-fg" [style.width.%]="starPct(d.bayesScore)">
+            ★★★★★
+          </div>
+        </div>
+        <div class="fs-val num">
+          {{ d.bayesScore | number : "1.2-2" }}
+        </div>
+      </div>
+
+      <div class="fs-line">
+        <div class="fs-label">Medijana:</div>
+        <div class="fs-stars" [style.--pct.%]="starPct(d.ratingMedian)">
+          <div class="stars-bg">★★★★★</div>
+          <div class="stars-fg" [style.width.%]="starPct(d.ratingMedian)">
+            ★★★★★
+          </div>
+        </div>
+        <div class="fs-val num">
+          {{ d.ratingMedian | number : "1.2-2" }}
+        </div>
+      </div>
+    </div>
+
+    <div class="fs-right">
+      <div class="fs-row" *ngFor="let r of rows">
+        <div class="fs-row-label">{{ r.rating }} ★</div>
+        <div class="fs-bar">
+          <div class="fs-bar-fill" [style.width.%]="r.pct"></div>
+        </div>
+        <div class="fs-row-count num">{{ r.count }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="fs" *ngIf="!data">
+  <div class="fs-empty muted">Nema ocena za prikaz.</div>
+</div>

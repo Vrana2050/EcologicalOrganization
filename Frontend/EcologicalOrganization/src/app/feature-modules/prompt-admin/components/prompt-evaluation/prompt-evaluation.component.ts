@@ -22,74 +22,74 @@ export class PromptEvaluationComponent implements OnChanges {
 
   data: AnalyticsOut | null = null;
 
+  /** sprečava duple fetch pozive */
+  private lastLoadedKey: string | null = null;
+
   constructor(private analytics: AnalyticsService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['promptId'] && this.promptId) {
-      this.scopeMode = 'prompt';
-      if (this.sectionTab === 'analytics') this.fetchPrompt();
-    }
-    if (
-      this.sectionTab === 'analytics' &&
-      this.scopeMode === 'version' &&
-      changes['versionId'] &&
-      this.versionId
-    ) {
-      this.fetchVersion();
+    // Kad god se promeni prompt ili verzija -> refetch po trenutnom scope-u
+    if (changes['promptId'] || changes['versionId']) {
+      this.fetchCurrent();
     }
   }
 
   onSectionSwitch(tab: SectionTab): void {
     if (this.sectionTab === tab) return;
     this.sectionTab = tab;
-
-    if (tab === 'analytics') {
-      if (this.scopeMode === 'prompt') this.fetchPrompt();
-      else this.fetchVersion();
-    }
+    // I na promeni taba uvek osveži podatke (analitika i feedback koriste isti payload)
+    this.fetchCurrent();
   }
 
   onScopeSwitch(mode: ScopeMode): void {
     if (this.scopeMode === mode) return;
     this.scopeMode = mode;
+    this.fetchCurrent();
+  }
 
-    if (this.sectionTab === 'analytics') {
-      if (mode === 'prompt') this.fetchPrompt();
-      else this.fetchVersion();
+  /** Uvek vuče podatke za aktuelni scope (prompt / version) bez obzira na tab */
+  private fetchCurrent(): void {
+    const key = `${this.scopeMode}:${this.promptId ?? 'null'}:${
+      this.versionId ?? 'null'
+    }`;
+    if (this.lastLoadedKey === key) return; // nema promene, nema poziva
+
+    if (this.scopeMode === 'prompt') {
+      if (!this.promptId) return;
+      this.loading = true;
+      this.error = undefined;
+      this.analytics
+        .getPromptAnalytics(this.promptId, 10)
+        .pipe(finalize(() => (this.loading = false)))
+        .subscribe({
+          next: (res) => {
+            this.data = res;
+            this.lastLoadedKey = key;
+          },
+          error: (err) => {
+            console.error('[FE] prompt analytics error', err);
+            this.error = 'Učitavanje nije uspelo.';
+            this.data = null;
+          },
+        });
+    } else {
+      if (!this.versionId) return;
+      this.loading = true;
+      this.error = undefined;
+      this.analytics
+        .getVersionAnalytics(this.versionId, 10)
+        .pipe(finalize(() => (this.loading = false)))
+        .subscribe({
+          next: (res) => {
+            this.data = res;
+            this.lastLoadedKey = key;
+          },
+          error: (err) => {
+            console.error('[FE] version analytics error', err);
+            this.error = 'Učitavanje nije uspelo.';
+            this.data = null;
+          },
+        });
     }
-  }
-
-  private fetchPrompt(): void {
-    if (!this.promptId) return;
-    this.loading = true;
-    this.error = undefined;
-    this.analytics
-      .getPromptAnalytics(this.promptId, 10)
-      .pipe(finalize(() => (this.loading = false)))
-      .subscribe({
-        next: (res) => (this.data = res),
-        error: (err) => {
-          console.error('[FE] prompt analytics error', err);
-          this.error = 'Učitavanje analitike nije uspelo.';
-          this.data = null;
-        },
-      });
-  }
-
-  private fetchVersion(): void {
-    if (!this.versionId) return;
-    this.loading = true;
-    this.error = undefined;
-    this.analytics
-      .getVersionAnalytics(this.versionId, 10)
-      .pipe(finalize(() => (this.loading = false)))
-      .subscribe({
-        next: (res) => (this.data = res),
-        error: (err) => {
-          console.error('[FE] version analytics error', err);
-          this.error = 'Učitavanje analitike nije uspelo.';
-          this.data = null;
-        },
-      });
   }
 }

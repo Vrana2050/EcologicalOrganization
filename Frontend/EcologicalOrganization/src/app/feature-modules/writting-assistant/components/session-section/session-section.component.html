@@ -109,8 +109,8 @@
 
 <wa-add-output-feedback
   *ngIf="feedbackModalOpen"
-  [modelOutputId]="section?.latestIteration?.modelOutput?.id || 0"
-  [sectionName]="section?.name || 'Sekcija'"
+  [modelOutputId]="section.latestIteration?.modelOutput?.id || 0"
+  [sectionName]="section.name || 'Sekcija'"
   [seqNo]="currentSeq"
   (close)="closeFeedbackModal()"
   (submitted)="onFeedbackSubmitted($event)"

@@ -1,7 +1,11 @@
-.pf-placeholder {
-  margin-top: 16px;
+.pf {
+  margin-top: 8px;
+}
+.pf-comments {
+  margin-top: 12px;
   padding: 12px;
-  border: 1px dashed #d1d5db;
+  border: 1px solid #e5e7eb;
+  background: #fff;
   border-radius: 10px;
 }
 .muted {
