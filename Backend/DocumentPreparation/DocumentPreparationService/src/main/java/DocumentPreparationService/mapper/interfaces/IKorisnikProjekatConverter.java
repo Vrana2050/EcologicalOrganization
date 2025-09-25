@@ -1,0 +1,9 @@
+package DocumentPreparationService.mapper.interfaces;
+
+import DocumentPreparationService.dto.DokumentRevizijaDto;
+import DocumentPreparationService.dto.KorisnikProjekatDto;
+import DocumentPreparationService.model.DokumentRevizija;
+import DocumentPreparationService.model.KorisnikProjekat;
+
+public interface IKorisnikProjekatConverter extends IBaseConverter<KorisnikProjekat, KorisnikProjekatDto>{
+}

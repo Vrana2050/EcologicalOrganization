@@ -1,4 +1,19 @@
 # Document Managment
+.idea/
+.vscode/
+
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+DocumentManagement/storage/docs/
+
+.venv/
+venv/
+
+.DS_Store
+Thumbs.db
 
 
 # Writing Assistant
@@ -11,5 +26,3 @@
 
 
 # User Managment
-
-
