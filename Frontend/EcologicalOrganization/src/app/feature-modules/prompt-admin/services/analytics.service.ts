@@ -15,15 +15,14 @@ export class AnalyticsService {
   }
 
   getPromptAnalytics(promptId: number): Observable<AnalyticsOut> {
-    return this.http.get<AnalyticsOut>(
-      `http://localhost:8000/api/v1/analytics/prompts/${promptId}`,
-      { headers: this.headers }
-    );
+    return this.http.get<AnalyticsOut>(`${this.baseUrl}/prompts/${promptId}`, {
+      headers: this.headers,
+    });
   }
 
   getVersionAnalytics(versionId: number): Observable<AnalyticsOut> {
     return this.http.get<AnalyticsOut>(
-      `http://localhost:8000/api/v1/analytics/prompt-versions/${versionId}`,
+      `${this.baseUrl}/prompt-versions/${versionId}`,
       { headers: this.headers }
     );
   }
@@ -41,10 +40,35 @@ export class AnalyticsService {
     if (documentTypeId !== null && documentTypeId !== undefined) {
       params = params.set('document_type_id', String(documentTypeId));
     }
-
     return this.http.get<DocumentTypeReportRow[]>(
-      `http://localhost:8000/api/v1/analytics/doc-type-report`,
+      `${this.baseUrl}/doc-type-report`,
       { headers: this.headers, params }
     );
+  }
+
+  downloadDocTypeReportPdf(
+    fromIso: string,
+    toIso: string,
+    documentTypeId: number | null,
+    includeTotal: boolean,
+    sortKey: string,
+    sortDir: 'asc' | 'desc',
+    tz?: string
+  ): Observable<Blob> {
+    let params = new HttpParams()
+      .set('from_ts', fromIso)
+      .set('to_ts', toIso)
+      .set('include_total', String(includeTotal))
+      .set('sort_key', sortKey)
+      .set('sort_dir', sortDir);
+    if (tz) params = params.set('tz', tz);
+    if (documentTypeId !== null && documentTypeId !== undefined) {
+      params = params.set('document_type_id', String(documentTypeId));
+    }
+    return this.http.get(`${this.baseUrl}/doc-type-report.pdf`, {
+      headers: this.headers,
+      params,
+      responseType: 'blob',
+    });
   }
 }

@@ -9,3 +9,4 @@ loguru
 python-multipart
 openai
 python-dotenv
+xhtml2pdf

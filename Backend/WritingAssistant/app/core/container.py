@@ -35,6 +35,9 @@ from app.services.analytics_service import AnalyticsService
 
 from app.services.llm_client.openai_client import OpenAIClient
 from app.services.llm_client.mock_client import MockLLMClient
+from app.services.report.report_service import DocTypeReportService
+from app.services.report.doc_type_report_renderer import DocTypeReportHtmlRenderer
+from app.services.report.xhtml2pdf_engine import Xhtml2PdfEngine
 
 
 class Container(containers.DeclarativeContainer):
@@ -47,7 +50,8 @@ class Container(containers.DeclarativeContainer):
             "app.api.v1.endpoints.template",
             "app.api.v1.endpoints.document_type",
             "app.api.v1.endpoints.output_feedback",
-            "app.api.v1.endpoints.analytics"
+            "app.api.v1.endpoints.analytics",
+            "app.api.v1.endpoints.report"
         ]
     )
 
@@ -161,6 +165,14 @@ class Container(containers.DeclarativeContainer):
         prompt_active_history_repository=prompt_active_history_repository,
     )
 
+    report_renderer = providers.Singleton(DocTypeReportHtmlRenderer)
+    report_pdf_engine = providers.Singleton(Xhtml2PdfEngine)
 
+    report_service = providers.Factory(
+        DocTypeReportService,
+        analytics_service=analytics_service,
+        renderer=report_renderer,
+        pdf_engine=report_pdf_engine,
+    )
 
 

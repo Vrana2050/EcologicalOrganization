@@ -35,6 +35,7 @@ export class SystemAnalyticsComponent implements OnInit {
   rows: DocumentTypeReportRow[] = [];
   sortKey: SortKey = 'document_type_name';
   sortDir: 'asc' | 'desc' = 'asc';
+  downloading = false;
 
   constructor(
     private analytics: AnalyticsService,
@@ -66,6 +67,43 @@ export class SystemAnalyticsComponent implements OnInit {
 
   isoEnd(): string {
     return `${this.toDate}T23:59:59${this.tzOffset()}`;
+  }
+
+  onDownload(): void {
+    this.validateDates();
+    if (this.dateError) return;
+    this.downloading = true;
+
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || undefined;
+    this.analytics
+      .downloadDocTypeReportPdf(
+        this.isoStart(),
+        this.isoEnd(),
+        this.selectedDocTypeId,
+        this.includeTotal,
+        this.sortKey,
+        this.sortDir,
+        tz
+      )
+      .subscribe({
+        next: (blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          const from = this.fromDate;
+          const to = this.toDate;
+          a.href = url;
+          a.download = `doc-type-report_${from}_to_${to}.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+          this.downloading = false;
+        },
+        error: () => {
+          this.error = 'Preuzimanje PDF izveštaja nije uspelo.';
+          this.downloading = false;
+        },
+      });
   }
 
   private tzOffset(): string {

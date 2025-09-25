@@ -325,4 +325,16 @@
       </tbody>
     </table>
   </div>
+
+  <div class="sa-actions-row" *ngIf="!loading && !error">
+    <div class="sa-actions">
+      <button
+        class="wa-btn"
+        (click)="onDownload()"
+        [disabled]="!!dateError || downloading"
+      >
+        {{ downloading ? "Pripremam PDF…" : "Preuzmi izveštaj (PDF)" }}
+      </button>
+    </div>
+  </div>
 </section>
