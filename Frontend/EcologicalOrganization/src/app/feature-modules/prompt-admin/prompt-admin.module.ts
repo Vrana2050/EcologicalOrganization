@@ -12,6 +12,7 @@ import { PromptAnalyticsComponent } from './components/prompt-analytics/prompt-a
 import { PromptFeedbackComponent } from './components/prompt-feedback/prompt-feedback.component';
 import { PromptEvaluationComponent } from './components/prompt-evaluation/prompt-evaluation.component';
 import { FeedbackSummaryComponent } from './components/feedback-summary/feedback-summary.component';
+import { SystemAnalyticsComponent } from './components/system-analytics/system-analytics.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { FeedbackSummaryComponent } from './components/feedback-summary/feedback
     PromptFeedbackComponent,
     PromptEvaluationComponent,
     FeedbackSummaryComponent,
+    SystemAnalyticsComponent,
   ],
   imports: [CommonModule, FormsModule],
 })

@@ -1,5 +1,6 @@
 from contextlib import AbstractContextManager
 from typing import Callable, Optional, Dict, Any
+from datetime import datetime
 
 from sqlalchemy.orm import Session
 from sqlalchemy import text
@@ -93,3 +94,22 @@ class AnalyticsRepository:
             val = s.execute(text("SELECT calc_bayes_score_for_prompt(:pid, :c) FROM dual"),
                             {"pid": prompt_id, "c": c}).scalar()
             return float(val) if val is not None else None
+
+
+    def get_doc_type_report(self, from_ts, to_ts, doc_type_id, include_total=True):
+        sql = text("""
+            SELECT *
+            FROM TABLE(
+            report_pkg.get_doc_type_report(
+                :from_ts, :to_ts, :doc_type_id, :include_total
+            )
+            )
+        """)
+        with self.session_factory() as s:
+            res = s.execute(sql, {
+                "from_ts": from_ts,
+                "to_ts": to_ts,
+                "doc_type_id": doc_type_id,
+                "include_total": 1 if include_total else 0
+            })
+            return [dict(r) for r in res.mappings().all()]

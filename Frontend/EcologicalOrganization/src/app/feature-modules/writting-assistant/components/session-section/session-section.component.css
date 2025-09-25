@@ -132,3 +132,8 @@ textarea.wa-input.wa-result {
   color: #1b5e20;
   background: #c8e6c9;
 }
+
+.wa-btn.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}

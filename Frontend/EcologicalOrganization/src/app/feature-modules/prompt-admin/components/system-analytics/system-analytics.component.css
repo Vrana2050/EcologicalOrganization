@@ -1,0 +1,153 @@
+/* Layout */
+.sa {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 30px;
+}
+
+/* Toolbar – svi filteri U JEDNOM redu */
+.sa-toolbar-inline {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap; /* lepo prelomi na manjim širinama */
+}
+
+/* Grupe i polja */
+.sa-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sa-group-inline {
+  min-width: 260px;
+}
+
+.sa-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sa-range-sep {
+  color: var(--wa-muted);
+  font-size: 13px;
+}
+
+.sa-doc-type {
+  min-width: 220px;
+}
+.sa-doc-type-select {
+  max-width: 260px;
+}
+
+/* Toggle (include total) */
+.sa-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--wa-muted);
+  font-size: 12px;
+  white-space: nowrap;
+  margin-bottom: 2px; /* da se poravna sa inputima */
+}
+.sa-toggle input {
+  transform: translateY(1px);
+}
+
+/* Akcije ispod filtera */
+.sa-actions-row {
+  display: flex;
+}
+.sa-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* State */
+.sa-state {
+  padding: 12px;
+}
+.sa-state.error {
+  color: #c00;
+}
+
+/* Tabela */
+.sa-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.sa-table th,
+.sa-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--wa-line);
+  text-align: left;
+  white-space: nowrap;
+}
+.sa-table thead th {
+  cursor: pointer;
+  user-select: none;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--wa-muted);
+  position: relative;
+}
+
+/* Sort indikator (strelica) */
+.sa-sort {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-left: 6px;
+  opacity: 0.25; /* prigušen kad nije aktivan */
+  vertical-align: middle;
+}
+.sa-sort::before {
+  content: "▲"; /* default */
+  font-size: 10px;
+  line-height: 12px;
+}
+.sa-sort.desc::before {
+  content: "▼";
+}
+.sa-sort.active {
+  opacity: 1; /* aktivna kolona */
+  color: var(--wa-text);
+}
+
+/* Total red – istaknut; uvek poslednji (TS ga drži odvojeno) */
+.sa-table tr.total td {
+  font-weight: 600;
+  background: var(--wa-panel-2);
+}
+
+/* “Svi” chip */
+.sa-total-chip {
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #a0a0a5;
+  color: var(--wa-text);
+  border: 1px solid var(--wa-line);
+}
+
+/* Inherit tvoj wa look */
+.wa-label {
+  font-size: 12px;
+  color: var(--wa-muted);
+  display: block;
+}
+.wa-input {
+  width: 100%;
+  background: var(--wa-panel-2);
+  color: var(--wa-text);
+  border: 1px solid var(--wa-line);
+  border-radius: 10px;
+  padding: 8px 10px;
+  resize: vertical;
+}
+.wa-input.small {
+  max-width: 200px;
+}

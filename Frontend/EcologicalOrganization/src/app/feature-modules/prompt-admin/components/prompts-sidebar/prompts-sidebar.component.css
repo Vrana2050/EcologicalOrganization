@@ -151,3 +151,24 @@ a.sidebar-title h1 {
 .menu-item:hover {
   background: var(--wa-hover);
 }
+
+.quick-links {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 8px 12px;
+}
+
+.quick-link {
+  font-size: 15px;
+
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s, transform 0.1s;
+}
+
+.quick-link:hover {
+  color: var(--wa-accent); /* hover naglasak */
+  transform: translateX(2px);
+}

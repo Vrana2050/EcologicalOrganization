@@ -1,0 +1,328 @@
+<section class="wa-card sa">
+  <div class="sa-toolbar-inline">
+    <div class="sa-group sa-group-inline">
+      <label class="wa-label">Period</label>
+      <div class="sa-range">
+        <input
+          class="wa-input small"
+          type="date"
+          [max]="toDate || null"
+          [(ngModel)]="fromDate"
+          (ngModelChange)="onFromDateChange($event)"
+          aria-label="Datum od"
+        />
+        <span class="sa-range-sep">–</span>
+        <input
+          class="wa-input small"
+          type="date"
+          [min]="fromDate || null"
+          [(ngModel)]="toDate"
+          (ngModelChange)="onToDateChange($event)"
+          aria-label="Datum do"
+        />
+      </div>
+    </div>
+
+    <div class="sa-group sa-doc-type">
+      <label class="wa-label" for="docTypeSelect">Tip dokumenta</label>
+      <select
+        id="docTypeSelect"
+        class="wa-input small sa-doc-type-select"
+        [disabled]="!docTypes?.length"
+        [ngModel]="selectedDocTypeId"
+        (ngModelChange)="onDocTypeChanged($event)"
+      >
+        <option [ngValue]="null">Svi</option>
+        <option *ngFor="let dt of docTypes" [ngValue]="dt.id">
+          {{ dt.name }}
+        </option>
+      </select>
+    </div>
+
+    <label class="sa-toggle">
+      <input type="checkbox" [(ngModel)]="includeTotal" />
+      <span>Uključi total</span>
+    </label>
+
+    <div class="sa-actions-row">
+      <div class="sa-actions">
+        <button class="wa-btn" (click)="onApply()" [disabled]="!!dateError">
+          Primeni
+        </button>
+        <button class="wa-btn ghost" (click)="onReset()">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sa-state error" *ngIf="dateError">{{ dateError }}</div>
+  <div class="sa-state" *ngIf="loading">Učitavam…</div>
+  <div class="sa-state error" *ngIf="!loading && error">{{ error }}</div>
+
+  <!-- Tabela -->
+  <div class="sa-table" *ngIf="!loading && !error">
+    <table>
+      <thead>
+        <tr>
+          <th
+            (click)="onSort('document_type_name')"
+            [attr.aria-sort]="
+              sortKey === 'document_type_name'
+                ? sortDir === 'asc'
+                  ? 'ascending'
+                  : 'descending'
+                : 'none'
+            "
+          >
+            Tip dokumenta
+            <span
+              class="sa-sort"
+              [class.active]="sortKey === 'document_type_name'"
+              [class.desc]="sortDir === 'desc'"
+            ></span>
+          </th>
+
+          <th
+            (click)="onSort('num_executions')"
+            [attr.aria-sort]="
+              sortKey === 'num_executions'
+                ? sortDir === 'asc'
+                  ? 'ascending'
+                  : 'descending'
+                : 'none'
+            "
+          >
+            # Izvršavanja
+            <span
+              class="sa-sort"
+              [class.active]="sortKey === 'num_executions'"
+              [class.desc]="sortDir === 'desc'"
+            ></span>
+          </th>
+
+          <th
+            (click)="onSort('avg_duration_ms')"
+            [attr.aria-sort]="
+              sortKey === 'avg_duration_ms'
+                ? sortDir === 'asc'
+                  ? 'ascending'
+                  : 'descending'
+                : 'none'
+            "
+          >
+            Prosečno trajanje (ms)
+            <span
+              class="sa-sort"
+              [class.active]="sortKey === 'avg_duration_ms'"
+              [class.desc]="sortDir === 'desc'"
+            ></span>
+          </th>
+
+          <th
+            (click)="onSort('avg_input_tokens')"
+            [attr.aria-sort]="
+              sortKey === 'avg_input_tokens'
+                ? sortDir === 'asc'
+                  ? 'ascending'
+                  : 'descending'
+                : 'none'
+            "
+          >
+            Avg input tok.
+            <span
+              class="sa-sort"
+              [class.active]="sortKey === 'avg_input_tokens'"
+              [class.desc]="sortDir === 'desc'"
+            ></span>
+          </th>
+
+          <th
+            (click)="onSort('avg_output_tokens')"
+            [attr.aria-sort]="
+              sortKey === 'avg_output_tokens'
+                ? sortDir === 'asc'
+                  ? 'ascending'
+                  : 'descending'
+                : 'none'
+            "
+          >
+            Avg output tok.
+            <span
+              class="sa-sort"
+              [class.active]="sortKey === 'avg_output_tokens'"
+              [class.desc]="sortDir === 'desc'"
+            ></span>
+          </th>
+
+          <th
+            (click)="onSort('total_cost_usd')"
+            [attr.aria-sort]="
+              sortKey === 'total_cost_usd'
+                ? sortDir === 'asc'
+                  ? 'ascending'
+                  : 'descending'
+                : 'none'
+            "
+          >
+            Ukupan trošak ($)
+            <span
+              class="sa-sort"
+              [class.active]="sortKey === 'total_cost_usd'"
+              [class.desc]="sortDir === 'desc'"
+            ></span>
+          </th>
+
+          <th
+            (click)="onSort('avg_cost_usd')"
+            [attr.aria-sort]="
+              sortKey === 'avg_cost_usd'
+                ? sortDir === 'asc'
+                  ? 'ascending'
+                  : 'descending'
+                : 'none'
+            "
+          >
+            Trošak/izv. ($)
+            <span
+              class="sa-sort"
+              [class.active]="sortKey === 'avg_cost_usd'"
+              [class.desc]="sortDir === 'desc'"
+            ></span>
+          </th>
+
+          <th
+            (click)="onSort('error_rate')"
+            [attr.aria-sort]="
+              sortKey === 'error_rate'
+                ? sortDir === 'asc'
+                  ? 'ascending'
+                  : 'descending'
+                : 'none'
+            "
+          >
+            Greške (%)
+            <span
+              class="sa-sort"
+              [class.active]="sortKey === 'error_rate'"
+              [class.desc]="sortDir === 'desc'"
+            ></span>
+          </th>
+
+          <th
+            (click)="onSort('rating_count')"
+            [attr.aria-sort]="
+              sortKey === 'rating_count'
+                ? sortDir === 'asc'
+                  ? 'ascending'
+                  : 'descending'
+                : 'none'
+            "
+          >
+            # Ocena
+            <span
+              class="sa-sort"
+              [class.active]="sortKey === 'rating_count'"
+              [class.desc]="sortDir === 'desc'"
+            ></span>
+          </th>
+
+          <th
+            (click)="onSort('rating_avg')"
+            [attr.aria-sort]="
+              sortKey === 'rating_avg'
+                ? sortDir === 'asc'
+                  ? 'ascending'
+                  : 'descending'
+                : 'none'
+            "
+          >
+            Avg ocena
+            <span
+              class="sa-sort"
+              [class.active]="sortKey === 'rating_avg'"
+              [class.desc]="sortDir === 'desc'"
+            ></span>
+          </th>
+
+          <th
+            (click)="onSort('rating_median')"
+            [attr.aria-sort]="
+              sortKey === 'rating_median'
+                ? sortDir === 'asc'
+                  ? 'ascending'
+                  : 'descending'
+                : 'none'
+            "
+          >
+            Medijan
+            <span
+              class="sa-sort"
+              [class.active]="sortKey === 'rating_median'"
+              [class.desc]="sortDir === 'desc'"
+            ></span>
+          </th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let r of rows" [class.total]="r.document_type_id === null">
+          <td>
+            <ng-container *ngIf="r.document_type_id !== null; else totalName">
+              {{ r.document_type_name }}
+            </ng-container>
+            <ng-template #totalName>
+              <span class="sa-total-chip">Svi</span>
+            </ng-template>
+          </td>
+
+          <td>{{ r.num_executions | number : "1.0-0" }}</td>
+          <td>
+            {{
+              r.avg_duration_ms == null
+                ? "—"
+                : (r.avg_duration_ms | number : "1.0-0")
+            }}
+          </td>
+          <td>
+            {{
+              r.avg_input_tokens == null
+                ? "—"
+                : (r.avg_input_tokens | number : "1.0-0")
+            }}
+          </td>
+          <td>
+            {{
+              r.avg_output_tokens == null
+                ? "—"
+                : (r.avg_output_tokens | number : "1.0-0")
+            }}
+          </td>
+          <td>${{ r.total_cost_usd | number : "1.2-2" }}</td>
+          <td>
+            {{
+              r.avg_cost_usd == null
+                ? "—"
+                : "$" + (r.avg_cost_usd | number : "1.4-4")
+            }}
+          </td>
+          <td>
+            <ng-container *ngIf="r.error_rate != null; else dash">
+              {{ r.error_rate * 100 | number : "1.1-1" }}%
+            </ng-container>
+            <ng-template #dash>—</ng-template>
+          </td>
+          <td>{{ r.rating_count | number : "1.0-0" }}</td>
+          <td>
+            {{ r.rating_avg == null ? "—" : (r.rating_avg | number : "1.1-2") }}
+          </td>
+          <td>
+            {{
+              r.rating_median == null
+                ? "—"
+                : (r.rating_median | number : "1.0-0")
+            }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

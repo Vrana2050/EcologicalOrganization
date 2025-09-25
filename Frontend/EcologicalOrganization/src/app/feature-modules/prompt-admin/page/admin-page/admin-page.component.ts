@@ -28,6 +28,7 @@ export class PromptAdminPageComponent implements OnInit {
   versionsLoading = false;
 
   showVersionsSidebar = false;
+  showSystemAnalytics = false;
 
   constructor(
     private documentTypeService: DocumentTypeService,
@@ -49,6 +50,13 @@ export class PromptAdminPageComponent implements OnInit {
         distinctUntilChanged()
       )
       .subscribe((id) => this.openPrompt(id));
+  }
+
+  onOpenSystemAnalytics(): void {
+    this.showSystemAnalytics = true;
+    this.showVersionsSidebar = false;
+    this.activePrompt = null;
+    this.versions = [];
   }
 
   loadPrompts(): void {
@@ -93,6 +101,7 @@ export class PromptAdminPageComponent implements OnInit {
   }
 
   openPrompt(id: number): void {
+    this.showSystemAnalytics = false;
     const found = this.prompts.find((x) => x.id === id);
     this.activePrompt = found ?? null;
 
@@ -104,6 +113,7 @@ export class PromptAdminPageComponent implements OnInit {
   }
 
   onCreateNewPrompt(): void {
+    this.showSystemAnalytics = false;
     const defaultDocTypeId = this.getDefaultDocTypeId();
     if (defaultDocTypeId == null) {
       alert('Nije učitan nijedan Tip dokumenta. Pokušaj ponovo.');
@@ -176,6 +186,7 @@ export class PromptAdminPageComponent implements OnInit {
   onSelectPrompt(p: Prompt): void {
     this.activePrompt = p;
     // this.router.navigate(['/prompt-admin', p.id]);
+    this.showSystemAnalytics = false;
     this.showVersionsSidebar = true;
     this.loadVersions(p.id);
   }

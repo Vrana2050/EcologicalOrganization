@@ -55,9 +55,16 @@
         ⭐ Oceni
       </button>
 
-      <button class="wa-btn" (click)="onGenerate()">
+      <button
+        class="wa-btn"
+        (click)="onGenerate()"
+        [disabled]="generating || loadingIter"
+        [class.loading]="generating"
+        title="{{ generating ? 'Generisanje u toku…' : '' }}"
+      >
         ⚡ Generiši sadržaj sekcije
       </button>
+
       <button class="wa-btn danger" (click)="onRemove()">Ukloni sekciju</button>
     </div>
   </div>

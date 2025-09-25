@@ -72,6 +72,7 @@ export class SessionSectionComponent implements OnInit, OnChanges {
   currentSeq = 0;
   maxSeq = 0;
   loadingIter = false;
+  generating = false; // guard za dugme Generiši
 
   resultDraft = '';
   statusMessageResult: string | null = null;
@@ -91,6 +92,7 @@ export class SessionSectionComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['section']) {
       this.hydrateFromSection();
+      this.generating = false; // reset kada parent pošalje novo stanje
       setTimeout(() => this.autoGrowFromRef(), 0);
     }
   }
@@ -179,10 +181,16 @@ export class SessionSectionComponent implements OnInit, OnChanges {
   }
 
   onGenerate() {
+    if (this.generating || this.loadingIter) return;
+    this.generating = true;
     this.generate.emit({
       section: this.section,
       instructionText: this.instructionText,
     });
+  }
+
+  markGenerateFinished() {
+    this.generating = false;
   }
 
   onResultChange() {

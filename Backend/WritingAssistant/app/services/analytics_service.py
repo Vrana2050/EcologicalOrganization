@@ -3,6 +3,8 @@ from app.repository.analytics_repository import AnalyticsRepository
 from app.repository.prompt_version_repository import PromptVersionRepository
 from app.repository.prompt_active_history_repository import PromptActiveHistoryRepository
 from app.core.exceptions import NotFoundError
+from typing import Optional, List, Dict, Any
+from datetime import datetime
 
 from app.model.prompt_version import PromptVersion
 
@@ -79,3 +81,7 @@ class AnalyticsService:
             **data,
             bayesScore=bayes,
         )
+
+
+    def get_doc_type_report(self, from_ts: datetime, to_ts: datetime, doc_type_id: Optional[int], include_total: bool = True) -> List[Dict[str, Any]]:
+        return self.repo.get_doc_type_report(from_ts, to_ts, doc_type_id, include_total)

@@ -4,6 +4,15 @@
     <a class="sidebar-title" href="/"><h1>Admin Dashboard</h1></a>
   </div>
 
+  <div class="quick-links">
+    <a href="/document-type-management" class="quick-link"
+      >Upravljaj tipovima dokumenata ↗</a
+    >
+    <a class="quick-link" (click)="openSystemAnalytics.emit()"
+      >Analitika celog sistema ↗</a
+    >
+  </div>
+
   <button class="wa-btn primary" (click)="onCreateNewPrompt()">
     + Kreiraj novi prompt
   </button>

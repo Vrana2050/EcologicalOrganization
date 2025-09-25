@@ -14,7 +14,6 @@ export interface OutputFeedbackItem {
 
   details?: FeedbackDetails | null;
 
-  // UI only
   _expanded?: boolean;
   _loadingDetails?: boolean;
 }

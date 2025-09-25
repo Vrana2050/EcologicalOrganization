@@ -1,4 +1,3 @@
-// prompt-evaluation.component.ts
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { Subscription, Observable, EMPTY } from 'rxjs';
@@ -25,15 +24,12 @@ export class PromptEvaluationComponent implements OnChanges {
   sectionTab: SectionTab = 'analytics';
   scopeMode: ScopeMode = 'prompt';
 
-  // zajednički loading/error za karticu koja je aktivna
   loading = false;
   error?: string;
 
-  // ANALYTICS
   data: AnalyticsOut | null = null;
   private lastLoadedKey: string | null = null;
 
-  // FEEDBACK (centralizovan)
   fbItems: OutputFeedbackItem[] = [];
   fbTotal = 0;
   fbPage = 1;
@@ -69,7 +65,6 @@ export class PromptEvaluationComponent implements OnChanges {
     this.fetchFeedback();
   }
 
-  // === ANALYTICS ===
   private analyticsKey(): string {
     return `${this.scopeMode}:${this.promptId ?? 'null'}:${
       this.versionId ?? 'null'
@@ -121,7 +116,6 @@ export class PromptEvaluationComponent implements OnChanges {
     }
   }
 
-  // === FEEDBACK ===
   private feedbackKey(): string {
     return `${this.scopeMode}:${this.promptId ?? 'null'}:${
       this.versionId ?? 'null'

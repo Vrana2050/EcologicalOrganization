@@ -144,4 +144,8 @@ export class DocumentTypeManagementComponent implements OnInit {
     this.descDraft = '';
     this.isNew = true;
   }
+
+  goBack() {
+    window.history.back();
+  }
 }
