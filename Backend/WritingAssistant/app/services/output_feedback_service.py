@@ -31,6 +31,7 @@ class OutputFeedbackService(BaseService):
         self.session_repo = chat_session_repo
 
     def add(self, payload: CreateOutputFeedback, user_id: int, user_email: Optional[str]) -> OutputFeedbackOut:
+        print(f"[OutputFeedbackService.add] user_id={user_id}, user_email={user_email}, payload={payload}")
         mo = self.mo_repo.read_by_id(int(payload.model_output_id))
         if not mo or getattr(mo, "deleted", 0) == 1:
             raise NotFoundError(detail="Model output not found")

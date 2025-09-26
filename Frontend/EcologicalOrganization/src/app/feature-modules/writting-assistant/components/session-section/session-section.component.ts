@@ -72,7 +72,7 @@ export class SessionSectionComponent implements OnInit, OnChanges {
   currentSeq = 0;
   maxSeq = 0;
   loadingIter = false;
-  generating = false; // guard za dugme Generiši
+  generating = false;
 
   resultDraft = '';
   statusMessageResult: string | null = null;

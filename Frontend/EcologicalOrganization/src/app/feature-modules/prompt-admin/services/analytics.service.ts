@@ -1,29 +1,23 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AnalyticsOut } from '../models/analytics.model';
 import { DocumentTypeReportRow } from '../models/document-type-report-row.model';
+import { environment } from 'src/env/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AnalyticsService {
-  private readonly baseUrl = 'http://localhost:8000/api/v1/analytics';
+  private readonly baseUrl = `${environment.apiHost}writing-assistant/analytics`;
 
   constructor(private http: HttpClient) {}
 
-  private get headers(): HttpHeaders {
-    return new HttpHeaders({ 'x-user-id': '2', 'x-user-role': 'ADMIN' });
-  }
-
   getPromptAnalytics(promptId: number): Observable<AnalyticsOut> {
-    return this.http.get<AnalyticsOut>(`${this.baseUrl}/prompts/${promptId}`, {
-      headers: this.headers,
-    });
+    return this.http.get<AnalyticsOut>(`${this.baseUrl}/prompts/${promptId}`);
   }
 
   getVersionAnalytics(versionId: number): Observable<AnalyticsOut> {
     return this.http.get<AnalyticsOut>(
-      `${this.baseUrl}/prompt-versions/${versionId}`,
-      { headers: this.headers }
+      `${this.baseUrl}/prompt-versions/${versionId}`
     );
   }
 
@@ -42,7 +36,7 @@ export class AnalyticsService {
     }
     return this.http.get<DocumentTypeReportRow[]>(
       `${this.baseUrl}/doc-type-report`,
-      { headers: this.headers, params }
+      { params }
     );
   }
 
@@ -66,7 +60,6 @@ export class AnalyticsService {
       params = params.set('document_type_id', String(documentTypeId));
     }
     return this.http.get(`${this.baseUrl}/doc-type-report.pdf`, {
-      headers: this.headers,
       params,
       responseType: 'blob',
     });

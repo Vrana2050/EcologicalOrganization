@@ -19,7 +19,7 @@ class AppCreator:
 
         self.app.add_middleware(
             CORSMiddleware,
-            allow_origins=["http://localhost:4200"],  
+            allow_origins=["http://localhost:4200", "http://localhost:9000"],  
             allow_credentials=True,
             allow_methods=["*"],
             allow_headers=["*"],
@@ -28,11 +28,12 @@ class AppCreator:
         self.container = Container()
         self.db = self.container.db()
 
-        @self.app.get("/")
+        @self.app.get("/writing-assistant/health")
         def root():
             return "service is working"
 
-        self.app.include_router(v1_routers, prefix="/api/v1")
+        self.app.include_router(v1_routers, prefix="/writing-assistant")
+
 
         def custom_openapi():
             if self.app.openapi_schema:

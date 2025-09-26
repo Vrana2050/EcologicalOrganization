@@ -1,27 +1,19 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { map, Observable, of, shareReplay, switchMap } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { map, Observable } from 'rxjs';
 import { Prompt, PromptPage } from '../models/prompt.model';
-import { PromptVersion } from '../models/prompt-version.model';
+import { environment } from 'src/env/environment';
 
 @Injectable({ providedIn: 'root' })
 export class PromptService {
-  private readonly promptsUrl = 'http://localhost:8000/api/v1/prompts';
+  private readonly promptsUrl = `${environment.apiHost}writing-assistant/prompts`;
 
   constructor(private http: HttpClient) {}
-
-  private get headers(): HttpHeaders {
-    return new HttpHeaders({
-      'x-user-id': '2',
-      'x-user-role': 'ADMIN',
-    });
-  }
 
   list(page = 1, perPage = 20): Observable<PromptPage> {
     return this.http
       .get<any>(this.promptsUrl, {
         params: { page, per_page: perPage },
-        headers: this.headers,
       })
       .pipe(
         map(
@@ -58,26 +50,16 @@ export class PromptService {
   }
 
   delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.promptsUrl}/${id}`, {
-      headers: this.headers,
-    });
+    return this.http.delete<void>(`${this.promptsUrl}/${id}`);
   }
 
   updateTitle(id: number, title: string): Observable<void> {
-    return this.http.patch<void>(
-      `${this.promptsUrl}/${id}/title`,
-      { title },
-      { headers: this.headers }
-    );
+    return this.http.patch<void>(`${this.promptsUrl}/${id}/title`, { title });
   }
 
   saveNewPrompt(title: string, documentTypeId: number): Observable<Prompt> {
     return this.http
-      .post<any>(
-        this.promptsUrl,
-        { title, document_type_id: documentTypeId },
-        { headers: this.headers }
-      )
+      .post<any>(this.promptsUrl, { title, document_type_id: documentTypeId })
       .pipe(
         map(
           (p): Prompt => ({

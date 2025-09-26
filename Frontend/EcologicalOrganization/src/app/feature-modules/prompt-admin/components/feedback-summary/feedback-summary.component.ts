@@ -14,7 +14,6 @@ export class FeedbackSummaryComponent {
     return (v / 5) * 100;
   }
 
-  // histogram podaci 5..1
   get rows() {
     const d = this.data;
     const items = [

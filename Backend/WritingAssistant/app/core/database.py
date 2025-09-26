@@ -6,7 +6,11 @@ from sqlalchemy.orm import Session
 
 from app.model import Base  
 
-DATABASE_URL = "oracle+oracledb://writing_assistant:Assistant123@oracle-db:1521/?service_name=XEPDB1"
+# DATABASE_URL = "oracle+oracledb://writing_assistant:Assistant123@oracle-db:1521/?service_name=XEPDB1"
+
+
+DATABASE_URL = "oracle+oracledb://writing_assistant:Assistant123@oracle-xe-nais:1521/?service_name=XEPDB1"
+
 
 
 class Database:

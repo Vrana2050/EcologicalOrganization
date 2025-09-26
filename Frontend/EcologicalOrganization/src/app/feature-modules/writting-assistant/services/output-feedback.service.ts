@@ -1,23 +1,17 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import {
   OutputFeedback,
   CreateOutputFeedback,
 } from '../models/output-feedback.model';
+import { environment } from 'src/env/environment';
 
 @Injectable({ providedIn: 'root' })
 export class OutputFeedbackService {
-  private readonly baseUrl = 'http://localhost:8000/api/v1/output-feedback';
+  private readonly baseUrl = `${environment.apiHost}writing-assistant/output-feedback`;
 
   constructor(private http: HttpClient) {}
-
-  private get headers(): HttpHeaders {
-    return new HttpHeaders({
-      'x-user-id': '2',
-      'x-user-email': 'user@example.com',
-    });
-  }
 
   create(payload: CreateOutputFeedback): Observable<OutputFeedback> {
     const body: any = {
@@ -28,19 +22,17 @@ export class OutputFeedbackService {
       body.comment_text = payload.commentText.trim();
     }
 
-    return this.http
-      .post<any>(this.baseUrl, body, { headers: this.headers })
-      .pipe(
-        map(
-          (raw): OutputFeedback => ({
-            id: raw.id,
-            modelOutputId: raw.model_output_id,
-            ratingValue: raw.rating_value,
-            commentText: raw.comment_text ?? null,
-            createdBy: raw.created_by,
-            createdAt: raw.created_at,
-          })
-        )
-      );
+    return this.http.post<any>(this.baseUrl, body).pipe(
+      map(
+        (raw): OutputFeedback => ({
+          id: raw.id,
+          modelOutputId: raw.model_output_id,
+          ratingValue: raw.rating_value,
+          commentText: raw.comment_text ?? null,
+          createdBy: raw.created_by,
+          createdAt: raw.created_at,
+        })
+      )
+    );
   }
 }

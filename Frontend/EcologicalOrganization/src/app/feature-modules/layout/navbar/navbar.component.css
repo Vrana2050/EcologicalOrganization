@@ -1,10 +1,28 @@
-div {
-    width: 100%;
-    display: flex;
-    gap: 10px;
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.brand {
+  margin: 0;
+  font-weight: bold;
+  font-size: 18px;
+  color: white;
+}
+
+.admin-link {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.admin-link:hover {
+  text-decoration: underline;
 }
 
 #buttons {
-    width: auto;
-    margin-left: auto;
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
 }

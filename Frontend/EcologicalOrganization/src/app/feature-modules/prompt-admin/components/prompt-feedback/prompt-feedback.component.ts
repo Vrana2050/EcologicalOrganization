@@ -1,4 +1,3 @@
-// prompt-feedback.component.ts (prezentacioni sloj + lenjo učitavanje detalja)
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FeedbackService } from '../../services/feedback.service';
 import { OutputFeedbackItem } from '../../models/feedback.model';

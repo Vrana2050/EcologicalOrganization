@@ -27,21 +27,51 @@ export class RegistrationComponent {
   constructor(private authService: AuthService, private router: Router) {}
 
   register(): void {
-    if (!this.registrationForm.valid) return;
+    if (this.registrationForm.invalid) return;
+
+    const v = this.registrationForm.value;
 
     const registration: Registration = {
-      name: this.registrationForm.value.name || '',
-      surname: this.registrationForm.value.surname || '',
-      email: this.registrationForm.value.email || '',
-      password: this.registrationForm.value.password || '',
+      name: v.name || '',
+      surname: v.surname || '',
+      email: v.email || '',
+      password: v.password || '',
       roles: this.systems.map((subsystem) => ({
         subsystem,
-        role: this.registrationForm.value[subsystem] as RoleType,
+        role: (v[subsystem] as RoleType) ?? 'EMPLOYEE',
       })),
     };
 
     this.authService.register(registration).subscribe({
-      next: () => this.router.navigate(['home']),
+      next: () => {
+        alert('Korisnik uspešno napravljen ✅');
+
+        // reset na početne vrednosti
+        this.registrationForm.reset({
+          name: '',
+          surname: '',
+          email: '',
+          password: '',
+          DM: 'EMPLOYEE',
+          PM: 'EMPLOYEE',
+          WA: 'EMPLOYEE',
+          DP: 'EMPLOYEE',
+        });
+        this.registrationForm.markAsPristine();
+        this.registrationForm.markAsUntouched();
+      },
+      error: (err) => {
+        // prikaži poruku od bekenda ako postoji
+        const msg =
+          err?.error?.detail ||
+          err?.error?.message ||
+          'Došlo je do greške pri registraciji.';
+        alert(msg);
+      },
     });
+  }
+
+  goBack() {
+    window.history.back();
   }
 }

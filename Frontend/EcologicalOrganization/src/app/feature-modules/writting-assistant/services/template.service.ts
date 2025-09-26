@@ -1,21 +1,19 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { Template, TemplatePage } from '../models/template.model';
+import { environment } from 'src/env/environment';
 
 @Injectable({ providedIn: 'root' })
 export class TemplateService {
-  private readonly baseUrl = 'http://localhost:8000/api/v1/templates';
+  private readonly baseUrl = `${environment.apiHost}writing-assistant/templates`;
 
   constructor(private http: HttpClient) {}
 
   list(page = 1, perPage = 20): Observable<TemplatePage> {
-    const headers = new HttpHeaders({ 'x-user-id': '2' });
-
     return this.http
       .get<any>(this.baseUrl, {
         params: { page, per_page: perPage },
-        headers,
       })
       .pipe(
         map((raw) => ({
@@ -38,8 +36,7 @@ export class TemplateService {
   }
 
   create(formData: FormData): Observable<Template> {
-    const headers = new HttpHeaders({ 'x-user-id': '2' });
-    return this.http.post<any>(this.baseUrl, formData, { headers }).pipe(
+    return this.http.post<any>(this.baseUrl, formData).pipe(
       map(
         (t: any): Template => ({
           id: t.id,

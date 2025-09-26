@@ -1,20 +1,14 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { DocumentType, DocumentTypePage } from '../models/document-type.model';
+import { environment } from 'src/env/environment';
 
 @Injectable({ providedIn: 'root' })
 export class DocumentTypeService {
-  private readonly url = 'http://localhost:8000/api/v1/document-types';
+  private readonly url = `${environment.apiHost}writing-assistant/document-types`;
 
   constructor(private http: HttpClient) {}
-
-  private get headers(): HttpHeaders {
-    return new HttpHeaders({
-      'x-user-id': '2',
-      'x-user-role': 'ADMIN',
-    });
-  }
 
   list(
     page = 1,
@@ -24,7 +18,6 @@ export class DocumentTypeService {
     return this.http
       .get<any>(this.url, {
         params: { page, per_page: perPage, ordering },
-        headers: this.headers,
       })
       .pipe(
         map(
@@ -50,9 +43,7 @@ export class DocumentTypeService {
   }
 
   delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.url}/${id}`, {
-      headers: this.headers,
-    });
+    return this.http.delete<void>(`${this.url}/${id}`);
   }
 
   update(
@@ -60,18 +51,10 @@ export class DocumentTypeService {
     name: string,
     description: string | null
   ): Observable<void> {
-    return this.http.patch<void>(
-      `${this.url}/${id}`,
-      { name, description },
-      { headers: this.headers }
-    );
+    return this.http.patch<void>(`${this.url}/${id}`, { name, description });
   }
 
   create(name: string, description: string | null): Observable<DocumentType> {
-    return this.http.post<DocumentType>(
-      this.url,
-      { name, description },
-      { headers: this.headers }
-    );
+    return this.http.post<DocumentType>(this.url, { name, description });
   }
 }

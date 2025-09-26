@@ -1,6 +1,14 @@
 <div class="card-container">
-  <a href="/document-management" class="card">Document Management</a>
-  <a href="/document-preparation" class="card">Document Preparation</a>
-  <a href="/writing-assistant" class="card">Writting Assistant</a>
-  <a href="/project-realization" class="card">Project Realization</a>
+  <a href="/document-management" class="card" (click)="enter('DM', $event)"
+    >Document Management</a
+  >
+  <a href="/document-preparation" class="card" (click)="enter('DP', $event)"
+    >Document Preparation</a
+  >
+  <a href="/writing-assistant" class="card" (click)="enter('WA', $event)"
+    >Writting Assistant</a
+  >
+  <a href="/project-realization" class="card" (click)="enter('PM', $event)"
+    >Project Realization</a
+  >
 </div>

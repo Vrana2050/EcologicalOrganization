@@ -1,23 +1,17 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import {
   CreateSessionSectionIn,
   SessionSectionOut,
 } from '../models/session-section.model';
+import { environment } from 'src/env/environment';
 
 @Injectable({ providedIn: 'root' })
 export class SessionSectionService {
-  private readonly baseUrl = 'http://localhost:8000/api/v1/session-section';
+  private readonly baseUrl = `${environment.apiHost}writing-assistant/session-section`;
 
   constructor(private http: HttpClient) {}
-
-  private get headers(): HttpHeaders {
-    return new HttpHeaders({
-      'x-user-id': '2',
-      'x-user-role': 'ADMIN',
-    });
-  }
 
   create(payload: CreateSessionSectionIn): Observable<{
     id: number;
@@ -35,23 +29,19 @@ export class SessionSectionService {
       body.template_section_id = payload.templateSectionId;
     }
 
-    return this.http
-      .post<SessionSectionOut>(this.baseUrl, body, { headers: this.headers })
-      .pipe(
-        map((raw) => ({
-          id: raw.id,
-          sessionId: raw.sessionId,
-          templateSectionId: raw.templateSectionId ?? null,
-          name: raw.name,
-          position: raw.position,
-        }))
-      );
+    return this.http.post<SessionSectionOut>(this.baseUrl, body).pipe(
+      map((raw) => ({
+        id: raw.id,
+        sessionId: raw.sessionId,
+        templateSectionId: raw.templateSectionId ?? null,
+        name: raw.name,
+        position: raw.position,
+      }))
+    );
   }
 
   delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`, {
-      headers: this.headers,
-    });
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
   generateIteration(
@@ -63,20 +53,12 @@ export class SessionSectionService {
       global_instruction: payload.globalInstruction ?? null,
     };
 
-    return this.http.post<any>(
-      `${this.baseUrl}/${sectionId}/iterations`,
-      body,
-      { headers: this.headers }
-    );
+    return this.http.post<any>(`${this.baseUrl}/${sectionId}/iterations`, body);
   }
 
   updateTitle(sectionId: number, name: string): Observable<SessionSectionOut> {
     return this.http
-      .patch<any>(
-        `${this.baseUrl}/${sectionId}/title`,
-        { name },
-        { headers: this.headers }
-      )
+      .patch<any>(`${this.baseUrl}/${sectionId}/title`, { name })
       .pipe(
         map((raw) => ({
           id: raw.id,
@@ -104,9 +86,7 @@ export class SessionSectionService {
     sectionDraft?: { id: number; content?: string | null } | null;
   }> {
     return this.http
-      .get<any>(`${this.baseUrl}/${sectionId}/iterations/${seqNo}`, {
-        headers: this.headers,
-      })
+      .get<any>(`${this.baseUrl}/${sectionId}/iterations/${seqNo}`)
       .pipe(
         map((raw) => ({
           id: raw.id,
@@ -153,11 +133,9 @@ export class SessionSectionService {
     sectionDraft?: { id: number; content?: string | null } | null;
   }> {
     return this.http
-      .put<any>(
-        `${this.baseUrl}/${sectionId}/iterations/${seqNo}/draft`,
-        { content },
-        { headers: this.headers }
-      )
+      .put<any>(`${this.baseUrl}/${sectionId}/iterations/${seqNo}/draft`, {
+        content,
+      })
       .pipe(
         map((raw) => ({
           id: raw.id,

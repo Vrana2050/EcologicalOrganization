@@ -1,3 +1,4 @@
+// src/app/feature-modules/writting-assistant/services/chat-session.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, map, catchError, of } from 'rxjs';
@@ -7,28 +8,22 @@ import {
   SessionSectionWithLatest,
 } from '../models/session-section.model';
 import { Router } from '@angular/router';
+import { TokenStorage } from 'src/app/infrastructure/auth/jwt/token.service';
+
+import { environment } from 'src/env/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ChatSessionService {
-  private readonly baseUrl = 'http://localhost:8000/api/v1/chat-session';
+  private readonly baseUrl = `${environment.apiHost}writing-assistant/chat-session`;
 
   constructor(private http: HttpClient, private router: Router) {}
-
-  private get headers(): HttpHeaders {
-    return new HttpHeaders({ 'x-user-id': '2' });
-  }
-
-  private get adminHeaders(): HttpHeaders {
-    return new HttpHeaders({ 'x-user-id': '2', 'x-user-role': 'ADMIN' });
-  }
 
   list(page = 1, perPage = 20): Observable<ChatSessionPage> {
     return this.http
       .get<any>(this.baseUrl, {
         params: { page, per_page: perPage },
-        headers: this.headers,
       })
       .pipe(
         map(
@@ -59,37 +54,29 @@ export class ChatSessionService {
     const payload: any = { template_id: templateId };
     if (title && title.trim()) payload.title = title.trim();
 
-    return this.http
-      .post<any>(this.baseUrl, payload, { headers: this.headers })
-      .pipe(
-        map(
-          (raw): ChatSession => ({
-            id: raw.id,
-            templateId: raw.template_id,
-            documentTypeId: raw.document_type_id ?? null,
-            createdBy: raw.created_by,
-            title: raw.title,
-            updatedAt: raw.updated_at,
-            isTestSession: raw.is_test_session === 1,
-            promptVersionId: raw.test_prompt_version_id ?? null,
-          })
-        )
-      );
+    return this.http.post<any>(this.baseUrl, payload).pipe(
+      map(
+        (raw): ChatSession => ({
+          id: raw.id,
+          templateId: raw.template_id,
+          documentTypeId: raw.document_type_id ?? null,
+          createdBy: raw.created_by,
+          title: raw.title,
+          updatedAt: raw.updated_at,
+          isTestSession: raw.is_test_session === 1,
+          promptVersionId: raw.test_prompt_version_id ?? null,
+        })
+      )
+    );
   }
 
   delete(sessionId: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${sessionId}`, {
-      headers: this.headers,
-    });
+    return this.http.delete<void>(`${this.baseUrl}/${sessionId}`);
   }
 
   updateTitle(sessionId: number, title: string): Observable<ChatSession> {
     return this.http
-      .patch<any>(
-        `${this.baseUrl}/${sessionId}/title`,
-        { title },
-        { headers: this.headers }
-      )
+      .patch<any>(`${this.baseUrl}/${sessionId}/title`, { title })
       .pipe(
         map(
           (raw): ChatSession => ({
@@ -106,91 +93,80 @@ export class ChatSessionService {
       );
   }
 
-  /** PATCH /chat-session/:id/document-type */
   patchDocumentType(
     sessionId: number,
     documentTypeId: number
   ): Observable<void> {
-    return this.http.patch<void>(
-      `${this.baseUrl}/${sessionId}/document-type`,
-      {
-        document_type_id: documentTypeId,
-        updated_at: new Date().toISOString(),
-      },
-      { headers: this.headers }
-    );
+    return this.http.patch<void>(`${this.baseUrl}/${sessionId}/document-type`, {
+      document_type_id: documentTypeId,
+      updated_at: new Date().toISOString(),
+    });
   }
 
   getOverview(sessionId: number): Observable<SessionOverview> {
-    return this.http
-      .get<any>(`${this.baseUrl}/${sessionId}/overview`, {
-        headers: this.headers,
-      })
-      .pipe(
-        map(
-          (raw): SessionOverview => ({
-            documentTypeId: raw.document_type_id,
-            title: raw.title,
-            latestGlobalInstructionText:
-              raw.latest_global_instruction_text ?? '',
-            sections: (raw.sections || []).map(
-              (x: any): SessionSectionWithLatest => {
-                const li = x.latest_iteration;
-                const sectionInstruction = li?.section_instruction ?? null;
-                const modelOutput = li?.model_output ?? null;
-                const sectionDraft = li?.section_draft ?? null;
+    return this.http.get<any>(`${this.baseUrl}/${sessionId}/overview`).pipe(
+      map(
+        (raw): SessionOverview => ({
+          documentTypeId: raw.document_type_id,
+          title: raw.title,
+          latestGlobalInstructionText: raw.latest_global_instruction_text ?? '',
+          sections: (raw.sections || []).map(
+            (x: any): SessionSectionWithLatest => {
+              const li = x.latest_iteration;
+              const sectionInstruction = li?.section_instruction ?? null;
+              const modelOutput = li?.model_output ?? null;
+              const sectionDraft = li?.section_draft ?? null;
 
-                const latest = li
-                  ? {
-                      id: li.id,
-                      seqNo: li.seq_no,
-                      sessionSectionId: li.session_section_id,
-                      sectionInstruction: sectionInstruction
-                        ? {
-                            id: sectionInstruction.id,
-                            text:
-                              sectionInstruction.text_ ??
-                              sectionInstruction.text,
-                            createdAt: sectionInstruction.created_at ?? null,
-                          }
-                        : null,
-                      modelOutput: modelOutput
-                        ? {
-                            id: modelOutput.id,
-                            generatedText: modelOutput.generated_text ?? null,
-                          }
-                        : null,
-                      sectionDraft: sectionDraft
-                        ? {
-                            id: sectionDraft.id,
-                            content: sectionDraft.content ?? null,
-                          }
-                        : null,
-                    }
-                  : null;
+              const latest = li
+                ? {
+                    id: li.id,
+                    seqNo: li.seq_no,
+                    sessionSectionId: li.session_section_id,
+                    sectionInstruction: sectionInstruction
+                      ? {
+                          id: sectionInstruction.id,
+                          text:
+                            sectionInstruction.text_ ?? sectionInstruction.text,
+                          createdAt: sectionInstruction.created_at ?? null,
+                        }
+                      : null,
+                    modelOutput: modelOutput
+                      ? {
+                          id: modelOutput.id,
+                          generatedText: modelOutput.generated_text ?? null,
+                        }
+                      : null,
+                    sectionDraft: sectionDraft
+                      ? {
+                          id: sectionDraft.id,
+                          content: sectionDraft.content ?? null,
+                        }
+                      : null,
+                  }
+                : null;
 
-                return {
-                  id: x.id,
-                  sessionId: x.session_id,
-                  name: x.name ?? null,
-                  position: x.position ?? null,
-                  latestIteration: latest,
-                  maxSeqNo: latest?.seqNo ?? 0,
-                };
-              }
-            ),
-          })
-        ),
-        catchError((err) => {
-          this.router.navigate(['/writing-assistant']);
-          return of({
-            documentTypeId: 0,
-            title: '',
-            latestGlobalInstructionText: '',
-            sections: [],
-          });
+              return {
+                id: x.id,
+                sessionId: x.session_id,
+                name: x.name ?? null,
+                position: x.position ?? null,
+                latestIteration: latest,
+                maxSeqNo: latest?.seqNo ?? 0,
+              };
+            }
+          ),
         })
-      );
+      ),
+      catchError(() => {
+        this.router.navigate(['/writing-assistant']);
+        return of({
+          documentTypeId: 0,
+          title: '',
+          latestGlobalInstructionText: '',
+          sections: [],
+        });
+      })
+    );
   }
 
   createTestSession(payload: {
@@ -202,23 +178,19 @@ export class ChatSessionService {
       title: payload.title,
     };
 
-    return this.http
-      .post<any>(`${this.baseUrl}/test`, body, {
-        headers: new HttpHeaders({ 'x-user-id': '2', 'x-user-role': 'ADMIN' }),
-      })
-      .pipe(
-        map(
-          (raw): ChatSession => ({
-            id: raw.id,
-            templateId: raw.template_id,
-            documentTypeId: raw.document_type_id ?? null,
-            createdBy: raw.created_by,
-            title: raw.title,
-            updatedAt: raw.updated_at,
-            isTestSession: raw.is_test_session === 1,
-            promptVersionId: raw.test_prompt_version_id ?? null,
-          })
-        )
-      );
+    return this.http.post<any>(`${this.baseUrl}/test`, body).pipe(
+      map(
+        (raw): ChatSession => ({
+          id: raw.id,
+          templateId: raw.template_id,
+          documentTypeId: raw.document_type_id ?? null,
+          createdBy: raw.created_by,
+          title: raw.title,
+          updatedAt: raw.updated_at,
+          isTestSession: raw.is_test_session === 1,
+          promptVersionId: raw.test_prompt_version_id ?? null,
+        })
+      )
+    );
   }
 }
