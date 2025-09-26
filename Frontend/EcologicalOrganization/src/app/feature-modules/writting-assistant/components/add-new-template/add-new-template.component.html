@@ -1,0 +1,83 @@
+<div class="wa-modal-backdrop" (click)="backdropClick()">
+  <div
+    class="wa-modal"
+    (click)="$event.stopPropagation()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="addTplTitle"
+  >
+    <h2 id="addTplTitle">Dodaj novi šablon</h2>
+
+    <div class="file-row">
+      <label class="wa-file-btn">
+        <input
+          #fileInput
+          type="file"
+          accept=".md,text/markdown"
+          (change)="onFileSelected($event)"
+        />
+        Choose file
+      </label>
+
+      <div class="file-chip" [class.placeholder]="!form.file">
+        <ng-container *ngIf="form.file; else ph">
+          <span class="file-chip-name">{{ form.file.name }}</span>
+          <button
+            class="file-chip-x"
+            type="button"
+            aria-label="Ukloni fajl"
+            (click)="clearFile(fileInput)"
+          >
+            ×
+          </button>
+        </ng-container>
+        <ng-template #ph></ng-template>
+      </div>
+    </div>
+
+    <div>
+      <label class="wa-label" for="tplName">Naziv šablona</label>
+      <input
+        id="tplName"
+        class="wa-input"
+        type="text"
+        [(ngModel)]="form.name"
+        (ngModelChange)="touchedName = true"
+        placeholder="Naziv"
+      />
+    </div>
+
+    <div>
+      <label class="wa-label" for="docTypeSelect">Tip dokumenta</label>
+      <select
+        id="docTypeSelect"
+        class="wa-input small"
+        [ngModel]="form.documentTypeId"
+        (ngModelChange)="form.documentTypeId = $event === null ? null : +$event"
+      >
+        <option [ngValue]="null" disabled>Odaberi tip…</option>
+        <option *ngFor="let dt of documentTypes" [ngValue]="dt.id">
+          {{ dt.name === "Default" ? "Ostalo" : dt.name }}
+        </option>
+      </select>
+    </div>
+
+    <div class="wa-modal-actions">
+      <button
+        class="wa-btn primary"
+        (click)="submit()"
+        [disabled]="saving || !isValid()"
+      >
+        {{ saving ? "Dodavanje…" : "Dodaj" }}
+      </button>
+      <button
+        class="wa-btn ghost"
+        type="button"
+        (click)="cancel()"
+        [disabled]="saving"
+      >
+        Odustani
+      </button>
+    </div>
+  </div>
+</div>

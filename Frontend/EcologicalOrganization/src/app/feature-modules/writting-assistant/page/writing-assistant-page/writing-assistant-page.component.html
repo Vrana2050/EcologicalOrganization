@@ -1,0 +1,47 @@
+<div class="app" [class.show-templates]="showTemplatesSidebar">
+  <wa-conversations-sidebar
+    [conversations]="conversations"
+    [selectedId]="activeSession?.id"
+    (createNew)="openTemplates()"
+    (selectConversation)="onSelectConversation($event)"
+    (deleteConversation)="onDeleteConversation($event)"
+  ></wa-conversations-sidebar>
+
+  <wa-templates-sidebar
+    *ngIf="showTemplatesSidebar"
+    (hide)="closeTemplates()"
+    (created)="onSessionCreated($event)"
+    [documentTypes]="documentTypes"
+  >
+  </wa-templates-sidebar>
+
+  <main class="main">
+    <div class="workspace">
+      <xp-welcome-screen
+        *ngIf="!activeSession && !showTemplatesSidebar"
+        (createNew)="openTemplates()"
+      >
+      </xp-welcome-screen>
+
+      <wa-session-editor
+        *ngIf="activeSession && sessionOverview"
+        [hidden]="showPreview"
+        [session]="activeSession"
+        [documentTypes]="documentTypes"
+        [overview]="sessionOverview"
+        (sessionTitleChanged)="onSessionTitleChanged($event)"
+        (documentTypeChanged)="onSessionDocTypeChanged($event)"
+        (overviewChanged)="onOverviewChanged($event)"
+        (openPreview)="showPreview = true"
+      ></wa-session-editor>
+
+      <wa-preview-document
+        *ngIf="activeSession && sessionOverview"
+        [hidden]="!showPreview"
+        [title]="sessionOverview.title || activeSession.title || 'Dokument'"
+        [overview]="sessionOverview"
+        (close)="showPreview = false"
+      ></wa-preview-document>
+    </div>
+  </main>
+</div>

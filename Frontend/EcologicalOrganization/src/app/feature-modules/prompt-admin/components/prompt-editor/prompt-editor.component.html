@@ -1,0 +1,41 @@
+<div class="wa-editor">
+  <div class="wa-editor-inner" *ngIf="!loading && !error; else stateTpl">
+    <pa-prompt-header
+      [title]="prompt?.title || null"
+      [documentTypes]="documentTypes"
+      [documentTypeId]="prompt?.documentTypeId ?? null"
+      [isNewPrompt]="prompt?.id === -1"
+      [startInEditMode]="prompt?.id === -1"
+      (savePrompt)="onHeaderSavePrompt($event)"
+      (deletePrompt)="onHeaderDeletePrompt()"
+      (docTypeChanged)="onHeaderDocTypeChanged($event)"
+      (createNewVersion)="onHeaderCreateNewVersion()"
+      (saveNewPrompt)="onHeaderSaveNewPrompt($event)"
+    ></pa-prompt-header>
+
+    <xp-prompt-version
+      *ngIf="selectedVersion"
+      [version]="selectedVersion"
+      (saveBasicInfo)="onSaveVersionBasicInfo($event)"
+      (savePromptText)="onSaveVersionPromptText($event)"
+      (setActive)="onSetActiveVersion($event)"
+      (deletePromptVersion)="onDeletePromptVersion($event)"
+      (saveNewVersion)="onSaveNewVersion($event)"
+      (goToTest)="onGoToTest($event)"
+    >
+    </xp-prompt-version>
+
+    <xp-prompt-evaluation
+      *ngIf="
+        prompt && prompt.id > 0 && selectedVersion && selectedVersion.id > 0
+      "
+      [promptId]="prompt.id"
+      [versionId]="selectedVersion.id"
+    ></xp-prompt-evaluation>
+  </div>
+
+  <ng-template #stateTpl>
+    <div class="wa-state" *ngIf="loading">Učitavam…</div>
+    <div class="wa-state error" *ngIf="!loading && error">{{ error }}</div>
+  </ng-template>
+</div>

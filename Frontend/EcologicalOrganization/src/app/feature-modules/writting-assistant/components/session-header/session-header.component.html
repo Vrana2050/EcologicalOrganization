@@ -1,0 +1,93 @@
+<section class="wa-card">
+  <div class="wa-header-top">
+    <div class="wa-header-left">
+      <div class="wa-title-wrap">
+        <ng-container *ngIf="!editingTitle; else editTpl">
+          <h2 class="wa-title">{{ title }}</h2>
+          <button
+            class="wa-btn icon small"
+            (click)="startEdit()"
+            aria-label="Uredi naslov"
+          >
+            ✎
+          </button>
+        </ng-container>
+
+        <ng-template #editTpl>
+          <div class="wa-edit-wrap">
+            <input
+              class="wa-input small"
+              type="text"
+              [(ngModel)]="titleDraft"
+              (keyup.enter)="trySave()"
+              (blur)="trySave()"
+              [class.invalid]="invalidTitle"
+              placeholder="Unesi naslov…"
+            />
+            <button class="wa-btn small" (click)="trySave()">✔</button>
+            <button class="wa-btn danger small" (click)="cancelEdit()">
+              ✕
+            </button>
+          </div>
+        </ng-template>
+      </div>
+
+      <div class="wa-doc-type">
+        <label class="wa-label">Tip dokumenta</label>
+
+        <ng-container *ngIf="isTestSession; else selectTpl">
+          <div class="pa-doc-type" [title]="selectedDocType?.description || ''">
+            {{ selectedDocType?.name || "—" }}
+          </div>
+        </ng-container>
+
+        <ng-template #selectTpl>
+          <select
+            id="docTypeSelect"
+            class="wa-input small wa-doc-type-select"
+            [disabled]="!documentTypes.length"
+            [ngModel]="documentTypeId"
+            (ngModelChange)="onDocTypeChanged($event)"
+          >
+            <option *ngFor="let dt of documentTypes" [value]="dt.id">
+              {{ dt.name === "Default" ? "" : dt.name }}
+            </option>
+          </select>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="wa-doc-desc"
+    *ngIf="selectedDocType && selectedDocType.name !== 'Default'"
+  >
+    <strong>{{ selectedDocType.name }}</strong>
+    <div class="wa-doc-desc-text" [title]="selectedDocType.description || ''">
+      {{ selectedDocType.description || "—" }}
+    </div>
+  </div>
+
+  <div class="wa-stack">
+    <div>
+      <label class="wa-label" for="giTextarea">Globalne instrukcije</label>
+      <textarea
+        id="giTextarea"
+        class="wa-input"
+        [ngModel]="globalInstruction"
+        (ngModelChange)="onGlobalInstructionInput($event)"
+        rows="4"
+        placeholder="Npr: Koristi stručan i koncizan ton…"
+      ></textarea>
+    </div>
+
+    <div class="wa-actions">
+      <button class="wa-btn" (click)="addSection.emit()">
+        ＋ Dodaj sekciju
+      </button>
+      <button class="wa-btn" (click)="viewDocument.emit()">
+        Pogledaj ceo dokument
+      </button>
+    </div>
+  </div>
+</section>

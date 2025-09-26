@@ -1,0 +1,124 @@
+<section class="wa-card">
+  <div class="wa-section-head">
+    <div class="wa-title-wrap">
+      <ng-container *ngIf="!editingTitle; else editTitleTpl">
+        <h3 class="wa-section-title">{{ section.name || "Sekcija" }}</h3>
+        <div class="wa-edit-icon" (click)="startEditTitle()">✎</div>
+      </ng-container>
+
+      <ng-template #editTitleTpl>
+        <div class="wa-edit-wrap">
+          <input
+            class="wa-input"
+            type="text"
+            [(ngModel)]="titleDraft"
+            placeholder="Naziv sekcije"
+            (keyup.enter)="trySaveTitle()"
+            (blur)="trySaveTitle()"
+            [class.invalid]="invalidTitle"
+          />
+          <button class="wa-btn small" (click)="trySaveTitle()">✔</button>
+          <button class="wa-btn danger small" (click)="cancelEditTitle()">
+            ✕
+          </button>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="wa-section-actions">
+      <div class="iter-nav" *ngIf="showIterationNav">
+        <button
+          class="wa-btn small"
+          [disabled]="loadingIter || currentSeq <= 1"
+          [ngStyle]="{ visibility: currentSeq > 1 ? 'visible' : 'hidden' }"
+          (click)="goPrev()"
+        >
+          ←
+        </button>
+        <span class="iter-indicator">{{ currentSeq }}/{{ maxSeq }}</span>
+        <button
+          class="wa-btn small"
+          [disabled]="loadingIter || currentSeq >= maxSeq"
+          [ngStyle]="{ visibility: currentSeq < maxSeq ? 'visible' : 'hidden' }"
+          (click)="goNext()"
+        >
+          →
+        </button>
+      </div>
+
+      <button
+        class="wa-btn small"
+        type="button"
+        *ngIf="section?.latestIteration?.modelOutput?.id"
+        (click)="openFeedbackModal()"
+      >
+        ⭐ Oceni
+      </button>
+
+      <button
+        class="wa-btn"
+        (click)="onGenerate()"
+        [disabled]="generating || loadingIter"
+        [class.loading]="generating"
+        title="{{ generating ? 'Generisanje u toku…' : '' }}"
+      >
+        ⚡ Generiši sadržaj sekcije
+      </button>
+
+      <button class="wa-btn danger" (click)="onRemove()">Ukloni sekciju</button>
+    </div>
+  </div>
+
+  <div class="wa-container">
+    <div class="wa-col">
+      <label class="wa-label">Instrukcije</label>
+      <textarea
+        class="wa-input"
+        [(ngModel)]="instructionText"
+        rows="4"
+        placeholder="Specifične instrukcije za ovu sekciju…"
+      ></textarea>
+    </div>
+
+    <div class="wa-col">
+      <div class="result-head">
+        <label class="wa-label">Rezultat</label>
+        <div class="result-actions" *ngIf="statusMessageResult">
+          <button
+            class="wa-btn success small"
+            type="button"
+            [disabled]="loadingIter || currentSeq === 0"
+            (click)="onSaveResult()"
+          >
+            Sačuvaj
+          </button>
+          <div
+            class="status"
+            [class.unsaved]="statusTypeResult === 'unsaved'"
+            [class.saved]="statusTypeResult === 'saved'"
+          >
+            {{ statusMessageResult }}
+          </div>
+        </div>
+      </div>
+
+      <textarea
+        #resultArea
+        class="wa-input wa-result"
+        [(ngModel)]="resultDraft"
+        (ngModelChange)="onResultChange()"
+        (input)="autoGrow($event)"
+        placeholder="Još uvek nema rezultata…"
+      ></textarea>
+    </div>
+  </div>
+</section>
+
+<wa-add-output-feedback
+  *ngIf="feedbackModalOpen"
+  [modelOutputId]="section.latestIteration?.modelOutput?.id || 0"
+  [sectionName]="section.name || 'Sekcija'"
+  [seqNo]="currentSeq"
+  (close)="closeFeedbackModal()"
+  (submitted)="onFeedbackSubmitted($event)"
+></wa-add-output-feedback>

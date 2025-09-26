@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  fastapi-app:
+    build: .
+    container_name: fastapi-app
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      - oracle-db
+    environment:
+      DATABASE_URL: oracle+oracledb://system:MyPassword123@oracle-db:1521/XEPDB1
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+
+  oracle-db:
+    image: container-registry.oracle.com/database/express:latest
+    container_name: oracle-xe
+    restart: always
+    environment:
+      ORACLE_PDB: XEPDB1
+      ORACLE_PWD: MyPassword123
+      ORACLE_SID: XE
+      ORACLE_CHARACTERSET: AL32UTF8
+    ports:
+      - "1521:1521"
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+
+volumes:
+  oracle-data: {}

@@ -4,13 +4,35 @@ import { HomeComponent } from 'src/app/feature-modules/layout/home/home.componen
 import { LoginComponent } from '../auth/login/login.component';
 import { AuthGuard } from '../auth/auth.guard';
 import { RegistrationComponent } from '../auth/registration/registration.component';
-
+import { WritingAssistantPageComponent } from 'src/app/feature-modules/writting-assistant/page/writing-assistant-page/writing-assistant-page.component';
+import { PromptAdminModule } from 'src/app/feature-modules/prompt-admin/prompt-admin.module';
+import { PromptAdminPageComponent } from 'src/app/feature-modules/prompt-admin/page/admin-page/admin-page.component';
+import { DocumentTypeManagementComponent } from 'src/app/feature-modules/prompt-admin/page/document-type-management/document-type-management.component';
 const routes: Routes = [
-  { path: 'home', component: HomeComponent },
+  { path: '', component: HomeComponent, canActivate: [AuthGuard] },
   { path: 'login', component: LoginComponent },
   {
     path: 'register',
     component: RegistrationComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['ADMIN'] },
+  },
+
+  { path: 'writing-assistant', component: WritingAssistantPageComponent },
+  {
+    path: 'writing-assistant/:sessionId',
+    component: WritingAssistantPageComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'dashboard',
+    component: PromptAdminPageComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['ADMIN'] },
+  },
+  {
+    path: 'document-type-management',
+    component: DocumentTypeManagementComponent,
     canActivate: [AuthGuard],
     data: { roles: ['ADMIN'] },
   },

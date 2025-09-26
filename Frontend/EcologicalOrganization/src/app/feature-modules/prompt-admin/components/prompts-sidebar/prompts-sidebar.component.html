@@ -1,0 +1,51 @@
+<aside class="sidebar">
+  <div class="brand">
+    <div class="dot"></div>
+    <a class="sidebar-title" href="/"><h1>Admin Dashboard</h1></a>
+  </div>
+
+  <div class="quick-links">
+    <a href="/document-type-management" class="quick-link"
+      >Upravljaj tipovima dokumenata ↗</a
+    >
+    <a class="quick-link" (click)="openSystemAnalytics.emit()"
+      >Analitika celog sistema ↗</a
+    >
+    <a class="quick-link" href="/register">Kreiraj novog korisnika ↗</a>
+  </div>
+
+  <button class="wa-btn primary" (click)="onCreateNewPrompt()">
+    + Kreiraj novi prompt
+  </button>
+
+  <div class="section-title">Promptovi</div>
+
+  <div *ngIf="loading">Učitavanje...</div>
+
+  <div class="list" *ngIf="!loading">
+    <div
+      class="item"
+      *ngFor="let p of prompts"
+      [class.selected]="p.id === selectedId"
+    >
+      <div class="avatar" (click)="onSelectPrompt(p)">📄</div>
+
+      <div class="meta" (click)="onSelectPrompt(p)">
+        <div class="title">
+          {{ p.title || "(bez naslova)" }}
+          <span *ngIf="p.isActive" class="badge">aktivan</span>
+        </div>
+        <div class="sub">
+          {{ p.updatedAt ? (p.updatedAt | date : "short") : "" }}
+        </div>
+      </div>
+
+      <div class="menu-wrap" (click)="$event.stopPropagation()">
+        <button class="menu-btn" (click)="toggleMenu(p.id)">⋮</button>
+        <div class="menu" *ngIf="menuOpenId === p.id">
+          <button class="menu-item" (click)="onDelete(p.id)">Obriši</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</aside>

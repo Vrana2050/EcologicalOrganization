@@ -1,0 +1,44 @@
+<div class="app" [class.show-versions]="showVersionsSidebar">
+  <pa-prompts-sidebar
+    [prompts]="prompts"
+    [selectedId]="showSystemAnalytics ? null : activePrompt?.id"
+    [loading]="loading"
+    (createNewPrompt)="onCreateNewPrompt()"
+    (selectPrompt)="onSelectPrompt($event)"
+    (deletePrompt)="onDeletePrompt($event)"
+    (openSystemAnalytics)="onOpenSystemAnalytics()"
+  ></pa-prompts-sidebar>
+
+  <pa-versions-sidebar
+    *ngIf="showVersionsSidebar && !showSystemAnalytics"
+    [versions]="versions"
+    [loading]="versionsLoading"
+    [selectedId]="activePrompt?.activeVersion?.id || null"
+    (selected)="onVersionSelected($event)"
+    (createNewVersion)="onCreateNewVersion()"
+  >
+  </pa-versions-sidebar>
+
+  <main class="main">
+    <div
+      class="workspace"
+      *ngIf="!showSystemAnalytics && activePrompt as prompt"
+    >
+      <pa-prompt-editor
+        [prompt]="prompt"
+        [selectedVersion]="prompt.activeVersion || null"
+        (deletePrompt)="onDeletePrompt($event)"
+        (deletePromptVersion)="onDeletePromptVersion($event)"
+        (savePrompt)="onSavePrompt($event)"
+        (saveVersionBasicInfo)="onSaveVersionBasicInfo($event)"
+        (saveVersionPromptText)="onSaveVersionPromptText($event)"
+        (saveNewVersion)="onSaveNewVersion($event)"
+        (createNewVersion)="onCreateNewVersion()"
+        (saveNewPrompt)="onSaveNewPrompt($event)"
+        (setActiveVersion)="onSetActiveVersion($event)"
+      ></pa-prompt-editor>
+    </div>
+
+    <xp-system-analytics *ngIf="showSystemAnalytics"></xp-system-analytics>
+  </main>
+</div>

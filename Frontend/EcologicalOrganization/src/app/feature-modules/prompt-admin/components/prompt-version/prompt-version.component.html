@@ -1,0 +1,121 @@
+<section class="wa-card pa-card">
+  <div class="pa-header-top">
+    <h3 class="pa-card-title">Osnovni podaci verzije</h3>
+    <div
+      class="status"
+      *ngIf="statusMessageBasic && !isNew"
+      [class.unsaved]="statusTypeBasic === 'unsaved'"
+      [class.saved]="statusTypeBasic === 'saved'"
+    >
+      {{ statusMessageBasic }}
+    </div>
+  </div>
+
+  <div class="pa-grid-2">
+    <div class="pa-field">
+      <label class="wa-label">Naziv</label>
+      <input
+        class="wa-input name"
+        type="text"
+        [disabled]="isDisabled"
+        [(ngModel)]="nameDraft"
+        (ngModelChange)="onBasicChange()"
+        placeholder="npr. v3 - Neutral"
+      />
+    </div>
+  </div>
+
+  <div class="pa-field">
+    <textarea
+      class="wa-input"
+      rows="4"
+      [disabled]="isDisabled"
+      [(ngModel)]="descriptionDraft"
+      (ngModelChange)="onBasicChange()"
+      placeholder="Kratak opis ove verzije…"
+    ></textarea>
+  </div>
+
+  <div class="pa-actions" *ngIf="!isNew">
+    <div class="pa-actions-left">
+      <button
+        *ngIf="!isActive; else activeTpl"
+        class="wa-btn success"
+        type="button"
+        [disabled]="isDisabled"
+        (click)="onSetActive()"
+      >
+        Postavi kao aktivnu
+      </button>
+      <ng-template #activeTpl>
+        <button class="wa-btn success solid" type="button" disabled>
+          Aktivna verzija
+        </button>
+      </ng-template>
+    </div>
+
+    <div class="pa-actions-right">
+      <button
+        class="wa-btn"
+        type="button"
+        [disabled]="isDisabled"
+        (click)="onSaveBasicInfo()"
+      >
+        Sačuvaj
+      </button>
+
+      <button
+        class="wa-btn danger"
+        type="button"
+        (click)="onDeletePromptVersion()"
+      >
+        Obriši verziju
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="wa-card pa-card prompt-text">
+  <div class="pa-header-top">
+    <h3 class="pa-card-title">Prompt tekst</h3>
+    <div
+      class="status"
+      *ngIf="statusMessageText && !isNew"
+      [class.unsaved]="statusTypeText === 'unsaved'"
+      [class.saved]="statusTypeText === 'saved'"
+    >
+      {{ statusMessageText }}
+    </div>
+  </div>
+
+  <div class="pa-field">
+    <textarea
+      class="wa-input mono"
+      rows="10"
+      [disabled]="isDisabled"
+      [(ngModel)]="promptTextDraft"
+      (ngModelChange)="onTextChange()"
+      placeholder="Ovde unesi tekst prompta…"
+    ></textarea>
+  </div>
+
+  <div class="pa-actions pa-actions-right">
+    <button
+      class="wa-btn"
+      type="button"
+      *ngIf="isNew"
+      (click)="onSaveNewVersion()"
+    >
+      Kreiraj novu verziju
+    </button>
+
+    <ng-container *ngIf="!isNew">
+      <button class="wa-btn" type="button" (click)="onSavePromptText()">
+        Sačuvaj tekst
+      </button>
+      <button class="wa-btn" type="button" (click)="onGoToTestPage()">
+        Idi na stranicu za testiranje prompta ↗
+      </button>
+    </ng-container>
+  </div>
+</section>

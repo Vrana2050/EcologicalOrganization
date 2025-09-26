@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+oracledb
+pydantic
+sqlacodegen
+dependency-injector
+loguru
+python-multipart
+openai
+python-dotenv
+xhtml2pdf

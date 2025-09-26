@@ -1,0 +1,61 @@
+.app {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  height: 100vh;
+}
+
+.app.show-templates {
+  grid-template-columns: 320px 280px 1fr;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.topbar {
+  height: 56px;
+  border-bottom: 1px solid var(--wa-line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.02), transparent);
+}
+
+.breadcrumbs {
+  font-size: 13px;
+  color: var(--wa-muted);
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--wa-muted);
+}
+
+.workspace {
+  flex: 1;
+  overflow: auto;
+  padding: 24px;
+}
+
+.welcome {
+  max-width: 720px;
+  margin: 32px auto;
+  border: 1px dashed var(--wa-line);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  background: var(--wa-panel);
+}
+
+.welcome h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+}
+
+.welcome p {
+  margin: 0 0 16px;
+  color: var(--wa-muted);
+}

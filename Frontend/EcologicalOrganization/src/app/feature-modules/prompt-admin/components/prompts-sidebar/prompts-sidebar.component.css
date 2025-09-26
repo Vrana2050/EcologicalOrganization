@@ -1,0 +1,174 @@
+.sidebar {
+  background: var(--wa-panel);
+  border-right: 1px solid var(--wa-line);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  height: 100%;
+  min-width: 280px;
+}
+
+a.sidebar-title {
+  text-decoration: none;
+  color: black;
+}
+
+a.sidebar-title h1 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--wa-accent);
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: 0.2px;
+}
+
+.section-title {
+  color: var(--wa-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 10px 8px 6px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.item {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.item:hover {
+  background: var(--wa-hover);
+  border-color: var(--wa-line);
+}
+
+.item.selected {
+  background: var(--wa-selected);
+  border-color: var(--wa-accent);
+}
+
+.avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: var(--wa-panel-2);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  color: var(--wa-muted);
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.title {
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sub {
+  font-size: 12px;
+  color: var(--wa-muted);
+}
+
+.badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--wa-line);
+  color: #fff;
+  background-color: green;
+  margin-left: 20px;
+}
+
+.menu-wrap {
+  margin-left: auto;
+  position: relative;
+}
+
+.menu-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--wa-muted);
+}
+
+.menu {
+  position: absolute;
+  right: 0;
+  top: 24px;
+  background: var(--wa-panel-2);
+
+  border-radius: 6px;
+  padding: 4px 0;
+  min-width: 100px;
+  z-index: 10;
+}
+
+.menu-item {
+  display: block;
+  width: 100%;
+  padding: 6px 12px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.menu-item:hover {
+  background: var(--wa-hover);
+}
+
+.quick-links {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 8px 12px;
+}
+
+.quick-link {
+  font-size: 15px;
+
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s, transform 0.1s;
+}
+
+.quick-link:hover {
+  color: var(--wa-accent); /* hover naglasak */
+  transform: translateX(2px);
+}

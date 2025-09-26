@@ -1,7 +1,6 @@
-version: '3.8'
+version: "3.8"
 
 services:
-
   gateway-api:
     build:
       context: ./GatewayService
@@ -29,19 +28,17 @@ services:
     ports:
       - "9000:9000"
 
-  
   user-management-service:
-     build:
-       context: ./UserManagement
-       dockerfile: Dockerfile
-     image: user-management-service:latest
-     depends_on:
-       - user-management-postgres
-     ports:
-       - "8007:8007"
-     environment:
+    build:
+      context: ./UserManagement
+      dockerfile: Dockerfile
+    image: user-management-service:latest
+    depends_on:
+      - user-management-postgres
+    ports:
+      - "8007:8007"
+    environment:
       DATABASE_URL: "postgresql+psycopg2://postgres:postgres@user-management-postgres:5432/UserManagement"
-
 
   user-management-postgres:
     image: postgres:16
@@ -56,43 +53,42 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
 
-  project-realization-service:
-    build:
-      context: ./ProjectRealization/pr
-      dockerfile: ./Dockerfile
-    image: project-realization:latest
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@//host.docker.internal:1522/XEPDB1
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    ports:
-      - "8006:8006"
-  
-  document-preparation-service:
-    build:
-      context: ./DocumentPreparation/DocumentPreparationService
-      dockerfile: ./Dockerfile
-    image: document-preparation-service:latest
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@//host.docker.internal:1521/XEPDB1
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    ports:
-      - "8005:8005"
+  # project-realization-service:
+  #   build:
+  #     context: ./ProjectRealization/pr
+  #     dockerfile: ./Dockerfile
+  #   image: project-realization:latest
+  #   environment:
+  #     - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@//host.docker.internal:1522/XEPDB1
+  #   extra_hosts:
+  #     - "host.docker.internal:host-gateway"
+  #   ports:
+  #     - "8006:8006"
 
-  document-management-service:
-    build:
-      context: ./DocumentManagement/app
-      dockerfile: ./Dockerfile
-    image: document-management-service:latest
-    environment:
-      - DATABASE_URL=jdbc:oracle:thin:@//host.docker.internal:1521/XEPDB1
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    ports:
-      - "8080:8080"
+  # document-preparation-service:
+  #   build:
+  #     context: ./DocumentPreparation/DocumentPreparationService
+  #     dockerfile: ./Dockerfile
+  #   image: document-preparation-service:latest
+  #   environment:
+  #     - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@//host.docker.internal:1521/XEPDB1
+  #   extra_hosts:
+  #     - "host.docker.internal:host-gateway"
+  #   ports:
+  #     - "8005:8005"
 
-  
+  # document-management-service:
+  #   build:
+  #     context: ./DocumentManagement/app
+  #     dockerfile: ./Dockerfile
+  #   image: document-management-service:latest
+  #   environment:
+  #     - DATABASE_URL=jdbc:oracle:thin:@//host.docker.internal:1521/XEPDB1
+  #   extra_hosts:
+  #     - "host.docker.internal:host-gateway"
+  #   ports:
+  #     - "8080:8080"
+
   #writing-assistant-service:
   #  build:
   #    context: ./WritingAssistant
@@ -105,9 +101,46 @@ services:
   #  ports:
   #    - "8000:8000"
 
+  oracle-xe:
+    image: container-registry.oracle.com/database/express:latest
+    container_name: oracle-xe-nais
+    restart: unless-stopped
+    environment:
+      ORACLE_PDB: XEPDB1
+      ORACLE_PWD: MyPassword123
+      ORACLE_SID: XE
+      ORACLE_CHARACTERSET: AL32UTF8
+    ports:
+      - "1521:1521"
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+    networks:
+      default:
+        aliases:
+          - oracle-xe-nais
+  writing-assistant-service:
+    build:
+      context: ./WritingAssistant
+      dockerfile: ./Dockerfile
+    image: writing-assistant-service:latest
+    depends_on:
+      - oracle-xe
+    environment:
+      DATABASE_URL: "oracle+oracledb://system:MyPassword123@oracle-xe-nais:1521/XEPDB1"
+    volumes:
+      - ./WritingAssistant:/app
+      - wa_data:/app/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8000:8000"
+
 volumes:
   pg_data:
-
+  oracle-data:
+    external: true
+    name: writingassistant_oracle-data
+  wa_data:
 
   # document-service:
   #   build:
@@ -167,18 +200,18 @@ volumes:
   #     - "27017:27017"
 
   #graph-service:
-   # build:
-     # context: ./GraphDatabaseService
-     # dockerfile: Dockerfile
-    #image: graph-spring-example:latest
-   # depends_on:
-   #   - eureka-server
-    #  - neo4j
-   # environment:
-   #   EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
-   #   SPRING_NEO4J_URI: "bolt://neo4j:7687"
-   #   SPRING_NEO4J_USERNAME: neo4j
-   #   SPRING_NEO4J_PASSWORD: password
+  # build:
+  # context: ./GraphDatabaseService
+  # dockerfile: Dockerfile
+  #image: graph-spring-example:latest
+  # depends_on:
+  #   - eureka-server
+  #  - neo4j
+  # environment:
+  #   EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+  #   SPRING_NEO4J_URI: "bolt://neo4j:7687"
+  #   SPRING_NEO4J_USERNAME: neo4j
+  #   SPRING_NEO4J_PASSWORD: password
 
   # elastic-search-service:
   #   build:
@@ -193,7 +226,6 @@ volumes:
   #   environment:
   #     SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
   #     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
-
 #  timeseries-service:
 #    build:
 #      context: ./TimeseriesDatabaseService
@@ -221,109 +253,109 @@ volumes:
 #      - DOCKER_INFLUXDB_INIT_BUCKET=nais_bucket
 #      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token
 
-  #neo4j:
-   # image: neo4j
-   # container_name: neo4j
-   # ports:
-   #   - "7474:7474"
-   #   - "7687:7687"
-   # environment:
-   #   NEO4J_AUTH: neo4j/password
-   # volumes:
-   #   - ./data:/data
+#neo4j:
+# image: neo4j
+# container_name: neo4j
+# ports:
+#   - "7474:7474"
+#   - "7687:7687"
+# environment:
+#   NEO4J_AUTH: neo4j/password
+# volumes:
+#   - ./data:/data
 
-  # elasticsearch:
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
-  #   container_name: elasticsearch
-  #   restart: always
-  #   ports:
-  #     - ${ELASTICSEARCH_PORT}:${ELASTICSEARCH_PORT}
-  #   env_file:
-  #     - .env
-  #   environment:
-  #     - xpack.security.enabled=false
-  #     - discovery.type=single-node
-  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-  #   ulimits:
-  #     memlock:
-  #       soft: -1
-  #       hard: -1
+# elasticsearch:
+#   image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
+#   container_name: elasticsearch
+#   restart: always
+#   ports:
+#     - ${ELASTICSEARCH_PORT}:${ELASTICSEARCH_PORT}
+#   env_file:
+#     - .env
+#   environment:
+#     - xpack.security.enabled=false
+#     - discovery.type=single-node
+#     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+#   ulimits:
+#     memlock:
+#       soft: -1
+#       hard: -1
 
-  # etcd:
-  #   container_name: milvus-etcd
-  #   image: quay.io/coreos/etcd:v3.5.5
-  #   environment:
-  #     - ETCD_AUTO_COMPACTION_MODE=revision
-  #     - ETCD_AUTO_COMPACTION_RETENTION=1000
-  #     - ETCD_QUOTA_BACKEND_BYTES=4294967296
-  #     - ETCD_SNAPSHOT_COUNT=50000
-  #   volumes:
-  #     - ${DOCKER_VOLUME_DIRECTORY:-.}/VectorDatabaseService/volumes/etcd:/etcd
-  #   command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
-  #   healthcheck:
-  #     test: ["CMD", "etcdctl", "endpoint", "health"]
-  #     interval: 30s
-  #     timeout: 20s
-  #     retries: 3
+# etcd:
+#   container_name: milvus-etcd
+#   image: quay.io/coreos/etcd:v3.5.5
+#   environment:
+#     - ETCD_AUTO_COMPACTION_MODE=revision
+#     - ETCD_AUTO_COMPACTION_RETENTION=1000
+#     - ETCD_QUOTA_BACKEND_BYTES=4294967296
+#     - ETCD_SNAPSHOT_COUNT=50000
+#   volumes:
+#     - ${DOCKER_VOLUME_DIRECTORY:-.}/VectorDatabaseService/volumes/etcd:/etcd
+#   command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+#   healthcheck:
+#     test: ["CMD", "etcdctl", "endpoint", "health"]
+#     interval: 30s
+#     timeout: 20s
+#     retries: 3
 
-  # minio:
-  #   container_name: milvus-minio
-  #   image: minio/minio:RELEASE.2023-03-20T20-16-18Z
-  #   environment:
-  #     MINIO_ACCESS_KEY: minioadmin
-  #     MINIO_SECRET_KEY: minioadmin
-  #   ports:
-  #     - "9001:9001"
-  #     - "9000:9000"
-  #   volumes:
-  #     - ${DOCKER_VOLUME_DIRECTORY:-.}/VectorDatabaseService/volumes/minio:/minio_data
-  #   command: minio server /minio_data --console-address ":9001"
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-  #     interval: 30s
-  #     timeout: 20s
-  #     retries: 3
+# minio:
+#   container_name: milvus-minio
+#   image: minio/minio:RELEASE.2023-03-20T20-16-18Z
+#   environment:
+#     MINIO_ACCESS_KEY: minioadmin
+#     MINIO_SECRET_KEY: minioadmin
+#   ports:
+#     - "9001:9001"
+#     - "9000:9000"
+#   volumes:
+#     - ${DOCKER_VOLUME_DIRECTORY:-.}/VectorDatabaseService/volumes/minio:/minio_data
+#   command: minio server /minio_data --console-address ":9001"
+#   healthcheck:
+#     test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+#     interval: 30s
+#     timeout: 20s
+#     retries: 3
 
-  # standalone:
-  #   container_name: milvus-standalone
-  #   image: milvusdb/milvus:v2.4.0
-  #   command: ["milvus", "run", "standalone"]
-  #   security_opt:
-  #   - seccomp:unconfined
-  #   environment:
-  #     ETCD_ENDPOINTS: etcd:2379
-  #     MINIO_ADDRESS: minio:9000
-  #   volumes:
-  #     - ${DOCKER_VOLUME_DIRECTORY:-.}/VectorDatabaseService/volumes/milvus:/var/lib/milvus
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
-  #     interval: 30s
-  #     start_period: 90s
-  #     timeout: 20s
-  #     retries: 3
-  #   ports:
-  #     - "19530:19530"
-  #     - "9091:9091"
-  #   depends_on:
-  #     - "etcd"
-  #     - "minio"
+# standalone:
+#   container_name: milvus-standalone
+#   image: milvusdb/milvus:v2.4.0
+#   command: ["milvus", "run", "standalone"]
+#   security_opt:
+#   - seccomp:unconfined
+#   environment:
+#     ETCD_ENDPOINTS: etcd:2379
+#     MINIO_ADDRESS: minio:9000
+#   volumes:
+#     - ${DOCKER_VOLUME_DIRECTORY:-.}/VectorDatabaseService/volumes/milvus:/var/lib/milvus
+#   healthcheck:
+#     test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+#     interval: 30s
+#     start_period: 90s
+#     timeout: 20s
+#     retries: 3
+#   ports:
+#     - "19530:19530"
+#     - "9091:9091"
+#   depends_on:
+#     - "etcd"
+#     - "minio"
 
-  # vector-database-service:
-  #  image: vector-database-service3
-  #  build:
-  #    context: ./VectorDatabaseService
-  #    dockerfile: Dockerfile
-  #  restart: on-failure
-  #  environment:
-  #    EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
-  #  ports:
-  #    - "8000:8000"
-  # #  command: uvicorn metodi:app --host 127.0.0.1 --port 8000
-  #  depends_on:
-  #    - eureka-server
-  #    - etcd
-  #    - minio
-  #    - standalone
+# vector-database-service:
+#  image: vector-database-service3
+#  build:
+#    context: ./VectorDatabaseService
+#    dockerfile: Dockerfile
+#  restart: on-failure
+#  environment:
+#    EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+#  ports:
+#    - "8000:8000"
+# #  command: uvicorn metodi:app --host 127.0.0.1 --port 8000
+#  depends_on:
+#    - eureka-server
+#    - etcd
+#    - minio
+#    - standalone
 
 #  kibana:
 #    image: docker.elastic.co/kibana/kibana:8.11.1
@@ -351,21 +383,20 @@ volumes:
 #    volumes:
 #      - 'grafana_storage:/var/lib/grafana'
 
+# redisdb:
+#   image: redis:latest
+#   ports:
+#     - "6379:6379"
+#   volumes:
+#     - data:/var/lib/redis
 
-  # redisdb:
-  #   image: redis:latest
-  #   ports:
-  #     - "6379:6379"
-  #   volumes:
-  #     - data:/var/lib/redis
-
-  # redis-insight:
-  #   image: redislabs/redisinsight:latest
-  #   ports:
-  #     - "5540:5540"
-  #   depends_on:
-  #     - redisdb
-  #   environment:
-  #     REDIS_HOST: redisdb
-  #     REDIS_PORT: 6379
+# redis-insight:
+#   image: redislabs/redisinsight:latest
+#   ports:
+#     - "5540:5540"
+#   depends_on:
+#     - redisdb
+#   environment:
+#     REDIS_HOST: redisdb
+#     REDIS_PORT: 6379
 
