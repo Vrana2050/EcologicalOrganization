@@ -92,7 +92,7 @@ export class SessionSectionComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['section']) {
       this.hydrateFromSection();
-      this.generating = false; // reset kada parent pošalje novo stanje
+      this.generating = false;
       setTimeout(() => this.autoGrowFromRef(), 0);
     }
   }

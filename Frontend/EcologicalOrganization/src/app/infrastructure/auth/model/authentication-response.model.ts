@@ -1,4 +1,4 @@
 export interface AuthenticationResponse {
-  access_token: string; // match backend exactly
+  access_token: string;
   token_type: string;
 }

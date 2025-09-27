@@ -36,6 +36,8 @@ export class TemplateService {
   }
 
   create(formData: FormData): Observable<Template> {
+    formData.append('repo_folder_id', '3');
+
     return this.http.post<any>(this.baseUrl, formData).pipe(
       map(
         (t: any): Template => ({

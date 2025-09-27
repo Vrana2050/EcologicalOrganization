@@ -14,7 +14,7 @@ export type Subsystem = 'WA' | 'DM' | 'DP' | 'PM';
 
 export interface TokenResponse {
   access_token: string;
-  token_type: string; // "bearer"
+  token_type: string;
 }
 
 @Injectable({

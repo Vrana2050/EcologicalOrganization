@@ -11,7 +11,7 @@ from .base import Base
 class PromptVersion(Base):
     __tablename__ = 'prompt_version'
     __table_args__ = (
-        ForeignKeyConstraint(['created_by'], ['user.id'], name='fk_prompt_version_user'),
+
         ForeignKeyConstraint(['prompt_id'], ['prompt.id'], name='fk_prompt_version'),
         PrimaryKeyConstraint('id', name='sys_c008243')
     )
@@ -48,7 +48,7 @@ class PromptVersion(Base):
 
     stats_finalized_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(timezone=True))
 
-    user: Mapped['User'] = relationship('User', back_populates='prompt_version')
+
     prompt: Mapped['Prompt'] = relationship('Prompt', back_populates='prompt_version')
     prompt_active_history: Mapped[list['PromptActiveHistory']] = relationship('PromptActiveHistory', back_populates='prompt_version')
     prompt_execution: Mapped[list['PromptExecution']] = relationship('PromptExecution', back_populates='prompt_version')

@@ -12,7 +12,7 @@ class OutputFeedback(Base):
     __tablename__ = 'output_feedback'
     __table_args__ = (
         CheckConstraint('rating_value BETWEEN 1 AND 5', name='chk_rating_value'),
-        ForeignKeyConstraint(['created_by'], ['user.id'], name='fk_feedback_user'),
+
         ForeignKeyConstraint(['model_output_id'], ['model_output.id'], name='fk_feedback_output'),
         PrimaryKeyConstraint('id', name='sys_c008281')
     )
@@ -26,5 +26,5 @@ class OutputFeedback(Base):
     created_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(True), server_default=text('CURRENT_TIMESTAMP\n'))
     created_by_email: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
 
-    user: Mapped['User'] = relationship('User', back_populates='output_feedback')
+
     model_output: Mapped[Optional['ModelOutput']] = relationship('ModelOutput', back_populates='output_feedback')

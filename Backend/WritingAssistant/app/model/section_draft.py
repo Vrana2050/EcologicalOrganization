@@ -11,7 +11,6 @@ from .base import Base
 class SectionDraft(Base):
     __tablename__ = 'section_draft'
     __table_args__ = (
-        ForeignKeyConstraint(['created_by'], ['user.id'], name='fk_draft_user'),
         ForeignKeyConstraint(['model_output'], ['model_output.id'], name='fk_draft_output'),
         PrimaryKeyConstraint('id', name='sys_c008278')
     )
@@ -23,6 +22,5 @@ class SectionDraft(Base):
     content: Mapped[Optional[str]] = mapped_column(Text)
     created_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(True), server_default=text('CURRENT_TIMESTAMP\n'))
 
-    user: Mapped['User'] = relationship('User', back_populates='section_draft')
     model_output_: Mapped[Optional['ModelOutput']] = relationship('ModelOutput', back_populates='section_draft')
     section_iteration: Mapped[list['SectionIteration']] = relationship('SectionIteration', back_populates='section_draft')

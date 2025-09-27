@@ -20,12 +20,9 @@ import { CommonModule } from '@angular/common';
   ],
 })
 export class AddNewTemplateComponent implements OnInit {
-  /** Prosledi sve document_type-ove sa page-a ili parent-a */
   @Input() documentTypes: DocumentType[] = [];
 
-  /** Zatvaranje bez akcije */
   @Output() close = new EventEmitter<void>();
-  /** Emituje kreirani Template */
   @Output() created = new EventEmitter<Template>();
 
   form = {

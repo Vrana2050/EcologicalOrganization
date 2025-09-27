@@ -27,6 +27,7 @@ async def add_template(
     name: str = Form(...),
     document_type_id: int = Form(...),
     file: UploadFile = File(...),
+    repo_folder_id: int | None = Form(None),  
     user_id: int = Depends(get_current_user_id),
     service: TemplateService = Depends(Provide[Container.template_service]),
 ):
@@ -38,4 +39,5 @@ async def add_template(
         content=content,
         mime_type=file.content_type or "application/octet-stream",
         created_by=user_id,
+        repo_folder_id=repo_folder_id,  
     )

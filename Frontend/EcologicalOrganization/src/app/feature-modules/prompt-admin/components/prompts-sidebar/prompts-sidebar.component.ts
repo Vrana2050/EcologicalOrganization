@@ -20,7 +20,7 @@ export class PromptsSidebarComponent {
   @Output() createNewPrompt = new EventEmitter<void>();
   @Output() selectPrompt = new EventEmitter<Prompt>();
   @Output() deletePrompt = new EventEmitter<number>();
-  @Output() openSystemAnalytics = new EventEmitter<void>(); // NOVO
+  @Output() openSystemAnalytics = new EventEmitter<void>();
 
   menuOpenId: number | null = null;
 

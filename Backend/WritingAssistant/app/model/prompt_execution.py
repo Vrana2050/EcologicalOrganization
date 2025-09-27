@@ -12,7 +12,7 @@ from .base import Base
 class PromptExecution(Base):
     __tablename__ = 'prompt_execution'
     __table_args__ = (
-        ForeignKeyConstraint(['created_by'], ['user.id'], name='fk_exec_user'),
+
         ForeignKeyConstraint(['global_instruction_id'], ['global_instruction.id'], name='fk_exec_global_instr'),
         ForeignKeyConstraint(['pricing_id'], ['model_pricing.id'], name='fk_exec_pricing'),
         ForeignKeyConstraint(['prompt_version_id'], ['prompt_version.id'], name='fk_exec_prompt_ver'),
@@ -40,7 +40,7 @@ class PromptExecution(Base):
     finished_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(True))
     duration_ms: Mapped[Optional[int]] = mapped_column(Integer)
 
-    user: Mapped['User'] = relationship('User', back_populates='prompt_execution')
+
     global_instruction: Mapped[Optional['GlobalInstruction']] = relationship('GlobalInstruction', back_populates='prompt_execution')
     pricing: Mapped[Optional['ModelPricing']] = relationship('ModelPricing', back_populates='prompt_execution')
     prompt_version: Mapped['PromptVersion'] = relationship('PromptVersion', back_populates='prompt_execution')

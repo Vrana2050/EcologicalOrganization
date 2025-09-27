@@ -8,6 +8,7 @@ import { WritingAssistantPageComponent } from 'src/app/feature-modules/writting-
 import { PromptAdminModule } from 'src/app/feature-modules/prompt-admin/prompt-admin.module';
 import { PromptAdminPageComponent } from 'src/app/feature-modules/prompt-admin/page/admin-page/admin-page.component';
 import { DocumentTypeManagementComponent } from 'src/app/feature-modules/prompt-admin/page/document-type-management/document-type-management.component';
+import { DocumentManagementComponent } from 'src/app/feature-modules/prompt-admin/components/document-management/document-management.component';
 const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [AuthGuard] },
   { path: 'login', component: LoginComponent },
@@ -33,6 +34,12 @@ const routes: Routes = [
   {
     path: 'document-type-management',
     component: DocumentTypeManagementComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['ADMIN'] },
+  },
+  {
+    path: 'document-management',
+    component: DocumentManagementComponent,
     canActivate: [AuthGuard],
     data: { roles: ['ADMIN'] },
   },

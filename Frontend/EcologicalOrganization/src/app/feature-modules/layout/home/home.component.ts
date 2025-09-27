@@ -1,4 +1,3 @@
-// src/app/home/home.component.ts
 import { Component } from '@angular/core';
 import {
   AuthService,
@@ -27,7 +26,6 @@ export class HomeComponent {
       next: () => this.router.navigate([this.routeMap[subsystem]]),
       error: (err) => {
         console.error('Subsystem login failed', err);
-        // po želji: toast / redirect na login
       },
     });
   }

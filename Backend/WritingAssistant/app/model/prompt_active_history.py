@@ -24,5 +24,4 @@ class PromptActiveHistory(Base):
     activated_by: Mapped[Optional[int]] = mapped_column(BigInteger)
     activated_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(True), server_default=text('CURRENT_TIMESTAMP\n'))
 
-    user: Mapped[Optional['User']] = relationship('User', back_populates='prompt_active_history')
     prompt_version: Mapped['PromptVersion'] = relationship('PromptVersion', back_populates='prompt_active_history')

@@ -1,0 +1,151 @@
+.dm-card {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 24px rgba(0, 0, 0, 0.06);
+}
+
+.dm-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.dm-breadcrumbs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.crumb {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  cursor: pointer;
+}
+.crumb.active {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+  cursor: default;
+}
+
+.dm-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.wa-input,
+.wa-select {
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.wa-btn {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 10px;
+  background: #111827;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+.wa-btn.outline {
+  background: transparent;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+}
+.wa-btn.ghost {
+  background: transparent;
+  color: #6b7280;
+  border: 1px dashed #e5e7eb;
+}
+.wa-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dm-status {
+  font-size: 14px;
+}
+.dm-status .err {
+  color: #b91c1c;
+}
+
+.dm-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.dm-column h3 {
+  margin: 0 0 8px 0;
+}
+
+.grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+
+.card {
+  border: 1px solid #eef2f7;
+  border-radius: 14px;
+  padding: 10px;
+  display: grid;
+  gap: 6px;
+  background: #fafafa;
+}
+.card .icon {
+  font-size: 24px;
+}
+.card .name {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card .muted {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.card .row-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.card .mini {
+  justify-self: start;
+  border: 1px solid #e5e7eb;
+  background: white;
+  border-radius: 8px;
+  height: 28px;
+  padding: 0 8px;
+  cursor: pointer;
+}
+.card .mini.danger {
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+.card .mini:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.empty {
+  color: #6b7280;
+  font-style: italic;
+}

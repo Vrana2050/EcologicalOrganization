@@ -2,12 +2,9 @@ from .base import Base
 
 from .document_type import DocumentType
 from .model_pricing import ModelPricing
-from .role import Role
-from .template_file import TemplateFile
-from .user import User
+from .storage_object import StorageObject
 from .prompt import Prompt
 from .template import Template
-from .user_role import UserRole
 from .chat_session import ChatSession
 from .prompt_version import PromptVersion
 from .template_section import TemplateSection
@@ -20,17 +17,17 @@ from .model_output import ModelOutput
 from .output_feedback import OutputFeedback
 from .section_draft import SectionDraft
 from .section_iteration import SectionIteration
+from .repo_folder import RepoFolder
+
 
 __all__ = [
     "Base",
     "DocumentType",
     "ModelPricing",
-    "Role",
-    "TemplateFile",
-    "User",
+    "StorageObject",
+    "RepoFolder",   
     "Prompt",
     "Template",
-    "UserRole",
     "ChatSession",
     "PromptVersion",
     "TemplateSection",
@@ -44,3 +41,4 @@ __all__ = [
     "SectionDraft",
     "SectionIteration",
 ]
+

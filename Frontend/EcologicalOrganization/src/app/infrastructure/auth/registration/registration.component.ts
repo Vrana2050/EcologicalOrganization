@@ -46,7 +46,6 @@ export class RegistrationComponent {
       next: () => {
         alert('Korisnik uspešno napravljen ✅');
 
-        // reset na početne vrednosti
         this.registrationForm.reset({
           name: '',
           surname: '',
@@ -61,7 +60,6 @@ export class RegistrationComponent {
         this.registrationForm.markAsUntouched();
       },
       error: (err) => {
-        // prikaži poruku od bekenda ako postoji
         const msg =
           err?.error?.detail ||
           err?.error?.message ||

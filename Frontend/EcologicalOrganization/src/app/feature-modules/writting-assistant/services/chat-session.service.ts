@@ -1,4 +1,3 @@
-// src/app/feature-modules/writting-assistant/services/chat-session.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, map, catchError, of } from 'rxjs';

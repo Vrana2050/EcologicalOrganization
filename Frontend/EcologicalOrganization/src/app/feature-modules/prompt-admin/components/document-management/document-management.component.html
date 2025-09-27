@@ -1,0 +1,144 @@
+<section class="dm-card">
+  <header class="dm-toolbar">
+    <nav class="dm-breadcrumbs" aria-label="Breadcrumb">
+      <button
+        class="crumb"
+        *ngFor="let c of breadcrumbs; let i = index"
+        (click)="goToCrumb(i)"
+        [disabled]="i === breadcrumbs.length - 1"
+        [class.active]="i === breadcrumbs.length - 1"
+        type="button"
+        title="Otvori nivo"
+      >
+        {{ c.name }}
+      </button>
+    </nav>
+
+    <div class="dm-actions">
+      <input
+        class="wa-input"
+        placeholder="Novi folder (naziv)"
+        [(ngModel)]="newFolderName"
+        (keyup.enter)="createFolder()"
+        aria-label="Naziv novog foldera"
+      />
+      <button
+        class="wa-btn"
+        (click)="createFolder()"
+        [disabled]="creating || !newFolderName.trim()"
+        type="button"
+      >
+        {{ creating ? "Kreiram..." : "Kreiraj folder" }}
+      </button>
+
+      <!-- Document Type selector -->
+      <select
+        class="wa-select"
+        [(ngModel)]="selectedDocumentTypeId"
+        aria-label="Tip dokumenta"
+        [disabled]="docTypesLoading || !docTypes.length"
+        title="Izaberi tip dokumenta"
+      >
+        <option [ngValue]="null" disabled>Tip dokumenta...</option>
+        <option *ngFor="let dt of docTypes" [ngValue]="dt.id">
+          {{ dt.name }}
+        </option>
+      </select>
+
+      <label class="wa-btn outline" title="Izaberi fajl">
+        Izaberi fajl
+        <input
+          id="dm-file-input"
+          type="file"
+          (change)="onFilePicked($event)"
+          hidden
+        />
+      </label>
+
+      <button
+        class="wa-btn"
+        (click)="uploadFile()"
+        [disabled]="
+          !selectedFile || uploading || selectedDocumentTypeId == null
+        "
+        type="button"
+        title="Otpremi izabrani fajl"
+      >
+        {{
+          uploading ? "Upload..." : selectedFile ? "Otpremi" : "Otpremi fajl"
+        }}
+      </button>
+
+      <button class="wa-btn ghost" (click)="refresh()" type="button">
+        Osvježi
+      </button>
+    </div>
+  </header>
+
+  <div class="dm-status" *ngIf="error || loading">
+    <span *ngIf="loading">Učitavam...</span>
+    <span class="err" *ngIf="error">{{ error }}</span>
+  </div>
+
+  <div class="dm-columns">
+    <!-- Folders -->
+    <div class="dm-column">
+      <h3>Folderi</h3>
+      <div class="empty" *ngIf="!folders?.length && !loading">
+        Nema foldera.
+      </div>
+
+      <ul class="grid">
+        <li class="card" *ngFor="let f of folders" (dblclick)="openFolder(f)">
+          <div class="icon">📁</div>
+          <div class="name" [title]="f.name">{{ f.name }}</div>
+
+          <div class="row-buttons">
+            <button class="mini" (click)="openFolder(f)" type="button">
+              Otvori
+            </button>
+            <button
+              class="mini danger"
+              (click)="deleteFolder(f, $event)"
+              [disabled]="deletingFolderIds.has(f.id)"
+              type="button"
+              title="Obriši folder"
+            >
+              {{ deletingFolderIds.has(f.id) ? "Brišem..." : "Obriši" }}
+            </button>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Files -->
+    <div class="dm-column">
+      <h3>Fajlovi</h3>
+      <div class="empty" *ngIf="!files?.length && !loading">Nema fajlova.</div>
+
+      <ul class="grid">
+        <li class="card" *ngFor="let file of files">
+          <div class="icon">📄</div>
+          <div class="name" [title]="file.originalName">
+            {{ file.originalName }}
+          </div>
+          <div class="muted">
+            {{ prettyBytes(file.sizeBytes) }} · {{ file.mimeType || "unknown" }}
+          </div>
+
+          <div class="row-buttons">
+            <button
+              class="mini danger"
+              (click)="deleteFile(file)"
+              [disabled]="deletingFileIds.has(file.id)"
+              type="button"
+              title="Obriši fajl"
+            >
+              {{ deletingFileIds.has(file.id) ? "Brišem..." : "Obriši" }}
+            </button>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>

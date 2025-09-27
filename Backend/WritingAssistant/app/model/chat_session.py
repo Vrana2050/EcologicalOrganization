@@ -11,7 +11,6 @@ from .base import Base
 class ChatSession(Base):
     __tablename__ = 'chat_session'
     __table_args__ = (
-        ForeignKeyConstraint(['created_by'], ['user.id'], name='fk_chat_session_user'),
         ForeignKeyConstraint(['template_id'], ['template.id'], name='fk_chat_session_template'),
         ForeignKeyConstraint(['document_type_id'], ['document_type.id'], name='fk_chat_session_doc_type'),
         PrimaryKeyConstraint('id', name='sys_c008250')
@@ -29,7 +28,6 @@ class ChatSession(Base):
     is_test_session: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0'))  
     test_prompt_version_id: Mapped[Optional[int]] = mapped_column(BigInteger, nullable=True)
 
-    user: Mapped['User'] = relationship('User', back_populates='chat_session')
     template: Mapped['Template'] = relationship('Template', back_populates='chat_session')
     document_type: Mapped['DocumentType'] = relationship('DocumentType', back_populates='chat_session')
     global_instruction: Mapped[list['GlobalInstruction']] = relationship('GlobalInstruction', back_populates='session')

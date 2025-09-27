@@ -6,13 +6,14 @@ from sqlalchemy.orm import Session
 
 from app.services.base_service import BaseService
 from app.repository.template_repository import TemplateRepository
-from app.repository.template_file_repository import TemplateFileRepository
+from app.repository.storage_object_repository import StorageObjectRepository
 from app.schema.template_schema import TemplateOut, TemplatePageOut, TemplateQuery
 from app.schema.pagination_schema import PaginationMeta
 from app.model.template import Template
 from app.model.template_section import TemplateSection
 from app.services.template_parsers.registry import pick_parser
 from app.core.exceptions import ValidationError
+from typing import Optional
 
 STORAGE_DIR = Path("app/storage/templates")
 
@@ -20,7 +21,7 @@ STORAGE_DIR = Path("app/storage/templates")
 class TemplateService(BaseService):
     MAX_FILE_SIZE = 5 * 1024 * 1024
 
-    def __init__(self, repository: TemplateRepository, file_repository: TemplateFileRepository, session_factory):
+    def __init__(self, repository: TemplateRepository, file_repository: StorageObjectRepository, session_factory):
         super().__init__(repository)
         self.repo = repository
         self.file_repo = file_repository
@@ -57,8 +58,9 @@ class TemplateService(BaseService):
         content: bytes,
         mime_type: str,
         created_by: int,
+        repo_folder_id: Optional[int] = None,
     ) -> TemplateOut:
-        
+
         if not content:
             raise ValidationError(detail="Fajl je prazan")
 
@@ -70,18 +72,21 @@ class TemplateService(BaseService):
         except ValueError as e:
             raise ValidationError(detail=str(e))
         parsed = parser.parse(content, filename)
+
         with self.session_factory() as session:
-            tf = self.file_repo.save_to_storage(
+            so = self.file_repo.save_to_storage(
                 content=content,
                 original_name=filename,
                 mime_type=mime_type,
                 storage_dir=STORAGE_DIR,
+                created_by=created_by,
                 session=session,
+                repo_folder_id=repo_folder_id,
             )
             tpl = Template(
                 name=name,
                 document_type_id=document_type_id,
-                file_id=tf.id,
+                storage_object_id=so.id,
                 json_schema=json.dumps(parsed.json_schema, ensure_ascii=False) if parsed.json_schema else None,
                 created_by=created_by,
             )
@@ -97,6 +102,7 @@ class TemplateService(BaseService):
                 )
             session.commit()
             session.refresh(tpl)
+
         return TemplateOut(
             id=tpl.id,
             name=tpl.name,
