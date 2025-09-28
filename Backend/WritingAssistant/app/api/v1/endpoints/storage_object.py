@@ -39,6 +39,7 @@ async def create_storage_object(
     file: UploadFile = File(...),
     repo_folder_id: Optional[int] = Form(None),
     user_id: int = Depends(get_current_user_id),
+    document_type_id: int = Form(...),
     service: StorageObjectService = Depends(Provide[Container.storage_object_service]),
     _: CurrentUser = Depends(require_admin),
 ):
@@ -49,6 +50,7 @@ async def create_storage_object(
         mime_type=file.content_type,
         repo_folder_id=repo_folder_id,
         created_by=user_id,
+        document_type_id=document_type_id
     )
 
 

@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 
 class StorageObject(Base):
-    __tablename__ = "storage_object"   # fizički rename urađen u SQL migraciji
+    __tablename__ = "storage_object"   
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     path: Mapped[str] = mapped_column(Text, nullable=False)

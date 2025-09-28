@@ -21,7 +21,6 @@ from app.repository.analytics_repository import AnalyticsRepository
 from app.repository.storage_object_repository import StorageObjectRepository
 from app.repository.repo_folder_repository import RepoFolderRepository
 
-
 from app.services.chat_session_service import ChatSessionService
 from app.services.session_section_service import SessionSectionService
 from app.services.section_instruction_service import SectionInstructionService
@@ -43,6 +42,14 @@ from app.services.report.report_service import DocTypeReportService
 from app.services.report.doc_type_report_renderer import DocTypeReportHtmlRenderer
 from app.services.report.xhtml2pdf_engine import Xhtml2PdfEngine
 
+from app.repository.vector_repository import VectorRepository
+from app.services.vector_service import VectorService
+
+from app.services.rag.embedding_service import EmbeddingService
+from app.services.rag.chunking_service import ChunkingService
+from app.services.rag.summarization_service import SummarizationService
+from app.services.rag.vector_ingestion_service import VectorIngestionService
+
 
 class Container(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(
@@ -62,6 +69,11 @@ class Container(containers.DeclarativeContainer):
     )
 
     db = providers.Singleton(Database)
+    
+    vector_repository = providers.Singleton(VectorRepository)
+    vector_service = providers.Factory(VectorService, repository=vector_repository)
+
+
 
     chat_session_repository = providers.Factory(ChatSessionRepository, session_factory=db.provided.session)
     session_section_repository = providers.Factory(SessionSectionRepository, session_factory=db.provided.session)
@@ -81,7 +93,6 @@ class Container(containers.DeclarativeContainer):
     output_feedback_repository = providers.Factory(OutputFeedbackRepository, session_factory=db.provided.session)
     analytics_repository = providers.Factory(AnalyticsRepository, session_factory=db.provided.session)
     repo_folder_repository = providers.Factory(RepoFolderRepository, session_factory=db.provided.session)
-
 
     chat_session_service = providers.Factory(
         ChatSessionService,
@@ -118,7 +129,7 @@ class Container(containers.DeclarativeContainer):
     model_pricing_service = providers.Factory(
         ModelPricingService,
         repository=model_pricing_repository,
-)
+    )
 
     section_iteration_service = providers.Factory(
         SectionIterationService,
@@ -157,6 +168,7 @@ class Container(containers.DeclarativeContainer):
         file_repository=storage_object_repository,
         session_factory=db.provided.session,
     )
+
     output_feedback_service = providers.Factory(
         OutputFeedbackService,
         repository=output_feedback_repository,
@@ -183,14 +195,35 @@ class Container(containers.DeclarativeContainer):
     )
 
 
+    embedding_service = providers.Singleton(EmbeddingService)
+    chunking_service = providers.Singleton(
+        ChunkingService,
+        max_model_tokens=512,
+        target_tokens=360,
+        overlap_tokens=64,
+    )
+    
+    summarization_service = providers.Factory(SummarizationService, llm=llm_service)
+
+
+    vector_ingestion_service = providers.Factory(
+        VectorIngestionService,
+        vector_service=vector_service,
+        summarizer=summarization_service,
+        chunker=chunking_service,
+        embed=embedding_service,
+    )
+
+
     storage_object_service = providers.Factory(
         StorageObjectService,
         repository=storage_object_repository,
         session_factory=db.provided.session,
+        ingestion_service=vector_ingestion_service,   
     )
-    
     repo_folder_service = providers.Factory(
         RepoFolderService,
         repository=repo_folder_repository,
         session_factory=db.provided.session,
     )
+    

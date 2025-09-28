@@ -9,16 +9,19 @@ from app.schema.storage_object_schema import (
 )
 from app.schema.pagination_schema import PaginationMeta
 
+
+
 STORAGE_DIR = Path("app/storage/objects")
 
 
 class StorageObjectService(BaseService):
-    MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB (po potrebi)
+    MAX_FILE_SIZE = 50 * 1024 * 1024 
 
-    def __init__(self, repository: StorageObjectRepository, session_factory):
+    def __init__(self, repository: StorageObjectRepository, session_factory, ingestion_service=None):
         super().__init__(repository)
         self.repo = repository
         self.session_factory = session_factory
+        self.ingestion = ingestion_service
 
     def list(self, page: int = 1, per_page: int = 20, repo_folder_id: Optional[int] = None) -> StorageObjectPageOut:
         q = StorageObjectQuery(
@@ -59,6 +62,7 @@ class StorageObjectService(BaseService):
         mime_type: str | None,
         repo_folder_id: Optional[int],
         created_by: int,
+        document_type_id: int,  
     ) -> StorageObjectOut:
         if not content:
             from app.core.exceptions import ValidationError
@@ -67,30 +71,53 @@ class StorageObjectService(BaseService):
             from app.core.exceptions import ValidationError
             raise ValidationError(detail="Fajl je prevelik")
 
+        saved_file_path: Path | None = None
+
         with self.session_factory() as session:
-            so = self.repo.save_to_storage(
-                content=content,
-                original_name=filename,
-                mime_type=mime_type,
-                storage_dir=STORAGE_DIR,
-                repo_folder_id=repo_folder_id,
-                created_by=created_by,
-                session=session,
-            )
-            session.commit()
-            session.refresh(so)
+            try:
+                so = self.repo.save_to_storage(
+                    content=content,
+                    original_name=filename,
+                    mime_type=mime_type,
+                    storage_dir=STORAGE_DIR,
+                    repo_folder_id=repo_folder_id,
+                    created_by=created_by,
+                    session=session,
+                )
+                session.flush()  
+                saved_file_path = Path(so.path)
 
-        return StorageObjectOut(
-            id=so.id,
-            original_name=so.original_name,
-            mime_type=so.mime_type,
-            size_bytes=so.size_bytes,
-            repo_folder_id=so.repo_folder_id,
-            path=so.path,
-            created_by=so.created_by,
-            created_at=so.created_at,
-        )
+                if self.ingestion:
+                    self.ingestion.ingest_uploaded_document(
+                        content=content,
+                        filename=so.original_name or "upload.bin",
+                        mime_type=so.mime_type,
+                        storage_object_id=so.id,
+                        document_type_id=document_type_id,
+                        title=so.original_name,
+                    )
 
+                session.commit()
+                session.refresh(so)
+
+                return StorageObjectOut(
+                    id=so.id,
+                    original_name=so.original_name,
+                    mime_type=so.mime_type,
+                    size_bytes=so.size_bytes,
+                    repo_folder_id=so.repo_folder_id,
+                    path=so.path,
+                    created_by=so.created_by,
+                    created_at=so.created_at,
+                )
+
+            except Exception:
+                session.rollback()
+                if saved_file_path and saved_file_path.exists():
+                    saved_file_path.unlink(missing_ok=True)
+                raise
+            
+            
     def get(self, object_id: int) -> StorageObjectOut:
         obj = self.repo.read_by_id(object_id)
         return StorageObjectOut(

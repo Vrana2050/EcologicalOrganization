@@ -101,6 +101,22 @@ services:
   #  ports:
   #    - "8000:8000"
 
+  weaviate:
+    image: cr.weaviate.io/semitechnologies/weaviate:latest
+    restart: unless-stopped
+    ports:
+      - "8082:8080"
+      - "50051:50051"
+    environment:
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "true" # DEV; za prod uključi auth
+      PERSISTENCE_DATA_PATH: "/var/lib/weaviate"
+      QUERY_DEFAULTS_LIMIT: "25"
+      CLUSTER_HOSTNAME: "node1"
+      DISABLE_TELEMETRY: "true"
+      # ENABLE_API_BASED_MODULES: "false"  # nije nam potrebno, šaljemo svoje vektore
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+
   oracle-xe:
     image: container-registry.oracle.com/database/express:latest
     container_name: oracle-xe-nais
@@ -125,8 +141,12 @@ services:
     image: writing-assistant-service:latest
     depends_on:
       - oracle-xe
+      - weaviate
     environment:
       DATABASE_URL: "oracle+oracledb://system:MyPassword123@oracle-xe-nais:1521/XEPDB1"
+    env_file:
+      - ./WritingAssistant/.env
+
     volumes:
       - ./WritingAssistant:/app
       - wa_data:/app/data
@@ -141,6 +161,7 @@ volumes:
     external: true
     name: writingassistant_oracle-data
   wa_data:
+  weaviate_data:
 
   # document-service:
   #   build:
