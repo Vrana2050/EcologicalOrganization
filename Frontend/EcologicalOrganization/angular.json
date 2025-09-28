@@ -60,10 +60,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "EcologicalOrganization:build:production"
+              "buildTarget": "EcologicalOrganization:build:production"
             },
             "development": {
-              "browserTarget": "EcologicalOrganization:build:development"
+              "buildTarget": "EcologicalOrganization:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -71,7 +71,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "EcologicalOrganization:build"
+            "buildTarget": "EcologicalOrganization:build"
           }
         },
         "test": {
