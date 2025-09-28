@@ -31,7 +31,6 @@
         {{ creating ? "Kreiram..." : "Kreiraj folder" }}
       </button>
 
-      <!-- Document Type selector -->
       <select
         class="wa-select"
         [(ngModel)]="selectedDocumentTypeId"
@@ -41,7 +40,7 @@
       >
         <option [ngValue]="null" disabled>Tip dokumenta...</option>
         <option *ngFor="let dt of docTypes" [ngValue]="dt.id">
-          {{ dt.name }}
+          {{ dt.name === "Default" ? "Ostalo" : dt.name }}
         </option>
       </select>
 
@@ -117,7 +116,11 @@
       <div class="empty" *ngIf="!files?.length && !loading">Nema fajlova.</div>
 
       <ul class="grid">
-        <li class="card" *ngFor="let file of files">
+        <li
+          class="card clickable"
+          *ngFor="let file of files"
+          (click)="showSummary(file)"
+        >
           <div class="icon">📄</div>
           <div class="name" [title]="file.originalName">
             {{ file.originalName }}
@@ -129,7 +132,7 @@
           <div class="row-buttons">
             <button
               class="mini danger"
-              (click)="deleteFile(file)"
+              (click)="deleteFile(file); $event.stopPropagation()"
               [disabled]="deletingFileIds.has(file.id)"
               type="button"
               title="Obriši fajl"
@@ -139,6 +142,25 @@
           </div>
         </li>
       </ul>
+    </div>
+  </div>
+
+  <!-- SUMMARY SECTION -->
+  <div class="dm-summary">
+    <h3>Sažetak dokumenta</h3>
+
+    <div class="dm-status" *ngIf="summaryLoading || summaryError">
+      <span *ngIf="summaryLoading">Učitavam sažetak...</span>
+      <span class="err" *ngIf="summaryError">{{ summaryError }}</span>
+    </div>
+
+    <div *ngIf="!summaryLoading && !summaryError">
+      <div class="empty" *ngIf="!summaryText">
+        Klikni na fajl da prikažeš sažetak.
+      </div>
+      <div class="summary-box" *ngIf="summaryText">
+        {{ summaryText }}
+      </div>
     </div>
   </div>
 </section>

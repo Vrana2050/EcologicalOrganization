@@ -6,6 +6,7 @@ from app.core.container import Container
 from app.core.dependencies import get_current_user_id, require_admin
 from app.core.security import CurrentUser
 from app.services.storage_object_service import StorageObjectService
+from app.services.vector_service import VectorService
 from app.schema.storage_object_schema import StorageObjectOut, StorageObjectPageOut, PatchStorageObject
 
 router = APIRouter(prefix="/storage-objects", tags=["storage-objects"])
@@ -74,3 +75,14 @@ def delete_storage_object(
 ):
     service.remove(object_id)
     return
+
+
+@router.get("/{object_id}/summary")
+@inject
+def get_storage_object_summary(
+    object_id: int,
+    vec: VectorService = Depends(Provide[Container.vector_service]),
+    _: CurrentUser = Depends(require_admin),
+):
+    
+    return {"summary_text": vec.get_summary(object_id)}

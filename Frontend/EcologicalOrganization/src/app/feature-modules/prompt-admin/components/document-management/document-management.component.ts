@@ -20,6 +20,10 @@ export class DocumentManagementComponent implements OnInit {
   uploading = false;
   error: string | null = null;
 
+  summaryText: string | null = null;
+  summaryLoading = false;
+  summaryError: string | null = null;
+
   deletingFolderIds = new Set<number>();
   deletingFileIds = new Set<number>();
 
@@ -89,6 +93,8 @@ export class DocumentManagementComponent implements OnInit {
   openFolder(f: RepoFolder): void {
     this.currentFolderId = f.id;
     this.breadcrumbs.push({ id: f.id, name: f.name });
+    this.summaryText = null;
+    this.summaryError = null;
     this.loadCurrent();
   }
 
@@ -164,7 +170,12 @@ export class DocumentManagementComponent implements OnInit {
       .delete(f.id)
       .pipe(finalize(() => this.deletingFolderIds.delete(f.id)))
       .subscribe({
-        next: () => this.loadCurrent(),
+        next: () => {
+          this.loadCurrent();
+          this.summaryText = null;
+          this.summaryError = null;
+          this.summaryLoading = false;
+        },
         error: (e) => (this.error = this.humanizeError(e)),
       });
   }
@@ -179,7 +190,12 @@ export class DocumentManagementComponent implements OnInit {
       .delete(file.id)
       .pipe(finalize(() => this.deletingFileIds.delete(file.id)))
       .subscribe({
-        next: () => this.loadCurrent(),
+        next: () => {
+          this.loadCurrent();
+          this.summaryText = null;
+          this.summaryError = null;
+          this.summaryLoading = false;
+        },
         error: (e) => (this.error = this.humanizeError(e)),
       });
   }
@@ -207,5 +223,19 @@ export class DocumentManagementComponent implements OnInit {
       if (e?.message) return e.message;
     } catch {}
     return 'Došlo je do greške.';
+  }
+
+  showSummary(file: StorageObject): void {
+    this.summaryText = null;
+    this.summaryError = null;
+    this.summaryLoading = true;
+
+    this.filesSvc
+      .getSummaryText(file.id)
+      .pipe(finalize(() => (this.summaryLoading = false)))
+      .subscribe({
+        next: (res) => (this.summaryText = res.summary_text || ''),
+        error: (e) => (this.summaryError = this.humanizeError(e)),
+      });
   }
 }

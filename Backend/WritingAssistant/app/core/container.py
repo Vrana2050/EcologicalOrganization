@@ -219,7 +219,8 @@ class Container(containers.DeclarativeContainer):
         StorageObjectService,
         repository=storage_object_repository,
         session_factory=db.provided.session,
-        ingestion_service=vector_ingestion_service,   
+        ingestion_service=vector_ingestion_service,
+        vector_service=vector_service,   
     )
     repo_folder_service = providers.Factory(
         RepoFolderService,

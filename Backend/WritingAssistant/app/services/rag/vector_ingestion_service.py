@@ -16,14 +16,6 @@ from datetime import datetime, timezone
 
 
 class VectorIngestionService:
-    """
-    Ulaz: bytes + meta (filename, mime, storage_object_id, document_type_id, title)
-    Koraci:
-      1) parse -> sekcije
-      2) summary (LLM)
-      3) embed summary -> Document
-      4) chunk per sekcija (token-aware) -> embed -> Chunk upis (batch)
-    """
     def __init__(
         self,
         vector_service: VectorService,
@@ -55,6 +47,7 @@ class VectorIngestionService:
 
         document_id = uuid4().hex
         doc_vec = self.embed.embed_passage(summary_text)
+        print("DOC_VEC_LEN =", len(doc_vec), "head=", doc_vec[:5])
         doc_obj = DocumentVector(
             id=document_id,
             storage_object_id=storage_object_id,
@@ -80,6 +73,7 @@ class VectorIngestionService:
                     created_at=datetime.now(timezone.utc),
                 )
                 vec = self.embed.embed_passage(chunk_text)
+                print("CHUNK_VEC_LEN =", len(vec), "idx=", chunk_index, "head=", vec[:3])
                 pairs.append((ch, vec))
                 chunk_index += 1
 

@@ -199,7 +199,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     #
     # available_subsystems = [u.subsystem for u in user_roles]
 
-    token = create_access_token(user.email, user.id, timedelta(minutes=20))
+    token = create_access_token(user.email, user.id, timedelta(days=30))
     return {'access_token': token, 'token_type': 'bearer'}
 
 

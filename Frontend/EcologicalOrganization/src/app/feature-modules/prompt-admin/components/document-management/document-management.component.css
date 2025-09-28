@@ -149,3 +149,38 @@
   color: #6b7280;
   font-style: italic;
 }
+
+/* Summary sekcija */
+.dm-summary {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+  display: grid;
+  gap: 12px;
+}
+
+.dm-summary h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.summary-box {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+  white-space: pre-wrap;
+  line-height: 1.5;
+  font-size: 14px;
+  color: #1f2937;
+}
+
+.card.clickable {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.card.clickable:hover {
+  background: #f3f4f6;
+}

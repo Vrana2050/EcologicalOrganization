@@ -96,4 +96,10 @@ export class StorageObjectService {
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.objectsUrl}/${id}`);
   }
+
+  getSummaryText(objectId: number) {
+    return this.http.get<{ summary_text: string }>(
+      `${this.objectsUrl}/${objectId}/summary`
+    );
+  }
 }

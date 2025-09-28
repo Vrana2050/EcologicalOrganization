@@ -86,3 +86,19 @@ class VectorRepository:
         resp = self._chunks().query.hybrid(query=query_text, vector=vector, alpha=alpha, limit=limit, filters=flt)
         return [{"uuid": str(o.uuid), "score": getattr(o.metadata, "score", None), "properties": o.properties}
                 for o in (resp.objects or [])]
+        
+        
+    def get_summary_text_by_storage_object_id(self, storage_object_id: int) -> Optional[str]:
+        flt = Filter.by_property("storage_object_id").equal(storage_object_id)
+        resp = self._docs().query.fetch_objects(filters=flt, limit=1)
+        objs = resp.objects or []
+        if not objs:
+            return None
+        props = objs[0].properties or {}
+        return props.get("summary_text")
+    
+    
+    def delete_by_storage_object_id(self, storage_object_id: int) -> None:
+        flt = Filter.by_property("storage_object_id").equal(storage_object_id)
+        self._docs().data.delete_many(where=flt)
+        self._chunks().data.delete_many(where=flt)

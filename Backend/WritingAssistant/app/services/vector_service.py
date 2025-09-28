@@ -3,6 +3,7 @@ from typing import List, Tuple
 
 from app.model.vector_models import DocumentVector, ChunkVector
 from app.repository.vector_repository import VectorRepository
+from app.core.exceptions import NotFoundError
 
 class VectorService:
     def __init__(self, repository: VectorRepository):
@@ -54,3 +55,13 @@ class VectorService:
             document_id=document_id,
             storage_object_id=storage_object_id,
         )
+
+    def get_summary(self, storage_object_id: int) -> str:
+        txt = self.repo.get_summary_text_by_storage_object_id(storage_object_id)
+        if not txt:
+            raise NotFoundError(detail="Sažetak nije pronađen za dati dokument.")
+        return txt
+    
+    
+    def delete_by_storage_object_id(self, storage_object_id: int) -> None:
+        self.repo.delete_by_storage_object_id(storage_object_id)

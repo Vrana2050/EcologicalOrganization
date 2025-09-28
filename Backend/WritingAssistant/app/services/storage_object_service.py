@@ -9,6 +9,9 @@ from app.schema.storage_object_schema import (
 )
 from app.schema.pagination_schema import PaginationMeta
 
+from app.services.rag.vector_ingestion_service import VectorIngestionService
+from app.services.vector_service import VectorService
+
 
 
 STORAGE_DIR = Path("app/storage/objects")
@@ -17,11 +20,14 @@ STORAGE_DIR = Path("app/storage/objects")
 class StorageObjectService(BaseService):
     MAX_FILE_SIZE = 50 * 1024 * 1024 
 
-    def __init__(self, repository: StorageObjectRepository, session_factory, ingestion_service=None):
+    def __init__(self, repository: StorageObjectRepository, session_factory,
+                 ingestion_service: VectorIngestionService,
+                 vector_service: VectorService):
         super().__init__(repository)
         self.repo = repository
         self.session_factory = session_factory
         self.ingestion = ingestion_service
+        self.vec = vector_service
 
     def list(self, page: int = 1, per_page: int = 20, repo_folder_id: Optional[int] = None) -> StorageObjectPageOut:
         q = StorageObjectQuery(
@@ -113,6 +119,7 @@ class StorageObjectService(BaseService):
 
             except Exception:
                 session.rollback()
+                # fajl brišemo jer DB nije commitovan
                 if saved_file_path and saved_file_path.exists():
                     saved_file_path.unlink(missing_ok=True)
                 raise
@@ -145,4 +152,9 @@ class StorageObjectService(BaseService):
         )
 
     def remove(self, object_id: int) -> None:
+        if self.vec:
+            self.vec.delete_by_storage_object_id(object_id)
+
         self.repo.delete_by_id(object_id)
+        
+
