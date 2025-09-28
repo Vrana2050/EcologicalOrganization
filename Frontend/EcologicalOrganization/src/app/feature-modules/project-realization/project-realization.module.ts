@@ -1,12 +1,11 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-
+import { NgModule } from '@angular/core';
+import { ProjectBoardViewComponent } from './components/project-board-view/project-board-view.component';
 
 @NgModule({
-  declarations: [],
-  imports: [
-    CommonModule
-  ]
+  declarations: [
+    ProjectBoardViewComponent
+  ],
+  imports: [CommonModule],
 })
-export class ProjectRealizationModule { }
+export class ProjectRealizationModule {}
