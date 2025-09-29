@@ -119,7 +119,6 @@ class StorageObjectService(BaseService):
 
             except Exception:
                 session.rollback()
-                # fajl brišemo jer DB nije commitovan
                 if saved_file_path and saved_file_path.exists():
                     saved_file_path.unlink(missing_ok=True)
                 raise

@@ -41,6 +41,9 @@ from app.schema.section_draft_schema import CreateSectionDraft
 from app.model.section_draft import SectionDraft
 from app.schema.section_draft_schema import CreateSectionDraft, UpdateSectionDraft
 
+from app.services.rag.retrieval_service import RetrievalService, RetrievalResult
+
+
 from app.core.security import CurrentUser
 
 
@@ -59,7 +62,8 @@ class SectionIterationService(BaseService):
         doc_type_service: DocumentTypeService,
         pv_repo: PromptVersionRepository,   
         draft_repo: SectionDraftRepository,
-        pricing_service: ModelPricingService,                   
+        pricing_service: ModelPricingService,     
+        retrieval_service: RetrievalService,              
     ):
         super().__init__(repository)
         self._iter_repo = repository
@@ -75,6 +79,7 @@ class SectionIterationService(BaseService):
         self._pv_repo = pv_repo   
         self._draft_repo = draft_repo
         self._pricing = pricing_service
+        self._retrieval = retrieval_service
 
     def _get_section(self, section_id: int) -> SessionSection:
         section = self._sec_repo.read_by_id(section_id)
@@ -102,6 +107,14 @@ class SectionIterationService(BaseService):
         return [s for s in (session.session_section or []) if getattr(s, "deleted", 0) == 0]
 
 
+    def _build_rag_context(self, r: RetrievalResult) -> str:
+        if not r or not r.chunk_blocks:
+            return ""
+        parts: List[str] = []
+        for b in r.chunk_blocks:
+            parts.append(b.text)
+        return "\n\n".join(parts).strip()
+
     def _compose_final_prompt(
         self,
         section: SessionSection,
@@ -109,6 +122,7 @@ class SectionIterationService(BaseService):
         base_prompt: str | None,
         global_text: str | None,
         section_text: str | None,
+        rag_context: str | None = None,   
     ) -> str:
         current_section_name = (section.name or "").strip()
 
@@ -121,8 +135,10 @@ class SectionIterationService(BaseService):
         prompt = prompt.replace("{SECTION_NAMES}", section_names)
         prompt = prompt.replace("{GLOBAL_INSTRUCTION}", (global_text or "").strip())
         prompt = prompt.replace("{SECTION_INSTRUCTION}", (section_text or "").strip())
+        prompt = prompt.replace("{RAG_CONTEXT}", (rag_context or "").strip())  
 
         return prompt.strip()
+
 
 
     def get_by_seq(self, section_id: int, seq_no: int, user_id: int):
@@ -257,6 +273,16 @@ class SectionIterationService(BaseService):
         prompt_version = self._resolve_prompt_version(session, document_type_id, current_user)
         base_prompt = prompt_version.prompt_text or ""
         active_sections = self._active_sections(session)
+        
+        
+        rag_res = self._retrieval.retrieve_context(
+            document_type_id=document_type_id,
+            global_instruction=(payload.global_instruction or ""),
+            section_instruction=(payload.section_instruction or ""),
+            section_name=(section.name or None),
+        )
+        
+        rag_context = self._build_rag_context(rag_res)
 
         final_prompt = self._compose_final_prompt(
             section=section,
@@ -264,6 +290,7 @@ class SectionIterationService(BaseService):
             base_prompt=base_prompt,
             global_text=payload.global_instruction,
             section_text=payload.section_instruction,
+            rag_context=rag_context
         )
 
         start_time = datetime.now(timezone.utc).replace(tzinfo=None)

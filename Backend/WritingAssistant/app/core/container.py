@@ -34,6 +34,7 @@ from app.services.model_pricing_service import ModelPricingService
 from app.services.output_feedback_service import OutputFeedbackService
 from app.services.analytics_service import AnalyticsService
 from app.services.storage_object_service import StorageObjectService
+
 from app.services.repo_folder_service import RepoFolderService
 
 from app.services.llm_client.openai_client import OpenAIClient
@@ -49,6 +50,7 @@ from app.services.rag.embedding_service import EmbeddingService
 from app.services.rag.chunking_service import ChunkingService
 from app.services.rag.summarization_service import SummarizationService
 from app.services.rag.vector_ingestion_service import VectorIngestionService
+from app.services.rag.retrieval_service import RetrievalService, RetrievalConfig
 
 
 class Container(containers.DeclarativeContainer):
@@ -131,22 +133,7 @@ class Container(containers.DeclarativeContainer):
         repository=model_pricing_repository,
     )
 
-    section_iteration_service = providers.Factory(
-        SectionIterationService,
-        repository=section_iteration_repository,
-        session_section_repository=session_section_repository,
-        chat_session_repository=chat_session_repository,
-        prompt_active_history_repository=prompt_active_history_repository,
-        gi_repo=global_instruction_repository,
-        si_repo=section_instruction_repository,
-        exec_repo=prompt_execution_repository,
-        out_repo=model_output_repository,
-        llm_service=llm_service,   
-        doc_type_service=document_type_service,
-        pv_repo=prompt_version_repository,
-        draft_repo=section_draft_repository,
-        pricing_service=model_pricing_service,
-    )
+
 
     prompt_service = providers.Factory(
         PromptService,
@@ -214,6 +201,11 @@ class Container(containers.DeclarativeContainer):
         embed=embedding_service,
     )
 
+    retrieval_service = providers.Singleton(
+        RetrievalService,
+        embeddings=embedding_service,
+        vectors=vector_service,
+    )
 
     storage_object_service = providers.Factory(
         StorageObjectService,
@@ -228,3 +220,22 @@ class Container(containers.DeclarativeContainer):
         session_factory=db.provided.session,
     )
     
+
+
+    section_iteration_service = providers.Factory(
+        SectionIterationService,
+        repository=section_iteration_repository,
+        session_section_repository=session_section_repository,
+        chat_session_repository=chat_session_repository,
+        prompt_active_history_repository=prompt_active_history_repository,
+        gi_repo=global_instruction_repository,
+        si_repo=section_instruction_repository,
+        exec_repo=prompt_execution_repository,
+        out_repo=model_output_repository,
+        llm_service=llm_service,   
+        doc_type_service=document_type_service,
+        pv_repo=prompt_version_repository,
+        draft_repo=section_draft_repository,
+        pricing_service=model_pricing_service,
+        retrieval_service=retrieval_service,
+    )

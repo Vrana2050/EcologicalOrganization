@@ -17,7 +17,6 @@ def _vector_cfg():
     )
 
 def _unwrap_optional(ann):
-    """Skini Optional[T] / T|None (Py3.11) na T."""
     origin = get_origin(ann)
     if origin in (Union, types.UnionType):
         args = [a for a in get_args(ann) if a is not type(None)]
@@ -49,7 +48,7 @@ def _pytype_to_weaviate_dtype(ann) -> DataType:
         return DataType.NUMBER
     if ann is datetime:
         return DataType.DATE
-    return DataType.TEXT  # fallback
+    return DataType.TEXT 
 
 def _model_properties(model_cls) -> list[Property]:
     props: list[Property] = []

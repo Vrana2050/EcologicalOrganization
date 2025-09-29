@@ -11,7 +11,6 @@ from .base import Base
 class PromptActiveHistory(Base):
     __tablename__ = 'prompt_active_history'
     __table_args__ = (
-        ForeignKeyConstraint(['activated_by'], ['user.id'], name='fk_prompt_history_user'),
         ForeignKeyConstraint(['prompt_version_id'], ['prompt_version.id'], name='fk_prompt_history'),
         ForeignKeyConstraint(['document_type_id'], ['document_type.id'], name='fk_pah_doc_type'),
         PrimaryKeyConstraint('id', name='sys_c008246')

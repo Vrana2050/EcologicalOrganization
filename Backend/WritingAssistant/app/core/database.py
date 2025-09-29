@@ -15,7 +15,7 @@ DATABASE_URL = "oracle+oracledb://writing_assistant:Assistant123@oracle-xe-nais:
 
 class Database:
     def __init__(self, db_url: str = DATABASE_URL) -> None:
-        self._engine = create_engine(db_url, echo=True)
+        self._engine = create_engine(db_url, echo=False)
         self._session_factory = orm.scoped_session(
             orm.sessionmaker(
                 autocommit=False,
