@@ -119,7 +119,7 @@ class RetrievalService:
                     continue
                 c2, d2 = item
                 if (c2.section_name == ch.section_name) and (
-                    nk == key or (d2 <= dist + self.cfg.neighbor_delta) or (d2 <= self.cfg.neighbor_abs_max)
+                    nk == key or (d2 <= min(self.cfg.max_chunk_distance, dist + self.cfg.neighbor_delta))
                 ):
                     chosen.append((c2, d2))
 

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 class DocTypeReportRow(BaseModel):
     document_type_id: Optional[int] = None  
@@ -22,3 +22,13 @@ class DocTypeReportRow(BaseModel):
     rating_c3: int
     rating_c4: int
     rating_c5: int
+
+
+
+class SectionSelectionIn(BaseModel):
+    section_id: int
+    seq_no: Optional[int] = None  
+
+class DocumentReportIn(BaseModel):
+    title: Optional[str] = None
+    selections: List[SectionSelectionIn]

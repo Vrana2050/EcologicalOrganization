@@ -6,12 +6,11 @@ from dataclasses import dataclass
 @dataclass
 class RetrievalConfig:
     top_m_docs: int = 4
-    max_doc_distance: float = 0.6
+    max_doc_distance: float = 0.5
     top_k_chunks: int = 3
     max_per_doc: int = 2
-    max_chunk_distance: float = 0.6
-    neighbor_delta: float = 0.10           
-    neighbor_abs_max: float = 0.75         
+    max_chunk_distance: float = 0.5
+    neighbor_delta: float = 0.10                  
 
 
 @dataclass

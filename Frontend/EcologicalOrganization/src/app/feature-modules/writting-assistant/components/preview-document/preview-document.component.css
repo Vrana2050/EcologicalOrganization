@@ -60,3 +60,9 @@
     line-height: 1.55;
   }
 }
+
+.wa-btn {
+  background: #eee;
+  border: 1px solid #ccc;
+  padding: 6px 12px;
+}

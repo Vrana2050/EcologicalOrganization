@@ -41,6 +41,7 @@
         [title]="sessionOverview.title || activeSession.title || 'Dokument'"
         [overview]="sessionOverview"
         (close)="showPreview = false"
+        [sessionId]="activeSession.id"
       ></wa-preview-document>
     </div>
   </main>

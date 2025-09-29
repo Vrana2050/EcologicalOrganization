@@ -279,7 +279,6 @@ class SectionIterationService(BaseService):
             document_type_id=document_type_id,
             global_instruction=(payload.global_instruction or ""),
             section_instruction=(payload.section_instruction or ""),
-            section_name=(section.name or None),
         )
         
         rag_context = self._build_rag_context(rag_res)

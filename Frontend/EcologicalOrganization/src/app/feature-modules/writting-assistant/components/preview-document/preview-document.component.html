@@ -1,6 +1,15 @@
 <div class="wa-preview">
   <div class="wa-preview-bar">
     <button class="wa-btn" (click)="close.emit()">← Nazad na uređivanje</button>
+    <button
+      class="wa-btn"
+      (click)="downloadPdf()"
+      [disabled]="downloading"
+      [class.loading]="downloading"
+      title="Preuzmi PDF"
+    >
+      📄 {{ downloading ? "Pripremam…" : "Preuzmi kao PDF" }}
+    </button>
   </div>
 
   <article class="doc">
