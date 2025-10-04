@@ -19,11 +19,15 @@ export interface IBaseProject{
   completionPercentage: number;
   members: IUserProject[];
 
+  canEdit(userId: number): boolean;
   getStatusLabel(): string;
   isCompleted(): boolean;
   isAbandoned(): boolean;
   isInProgress(): boolean;
+  isUserOwner(userId: number): boolean;
+  isUserAssignee(userId: number): boolean;
 }
 export interface IProjectBoard extends IProject {
+
 }
 

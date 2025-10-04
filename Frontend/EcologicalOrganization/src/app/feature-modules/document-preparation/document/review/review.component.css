@@ -1,0 +1,299 @@
+.document-container {
+  box-sizing: border-box;
+  display: flex;
+  width: 92%;
+  margin: calc((100vh - 92vh) /2) auto 0 auto;
+  height: 90%;
+  flex-direction: column;
+  padding: 16px;
+  background-color: #F5F5F5;
+  border: 1px solid #eee;
+  border-radius: 20px;
+  gap:2%;
+}
+.document-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.content{
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  height: 100%;
+  width: 100%;
+  gap:2%;
+}
+
+.document-title {
+  font-size: 24px;
+  font-weight: semi-bold;
+  color: #1B5E20;
+}
+
+.document-issues-container{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: auto;
+  max-width: 30%;
+  height: 100%;
+  border-right: 1px solid #ccc;
+  padding:16px;
+  gap:16px;
+  box-sizing: border-box;
+}
+
+.content-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 70%;
+  flex-direction: column;
+  height: 100%;
+}
+
+.file-container-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 8px;
+  flex:1;
+  width: 100%;
+}
+.new-file-icon{
+  width:24px;
+  height:24px;
+}
+.file-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: auto;
+  padding: 16px 8px;
+  gap: 10px;
+  min-height: 100px;
+  width: auto;
+  min-width: 200px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+.file-name {
+  position: relative;
+  width: 100%;
+  display:flex;
+  align-items: center;
+  justify-content: center;
+  gap:4px;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  word-break: break-word;
+}
+.file-container:hover {
+  background-color: #E0E0E0;
+  border-color: #BDBDBD;
+}
+.file-icon {
+  width: 64px;
+  height: 64px;
+}
+.dp-positive{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.2rem 0.2rem !important;
+  margin-left:8px;
+}
+.add-issue-img{
+  width:20px;
+  height:20px;
+}
+.issues-container{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap:8px;
+}
+.issue-header{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap:4px;
+}
+.issue-title{
+  font-size: 20px;
+  font-weight: 300;
+}
+.issue-list{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap:12px;
+  width: 100%;
+  padding-right:8px;
+}
+.issue-item{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  gap:6px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+}
+.action-buttons{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap:16px;
+  margin-top:16px;
+  width: 100%;
+}
+.previous-action-button{
+  background-color: #1976d2;
+  color: #fff;
+  border: none;
+  width: 120px;
+  height: 40px;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s, color 0.3s;
+}
+.previous-action-button:hover {
+  background-color: #115293;
+  color: #fff;
+}
+.next-action-button{
+  background-color: #26A69A;
+  color: #fff;
+  border: none;
+  width: 120px;
+  height: 40px;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s, color 0.3s;
+}
+.next-action-button:hover {
+  background-color: #1E8E89;
+  color: #fff;
+}
+.issue-description{
+  font-size: 12px;
+  font-weight: 400;
+  color: #333;
+}
+.file-summary-item{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap:8px;
+  padding:10px 0px;
+}
+.file-summary-item.selected {
+  background-color: #26A69A;
+  border-radius: 8px;
+  padding:10px 0px;
+}
+.file-summary-icon{
+  width:20px;
+  height:20px;
+}
+.file-summary-issues{
+  font-size: 16px;
+  font-weight: bold;
+  color: #b71c1c;            /* tamno crvena */
+  background-color: #ffebee; /* svetlo crvena pozadina */
+  padding: 6px 12px;
+  border: 2px solid #f44336; /* jarko crvena ivica */
+  border-radius: 8px;
+  display: inline-block;
+  box-shadow: 0 2px 6px rgba(244, 67, 54, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.summary-title{
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.files-list-container{
+  flex:1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap:8px;
+  overflow-y: auto;
+
+}
+.summary-review-content{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap:16px;
+  min-width: 70%;
+  height: 100%;
+  overflow-y: auto;
+}
+.summary-actions{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap:16px;
+  width: 100%;
+}
+
+.approve-button{
+  background-color: #26A69A;
+  color: #fff;
+  border: none;
+  width: 120px;
+  height: 40px;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s, color 0.3s;
+}
+.approve-button:hover {
+  background-color: #1E8E89;
+  color: #fff;
+}
+.reject-button{
+  background-color: #D32F2F;
+  color: #fff;
+  border: none;
+  width: 120px;
+  height: 40px;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s, color 0.3s;
+}
+.reject-button:hover {
+  background-color: #9A0007;
+  color: #fff;
+}
+.approve-button.disabled, .reject-button.disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

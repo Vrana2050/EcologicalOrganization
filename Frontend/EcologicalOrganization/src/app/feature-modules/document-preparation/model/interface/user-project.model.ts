@@ -3,6 +3,7 @@ export interface IUserProject{
   userId: number;
   projectId: number;
   projectRole: ProjectRole;
+  name?:string;
 }
 
 export enum ProjectRole {

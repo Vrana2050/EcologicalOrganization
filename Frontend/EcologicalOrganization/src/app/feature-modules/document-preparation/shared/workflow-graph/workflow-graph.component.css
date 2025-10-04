@@ -1,0 +1,10 @@
+.cy-container {
+  width: 600px;
+  height: 220px;
+  display: block;
+}
+.workflow-container {
+  width: 100%;
+  height: 100%;
+  display: block;
+}

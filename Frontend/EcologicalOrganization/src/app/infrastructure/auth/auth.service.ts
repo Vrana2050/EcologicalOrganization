@@ -14,7 +14,7 @@ import { Registration } from './model/registration.model';
   providedIn: 'root',
 })
 export class AuthService {
-  user$ = new BehaviorSubject<User>({ email: '', id: 0, role: '' });
+  user$ = new BehaviorSubject<User>({ email: '', id: 1001, role: 'MANAGER' });
 
   constructor(
     private http: HttpClient,

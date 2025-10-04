@@ -1,0 +1,44 @@
+<div class="analysis-container" #containerRef>
+  <img src="assets/pdfDownload.png" alt="Analysis Placeholder" class ="download-pdf-icon">
+  <div class="analysis-header" *ngIf="analysis">
+    <span>{{analysis.entityOfAnalysis.name}}</span>
+  </div>
+  <div class="analysis-content" *ngIf="analysis">
+    <div class="analysis-summary">
+      <span class ="summary-title">Summary</span>
+      <div class="summary-item" *ngIf="analysis.documentAnalyses">
+        <span class="item-label">Slowest status:</span>
+        <span class="item-value">{{analysis.slowestStatus.name}} {{analysis.slowestStatus.duration | number:'1.0-0'}} days</span>
+      </div>
+      <div class="summary-item" *ngIf="analysis.documentAnalyses">
+        <span class="item-label">Most rejected document:</span>
+        <span class="item-value">{{analysis.mostProblematicDocument.document.name}} {{analysis.mostProblematicDocument.returnCount | number:'1.0-0'}} times</span>
+      </div>
+       <div class="summary-item" *ngIf="analysis.documentAnalyses">
+        <span class="item-label">The most overdue document:</span>
+        <span class="item-value">{{analysis.largestDelay.document.name}} {{analysis.largestDelay.delayDays | number:'1.0-0'}} days</span>
+      </div>
+      <div class="summary-item">
+        <div class="timeline-labels">
+          <span>Start</span>
+        </div>
+        <div class="deadline-bar">
+          <div class="green" [style.width]="greenWidth">
+            <span class="marker">{{aboveGreenLabel}}</span>
+          </div>
+          <div class="red" [style.width]="redWidth"></div>
+        </div>
+        <div class="timeline-labels">
+          <span>{{ topRightLabel }}</span>
+        </div>
+      </div>
+      <div class="chart-container" >
+        <app-pie-chart [labels]="pieChartLabels"
+  [data]="pieChartData" [title]="'Project Status Breakdown (in days)'"> </app-pie-chart>
+      </div>
+    </div>
+    <div class="graph-analysis-container" *ngIf="analysis.documentAnalyses">
+      <document-preparation-graph-analysis [height]="graphHeight" [analyses]="analysis.documentAnalyses" [entityDeadlinePercentage]="analysis.entityDeadlinePercentage"></document-preparation-graph-analysis>
+    </div>
+  </div>
+</div>

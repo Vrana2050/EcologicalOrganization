@@ -7,7 +7,13 @@ import { RegistrationComponent } from '../auth/registration/registration.compone
 import { DocumentPreparationLayoutComponent } from 'src/app/feature-modules/document-preparation/layout/layout.component';
 import { DocumentPreparationNewsComponent } from 'src/app/feature-modules/document-preparation/news/news.component';
 import { DocumentPreparationHomeComponent } from 'src/app/feature-modules/document-preparation/home/home.component';
-import { DocumentPreparationProjectComponent } from 'src/app/feature-modules/document-preparation/project/project.component';
+import { DocumentPreparationBoardProjectComponent } from 'src/app/feature-modules/document-preparation/project/board/project.component';
+import { DocumentPreparationBoardDocumentComponent } from 'src/app/feature-modules/document-preparation/document/board/board.component';
+import { DocumentPreparationDocumentComponent } from 'src/app/feature-modules/document-preparation/document/document.component';
+import { DocumentPreparationDocumentAnalysisComponent } from 'src/app/feature-modules/document-preparation/document/analysis/analysis.component';
+import { DocumentPreparationProjectAnalysisComponent } from 'src/app/feature-modules/document-preparation/project/analysis/analysis.component';
+import { DocumentPreparationReviewComponent } from 'src/app/feature-modules/document-preparation/document/review/review.component';
+import { DocumentPreparationProjectCreateComponent } from 'src/app/feature-modules/document-preparation/project/create/project-create.component';
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'login', component: LoginComponent },
@@ -23,7 +29,14 @@ const routes: Routes = [
     children: [
       { path: '', component: DocumentPreparationHomeComponent },
       { path: 'news', component: DocumentPreparationNewsComponent },
-      { path: 'project/:id', component: DocumentPreparationProjectComponent }
+      { path: 'board/project/:id', component: DocumentPreparationBoardProjectComponent },
+      { path: 'board/document/:id', component: DocumentPreparationBoardDocumentComponent },
+      { path: 'document/:id', component: DocumentPreparationDocumentComponent },
+      { path: 'review/document/:id', component: DocumentPreparationReviewComponent },
+      { path: 'analysis/document/:id', component: DocumentPreparationDocumentAnalysisComponent },
+      { path: 'analysis/project/:id',component:DocumentPreparationProjectAnalysisComponent },
+      { path: 'create/project', component: DocumentPreparationProjectCreateComponent },
+      { path: 'edit/project/:id', component: DocumentPreparationProjectCreateComponent },
     ]
   },
   ];

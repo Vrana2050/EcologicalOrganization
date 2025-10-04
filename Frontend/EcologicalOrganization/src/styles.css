@@ -2,3 +2,29 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+button.dp-positive {
+  text-align: center;
+  padding: 0.8rem 1.2rem;
+  background-color: #26A69A;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  color : white;
+}
+button.dp-positive:hover {
+  background-color: #1E8E89;
+}
+button.dp-negative {
+  text-align: center;
+  padding: 0.8rem 1.2rem;
+  background-color: #D32F2F;
+  border: none;
+  border-radius: 15px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  color : white;
+}
+button.dp-negative:hover {
+  background-color: #E57373;
+}

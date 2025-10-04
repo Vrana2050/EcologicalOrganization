@@ -1,0 +1,95 @@
+.available-workflows-container {
+  box-sizing: border-box;
+  display: flex;
+  width: 92%;
+  margin: calc((100vh - 92vh) /2) auto 0 auto;
+  height: 90%;
+  flex-direction: column;
+  padding: 16px;
+  background-color: #F5F5F5;
+  border: 1px solid #eee;
+  border-radius: 20px;
+  gap:2%;
+}
+.workflow-content {
+  display: flex;
+  flex-direction: column;
+  flex:1;
+  overflow: auto;
+}
+.workflow-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.workflow-title {
+  font-size: 24px;
+  font-weight: 300;
+}
+.workflow-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr); /* uvek tačno 2 reda */
+  width: 100%;
+  height: 100%;
+  gap: 10px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+.item{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  height: 260px;
+  box-sizing: border-box;
+}
+.item.selected {
+  border: 3px solid #26A69A;
+  border-radius: 10px;
+}
+
+.workflow-actions-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
+.action-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  width: 150px;
+}
+.done-button {
+  background-color: #26A69A;
+  color: white;
+}
+.done-button:disabled {
+  background-color: #B2DFDB;
+  cursor: not-allowed;
+}
+.done-button:disabled:hover {
+  background-color: #B2DFDB;
+}
+
+.done-button:hover {
+  background-color: #1E8C86;
+}
+.close-button {
+  background-color: #D32F2F;
+}
+.close-button:hover {
+  background-color: #B71C1C;
+}
+.workflow-list-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 10px;
+  overflow-y: auto;
+  margin-top: 20px;
+}

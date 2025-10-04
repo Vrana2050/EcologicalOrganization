@@ -1,11 +1,11 @@
-import { IFile } from '../interface/file.model';
+import { Extension, IFile } from '../interface/file.model';
 export class File implements IFile{
   id: number;
   name: string;
   content: string;
   version: number;
   dateUploaded: Date;
-  extension: string;
+  extension: Extension;
 
   constructor(data: any) {
     if (data == null) {
@@ -35,6 +35,9 @@ export class File implements IFile{
     this.extension = data.ekstenzija;
     this.id = data.id;
     this.name = data.naziv;
+  }
+  isFirstVersion(): boolean {
+    return this.version === 1;
   }
 
 }

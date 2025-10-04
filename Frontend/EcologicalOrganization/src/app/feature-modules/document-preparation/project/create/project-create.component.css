@@ -1,0 +1,211 @@
+.project-form-container {
+  box-sizing: border-box;
+  display: flex;
+  width: 92%;
+  margin: calc((100vh - 92vh) /2) auto 0 auto;
+  height: 90%;
+  flex-direction: column;
+  padding: 16px;
+  background-color: #F5F5F5;
+  border: 1px solid #eee;
+  border-radius: 20px;
+  gap:2%;
+}
+.form-header {
+  font-size: 24px;
+  font-weight: 400;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.project-form {
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+  gap: 8px;
+  overflow-y: auto;
+  font-size: 16px;
+}
+.form-content {
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 100%;
+  height: 100%;
+  gap: 8px;
+  overflow-x: auto;
+  font-size: 16px;
+  flex: 1;
+}
+.data-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  max-width: 50%;
+  padding-left: 8px;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+.text-input{
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 400px;
+  box-sizing: border-box;
+
+}
+.workflow-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  flex: 1;
+}
+.workflow-section-title {
+  font-size: 20px;
+  font-weight: 300;
+  margin-bottom: 8px;
+  text-align: center;
+}
+.workflow-name {
+  font-size: 18px;
+  font-weight: 400;
+  text-align: center;
+}
+.change-workflow-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  width: 150px;
+}
+.change-workflow-button {
+  background-color: #26A69A;
+  color: white;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  gap: 16px;
+}
+.submit-button, .cancel-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 120px;
+  text-align: center;
+}
+.submit-button {
+  background-color: #4CAF50;
+  color: white;
+}
+.submit-button:hover {
+  background-color: #45a049;
+}
+.cancel-button {
+  background-color: #f44336;
+  color: white;
+}
+.cancel-button:hover {
+  background-color: #da190b;
+}
+.submit-button:disabled {
+  background-color: #9E9E9E;
+  cursor: not-allowed;
+}
+.submit-button:disabled:hover {
+  background-color: #9E9E9E;
+}
+
+.member-wrapper {
+  position: relative;
+  height: 300px;
+  width: 400px;
+}
+
+.dropdown {
+  position: absolute;
+  top: 10%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+.name-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2px;
+  padding: 2px;
+  cursor: pointer;
+}
+.name-container:hover {
+  background-color: #f0f0f0;
+}
+.name {
+  font-size: 14px;
+  padding: 2px;
+}
+.selected-members {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: absolute;
+  top: 15%;
+  left: 0;
+  right: 0;
+  border-radius: 4px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+.selected-member {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+}
+.role-label {
+  font-size: 14px;
+  color: #1B5E20;
+  padding:2px;
+  font-weight: 300;
+}
+.select-workflow-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  width: 170px;
+}
+.select-workflow-button {
+  background-color: #26A69A;
+  color: white;
+}
+.role-select {
+  padding: 6px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}

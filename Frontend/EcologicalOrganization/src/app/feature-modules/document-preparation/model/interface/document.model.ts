@@ -1,7 +1,9 @@
 import { IProject } from "./project.model";
-import { IWorkflow,IWorkflowStatus } from "./workflow.model";
+import { IStatus, IWorkflow,IWorkflowStatus } from "./workflow.model";
 import { IUserProject } from "./user-project.model";
 import { IFile } from "./file.model";
+import { IRevision,IRevisionIssue } from "./revision.model";
+
 export interface IDocumentBase{
   id : number;
   projectId : number;
@@ -9,6 +11,7 @@ export interface IDocumentBase{
   description? : string;
   isDraft : boolean;
   dueDate ?: Date;
+  dateCreated : Date;
   status : IWorkflowStatus;
   workflowId ?: number;
   priority ?: Priority;
@@ -18,6 +21,9 @@ export interface IDocumentBase{
   parentDocumentId? : number;
   mainFileId? : number;
   ownerId : number;
+  isDone(): boolean;
+  isInDraft(): boolean;
+
 }
 
 export enum Priority {
@@ -26,7 +32,51 @@ export enum Priority {
   High = 'visok',
 }
 
-export interface IDocumentBoard extends IDocumentBase{
+export interface IDocumentBoard extends IDocumentExtended{
   mainFile?:IFile;
+}
+export interface IDocumentExtended extends IDocumentBase{
+  isLocked(): boolean;
+  isUserAssignee(userId: number): boolean;
   dependsOn?: IDocumentBase[];
+  assignees?: IUserProject[];
+}
+export interface IDocumentDetails extends IDocumentExtended{
+  canReviewSubDocument(userId: number): boolean;
+  canEditDocument(userId: number): boolean;
+  getNextStatus(): IWorkflowStatus | undefined;
+  hasPermissionForNextStatus(): boolean;
+  doesActiveFileHaveUnCorrectedIssues(activeFileId: number): boolean;
+  doesActiveFileHaveUnApprovedCorrections(activeFileId: number): boolean;
+  canAddFile(userId: number): boolean;
+  canAddSubDocument(userId: number): boolean;
+  workflow?:IWorkflow;
+  vlasnik:IUserProject;
+  parentDocument?:IDocumentBase;
+  revisions?: IRevision[];
+  subDocuments?: IDocumentBoard[];
+  activeFiles?: IDocumentActiveFile[];
+  isUserOwner(userId: number): boolean;
+  canEditInCurrentStatus(userId: number): boolean;
+  isFileMain(fileId: number): boolean;
+  getAllReviewIssuesForActiveFile(activeFileId: number): IRevisionIssue[];
+  hasUnResolvedReview(): boolean;
+  getGlobalReviewIssues(): IRevisionIssue[];
+  isFileApproved(activeFileId:number): boolean;
+  getUnApprovedIssuesForActiveFile(activeFileId:number): IRevisionIssue[];
+  hasReviewAfter(date: Date): boolean;
+  isUserSubAssignee(userId: number): boolean;
+}
+
+export interface IDocumentActiveFile{
+  isFirstVersion(): boolean;
+  id: number;
+  file: IFile;
+  documentId: number;
+}
+export interface IRevisionDocumentActiveFile{
+  hasUnApprovedIssues(): boolean;
+  unApprovedIssues?: IRevisionIssue[];
+  activeFile: IDocumentActiveFile;
+  isFileNew: boolean;
 }

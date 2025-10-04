@@ -1,0 +1,28 @@
+.document-header {
+flex :1;
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
+.document-name {
+  font-size: 22px;
+  font-weight: semi-bold;
+  color :#1B5E20;
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0 1%;
+}
+.document-preparation-board {
+  flex: 5;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.document-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

@@ -1,0 +1,19 @@
+<div class="available-workflows-container">
+  <div class="workflow-content">
+    <div class="workflow-header">
+      <span class="workflow-title">Available Workflows</span>
+    </div>
+    <div class="workflow-list-wrapper">
+      <div class="workflow-list">
+        <div class="item" *ngFor="let workflow of workflows" (click)="selectWorkflow($event,workflow)" [class.selected]="workflow === selectedWorkflow">
+          <span class="workflow-name">{{ workflow.name }}</span>
+          <document-preparation-workflow-graph [height]="260" [workflow]="workflow"></document-preparation-workflow-graph>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="workflow-actions-container">
+    <button class="done-button action-button" [disabled]="!selectedWorkflow" (click)="done.emit(selectedWorkflow!)">Done</button>
+    <button class="close-button action-button" (click)="close.emit()">Back</button>
+  </div>
+</div>

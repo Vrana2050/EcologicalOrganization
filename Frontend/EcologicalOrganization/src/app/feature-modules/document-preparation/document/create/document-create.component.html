@@ -1,0 +1,104 @@
+<div class="document-form-container">
+  <div class="form-header">
+    <span class="form-title" *ngIf="!isEditing">Create Document</span>
+    <span class="form-title" *ngIf="isEditing">Edit {{document?.name}}</span>
+  </div>
+  <form class="document-form" [formGroup]="documentForm" (ngSubmit)="onSubmit()">
+    <div class="form-content">
+      <div class="name-group">
+        <label for="name">Name</label>
+        <input class="name-input" type="text" id="name" formControlName="name" required placeholder="Enter document name"/>
+      </div>
+      <div class="status-assignee-group">
+        <div class="status-group">
+          <img src="assets/status.png" alt="status icon" class="status-icon info-icon">
+          <label for="status">Status</label>
+          <div class="status-input-wrapper" [style.backgroundColor]="statusColor" (click)="toggleDropdown()">
+            <input class="status-input" type="text" id="status" [value]="status?.name" placeholder="Select status" />
+            <ul class="dropdown" *ngIf="dropdownOpen">
+              <li *ngFor="let entry of allowedStatuses | keyvalue "
+                  (click)="selectStatus(entry.key)">
+                  <div class="status-wrapper" [style.backgroundColor]="allowedStatuses.get(entry.key)" *ngIf="entry.key!==status"><span class="status-color-indicator">{{entry.key.name}}</span></div>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="assignee-group" *ngIf="project">
+          <img src="assets/team.png" alt="assignee icon" class="assignee-icon info-icon">
+          <label for="assignee">Assignees</label>
+          <input class="assignee-input" type="text" id="assignee" [formControl]="assigneeSearch" placeholder="Select assignees"/>
+           <div class="dropdown" *ngIf="filteredAssignees && filteredAssignees.length > 0">
+          <div class="dropdown-item"*ngFor="let user of availableUsers " (click)="selectAssignee(user)">
+              <span>{{ user.name }}</span>
+            </div>
+          </div>
+          <div class="assignees-preview-container">
+            <img src="assets/man.png" alt="user icon" class="user-icon" *ngFor="let assignee of documentForm.get('assignees')?.value">
+          </div>
+        </div>
+      </div>
+
+      <div class="due-date-priority-group">
+        <div class="due-date-group">
+          <img src="assets/calendar.png" alt="calendar icon" class="calendar-icon info-icon">
+          <label for="dueDate">Due Date</label>
+          <input class="due-date-input" type="date" id="dueDate" formControlName="dueDate"/>
+        </div>
+        <div class="priority-group">
+          <img src="assets/flag.png" alt="priority icon" class="priority-icon info-icon">
+          <label for="priority">Priority</label>
+          <select class="priority-select" id="priority" formControlName="priority">
+            <option value="" disabled selected>Select priority</option>
+            <option *ngFor="let level of priorityLevels" [value]="level">{{ getPriorityLevels(level) }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="description-group">
+        <label for="description">Description</label>
+        <textarea class="description-textarea" id="description" formControlName="description" rows="4" placeholder="Enter document description"></textarea>
+      </div>
+
+      <div class="dependency-group" *ngIf="potentialDependencies && potentialDependencies.length > 0">
+       <label for="dependencies">Dependencies</label>
+       <div class="dependency-input-wrapper">
+        <input type="text"
+              class="dependency-input"
+              placeholder="Select dependencies"
+              readonly
+              (click)="toggleDependencyDropdown()" />
+
+        <!-- Dropdown lista -->
+        <div class="dependency-dropdown" *ngIf="toggleDependencyOpen">
+          <div class="dependency-dropdown-item"
+              *ngFor="let dependency of potentialDependencies"
+              (click)="selectDependency(dependency)">
+            <span>{{ dependency.name }}</span>
+          </div>
+        </div>
+                      <!-- Prikaz izabranih zavisnosti -->
+        <div class="selected-dependencies" *ngIf="documentForm.get('dependencies')?.value.length > 0">
+          <div *ngFor="let dependency of documentForm.get('dependencies')?.value" class="dependency-chip">
+            <input type="checkbox" [checked]="true" (change)="toggleDependency(dependency)">
+            <span class="dependency-name">{{ dependency.name }}</span>
+            <span class="dependency-date">{{ dependency.dueDate | date }}</span>
+          </div>
+        </div>
+
+
+        </div>
+      </div>
+
+    </div>
+
+    <div class="form-actions">
+      <button class="cancel-button" type="button" (click)="documentForm.reset()">
+        Cancel
+      </button>
+      <button class="submit-button" type="submit" [disabled]="documentForm.invalid">
+        {{ isEditing ? 'Update' : 'Create' }}
+      </button>
+    </div>
+  </form>
+</div>
+<document-preparation-workflow-popup *ngIf="showChooseWorkflowPopup" (close)="showChooseWorkflowPopup = false"></document-preparation-workflow-popup>

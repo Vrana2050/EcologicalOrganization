@@ -1,6 +1,6 @@
 .layout-wrapper{
   background-color: #E0F4E1;
-  height: 91.5vh;
+  height: calc(100% - 65px);
   display: flex;
 
 }

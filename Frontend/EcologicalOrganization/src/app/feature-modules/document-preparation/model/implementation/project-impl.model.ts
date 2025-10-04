@@ -1,9 +1,10 @@
 import { ProjectStatus } from '../interface/project.model';
 import { IUserProject } from '../interface/user-project.model';
 import { IWorkflow } from '../interface/workflow.model';
-import { UserProject } from './user-project-impl.model';
+import { UserProject, UserProjectCreate } from './user-project-impl.model';
 import { IProject, IProjectHome, IBaseProject, IProjectBoard} from '../interface/project.model';
-import { Workflow } from './worflow-impl.model';
+import { Workflow } from './workflow-impl.model';
+import { ProjectRole } from '../interface/user-project.model';
 
 export class BaseProject implements IBaseProject{
   id: number;
@@ -56,8 +57,32 @@ export class BaseProject implements IBaseProject{
   isInProgress(): boolean {
     return this.status === ProjectStatus.InProgress;
   }
-}
+  isUserOwner(userId: number): boolean {
+    return this.members?.some(member => member.userId === userId && member.projectRole === ProjectRole.Manager) || false;
+  }
+  isUserAssignee(userId: number): boolean {
+    return this.members?.some(member => member.userId === userId && member.projectRole !== ProjectRole.Manager) || false;
+  }
+  canEdit(userId: number): boolean {
+    return this.isUserOwner(userId) && this.isInProgress();
+  }
 
+}
+export class Project extends BaseProject implements IProject {
+  dueDate: Date;
+  workflow: IWorkflow;
+  constructor(data: any) {
+    super(data);
+    if (!data.rokZavrsetka) {
+      throw new Error('Project: "dueDate" is required.');
+    }
+    if (!data.tokProjekta) {
+      throw new Error('Project: "workflow" is required.');
+    }
+    this.dueDate = new Date(data.rokZavrsetka);
+    this.workflow =  new Workflow(data.tokProjekta);
+  }
+}
 export class ProjectHome extends BaseProject implements IProjectHome {
   constructor(data: any) {
     super(data);
@@ -88,4 +113,20 @@ export class ProjectBoard extends BaseProject implements IProjectBoard {
     this.workflow =  new Workflow(data.tokProjekta);
   }
 
+}
+
+export class ProjectCreate {
+  naziv: string;
+  rokZavrsetka: Date;
+  tokProjekta:{
+    id: number;
+  };
+  korisniciProjekta: UserProjectCreate[];
+
+  constructor(data: any) {
+    this.naziv = data.name;
+    this.rokZavrsetka = new Date(data.dueDate);
+    this.tokProjekta = { id: data.workflow.id };
+    this.korisniciProjekta = data.assignees.map((assignee: any) => new UserProjectCreate(assignee));
+  }
 }

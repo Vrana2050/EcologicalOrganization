@@ -1,0 +1,78 @@
+<document-preparation-workflow-popup *ngIf="isWorkflowPopupVisible" (done)="handleWorkflowDone($event)" (close)="closePopup()"></document-preparation-workflow-popup>
+<div class="project-form-container">
+  <div class="form-header">
+    <span>Create New Project</span>
+  </div>
+  <form class="project-form" [formGroup]="projectForm" (ngSubmit)="onSubmit()">
+    <div class="form-content">
+      <div class="data-section">
+        <div class="form-group">
+          <label for="projectName">Project Name</label>
+          <input id="projectName" class="text-input" formControlName="name" type="text" placeholder="Enter project name" />
+        </div>
+        <div class="form-group">
+          <label for="dueDate">Due Date</label>
+          <input id="dueDate" class="text-input" formControlName="dueDate" type="date" />
+        </div>
+        <div class="form-group">
+          <label for="members">Members</label>
+          <div class="member-wrapper">
+            <input class="text-input" type="text" id="member" [formControl]="memberSearch" placeholder="Select members"/>
+
+
+            <div class="dropdown" *ngIf="filteredMembers && filteredMembers.length > 0">
+              <div class="dropdown-item" *ngFor="let user of filteredMembers" (click)="selectMember(user)">
+                <div class="name-container">
+                  <span class="name">{{ user.firstName }}</span>
+                  <span class="name">{{ user.lastName }}</span>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="selected-members" *ngIf="projectForm.get('assignees')?.value?.length > 0">
+              <div class="selected-member" *ngFor="let member of projectForm.get('assignees')?.value">
+                <input type="checkbox" checked (change)="removeMember(member, $event)" />
+                <span class="member-name">{{ member.name }}</span>
+                <span class="role-label" *ngIf="member.projectRole !==''">{{ getRoleName(member.projectRole) }}</span>
+                <select class="role-select" *ngIf="member.projectRole ===''"  (change)="assignRoleToMember(member, $event.target)">
+                    <option value="" disabled selected>Select role</option>
+                    <option *ngFor="let role of projectRoles" [value]="role">{{ getRoleName(role) }}</option>
+                </select>
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="workflow-section" *ngIf="selectedWorkflow">
+        <span class="workflow-section-title">Selected Workflow</span>
+        <span class="workflow-name">{{ selectedWorkflow.name }}</span>
+          <document-preparation-workflow-graph [height]="260" [workflow]="selectedWorkflow"></document-preparation-workflow-graph>
+        <button class="change-workflow-button" type="button" (click)="handleWorkflowChange()">
+          Change
+        </button>
+      </div>
+
+      <div class="workflow-section" *ngIf="!selectedWorkflow">
+        <span class="workflow-section-title">No Workflow Selected</span>
+        <button class="select-workflow-button" type="button" (click)="handleWorkflowChange()">
+          Select Workflow
+        </button>
+      </div>
+
+
+    </div>
+    <div class="form-actions">
+      <button class="cancel-button" type="button" (click)="projectForm.reset()">
+        Cancel
+      </button>
+      <button class="submit-button" type="submit" [disabled]="projectForm.invalid">
+        Create
+      </button>
+    </div>
+  </form>
+</div>

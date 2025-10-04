@@ -1,0 +1,24 @@
+<div class="overlay" *ngIf="!showChooseExisting">
+  <div class="popup">
+    <span class ="popup-title">Select workflow</span>
+    <div class="popup-content">
+      <div class="workflow-option">
+        <div class="icon-container">
+          <img src="assets/blank-page.png" alt="Create New Icon" class="workflow-icon" />
+        </div>
+        <span>Create New</span>
+      </div>
+      <div class="workflow-option">
+        <div class="icon-container" (click)="chooseExisting()">
+          <img src="assets/page.png" alt="Choose Existing Icon" class="workflow-icon" />
+        </div>
+        <span>Choose Existing</span>
+      </div>
+    </div>
+    <div class="popup-actions-container">
+      <button class="default-button action-button">Use default</button>
+      <button class="close-button action-button" (click)="closePopup()">Cancel</button>
+    </div>
+  </div>
+</div>
+<document-preparation-existing-workflow-window *ngIf="showChooseExisting" (done)="handleWorkflowDone($event)" (close)="showChooseExisting = false"></document-preparation-existing-workflow-window>

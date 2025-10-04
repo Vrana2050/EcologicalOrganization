@@ -22,6 +22,5 @@ export class SidebarComponent {
     this.isProjectClicked = false;
     this.isNewsClicked = true;
     this.router.navigate(['document-preparation/news']);
-    console.log('News clicked');
   }
 }

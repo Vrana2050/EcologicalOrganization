@@ -12,18 +12,19 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   margin-bottom: 1%;
 }
-.add-project-button {
-  margin-left: auto;
-  width: 70px;
-  height: 40px;
-  background-color: #26A69A;
-  border: none;
-  border-radius: 15px;
+.dp-positive{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.6rem !important;
 }
-
+.add-project-img{
+  width:30px;
+  height:30px;
+}
 .project-items {
   height: 100%;
   display: flex;
@@ -78,6 +79,9 @@ h1{
   padding:2px;
   border-radius:90%;
   cursor:pointer;
+}
+.view-project-button:hover{
+  background:#1E8E89;
 }
 .view-project-icon{
   border-radius:90%;

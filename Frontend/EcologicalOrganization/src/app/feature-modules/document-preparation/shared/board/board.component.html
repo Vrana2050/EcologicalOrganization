@@ -1,1 +1,66 @@
-<p>board works!</p>
+<div class="board-container" *ngIf="boardWorkflow.statuses.length === sortedWorkflow.statuses.length">
+  <div class="board-column" *ngFor="let status of boardWorkflow.statuses">
+    <div class="board-column-header" [style.border-color]="statusColors[status.status.currentStatus.id]">
+      <div class="board-column-info">
+        <span class="board-column-title">{{status.status.currentStatus.name}}</span>
+        <div class="board-column-count-container" *ngIf="documents" [style.border-color]="statusColors[status.status.currentStatus.id]">
+          <span class="board-column-count">{{getDocumentCountByStatus(status)}}</span>
+        </div>
+      </div>
+      <div class="board-column-add" *ngIf="canAddDocument(status.status.currentStatus)">
+        <button class="add-button" [style.border-color]="statusColors[status.status.currentStatus.id]" (click)="openCreateDocumentModal($event, status.status.currentStatus)">
+          <i class="fa-solid fa-plus add-icon" [style.color]="statusColors[status.status.currentStatus.id]"></i>
+        </button>
+      </div>
+    </div>
+    <div class="board-column-content" *ngFor="let doc of status.documents" (click)="openDocument(doc)">
+      <div class ="board-column-content-container" [style.border-color]="statusColors[status.status.currentStatus.id]">
+        <div class="header">
+          <span>{{doc.name}}</span>
+          <img class="lock-icon" src="assets/lock.png" alt="Info Icon" *ngIf="doc.isLocked()">
+        </div>
+        <div class="document-info">
+            <div class="document-due-date-description">
+              <div class="document-description" *ngIf="doc.description" (click)="openDescriptionModal($event, doc)">
+                <img class="description-icon" src="assets/description.png" alt="Description Icon">
+              </div>
+              <div class="document-due-date" *ngIf="doc.dueDate">
+                <img *ngIf="doc.dueDate" class="calendar-icon" src="assets/calendar.png" alt="Due Date Icon">
+                <span class="due-date-text">{{doc.dueDate | date:'dd.MM.yyyy'}}</span>
+              </div>
+            </div>
+            <div class="document-assignees">
+              <img src="assets/man.png" alt="Assignee Avatar" class="assignee-avatar" *ngFor="let user of doc.assignees">
+            </div>
+          </div>
+          <div class ="document-file-modification" *ngIf="doc.mainFile">
+            <img class="file-icon" src="assets/{{doc.mainFile.extension}}.png" alt="File Icon" (click)="openFile($event,doc.mainFile)">
+            <div class="modification-info">
+              <span>Last Modified:</span>
+              <span *ngIf="doc.mainFile">{{doc.mainFile.dateUploaded | date:'dd.MM.yyyy'}}</span>
+            </div>
+          </div>
+          <div class="document-progress-bar" *ngIf="doc.completionPercentage > 0 && (!status.status.isReview() || !canReviewDocument(doc)) && !status.status.isLast()" >
+              <document-preparation-progress-bar  [percentage]="doc.completionPercentage" class="progress-bar"/>
+          </div>
+          <div class="action-button-container" *ngIf="status.status.isReview() && canReviewDocument(doc)">
+              <button (click)="openDocumentReview($event, doc)" class="action-button">Review</button>
+          </div>
+          <div class="action-button-container" *ngIf="status.status.isLast()">
+              <button (click)="openDocumentAnalysis($event, doc)" class="action-button">Analyze</button>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div
+  class="description-tooltip"
+  *ngIf="isDocumentDescriptionModalOpen"
+  [style.top.px]="modalPosition.top"
+  [style.left.px]="modalPosition.left"
+>
+  <span class="close-btn" (click)="closeDescriptionModal($event)">×</span>
+  <p>{{ descriptionToShow }}</p>
+</div>

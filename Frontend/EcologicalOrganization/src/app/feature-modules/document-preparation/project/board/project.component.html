@@ -1,0 +1,12 @@
+<div class ="container" *ngIf="showCreateDocumentModal === false">
+  <div class="project-header" *ngIf="project">
+    <div class="project-header-left">
+      <span class="project-name">{{ project.name }}</span>
+      <button class="dp-positive" (click)="openProjectAnalysis(project)" *ngIf="canAnalyze()">Analyze</button>
+    </div>
+    <button class="dp-negative" *ngIf="isUserOwner()">Abandon</button>
+    <button class="dp-positive" *ngIf="isUserAssignee()">My Tasks</button>
+  </div>
+  <document-preparation-board class="document-preparation-board" *ngIf="project && documents" (addDocument)="openAddDocument($event)" [sortedWorkflow]="project.workflow" [documents]="documents" [isUserOwner]="isUserOwner()" [isUserAssignee]="isUserAssignee()" [canEdit]="canEdit"></document-preparation-board>
+</div>
+<document-preparation-document-create  [status]="statusToCreateDocumentIn" [sortedWorkflow]="project.workflow" [project]="project" [isUserOwner]="isUserOwner()" [isUserAssignee]="isUserAssignee()" *ngIf="showCreateDocumentModal"></document-preparation-document-create>
