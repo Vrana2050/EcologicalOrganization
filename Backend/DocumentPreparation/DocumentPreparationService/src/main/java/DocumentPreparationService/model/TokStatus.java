@@ -46,6 +46,9 @@ public class TokStatus {
             return true;
         return false;
     }
+    public boolean isRevizija() {
+        return this.trenutnoStanje.getPotrebnoOdobrenjeZaPrelazak();
+    }
 
     public boolean isInReview() {
         if(isDone()) return false;
@@ -54,5 +57,33 @@ public class TokStatus {
             return true;
         }
         return false;
+    }
+
+    public boolean canCreate() {
+        return getTrenutnoStanje().getDozvolaDodavanjaZaZaduzenog() || getTrenutnoStanje().getDozvolaDodavanjaZaVlasnika();
+    }
+
+    public boolean canAssigneeAddDocument() {
+        return getTrenutnoStanje().getDozvolaDodavanjaZaZaduzenog();
+    }
+
+
+    public boolean canDodeljenikEdit() {
+        return getTrenutnoStanje().getDozvolaMenjanjaZaZaduzenog();
+    }
+    public boolean canVlasnikEdit(){
+        return getTrenutnoStanje().getDozvolaMenjanjaZaVlasnika();
+    }
+
+    public boolean canVlasnikAdd() {
+        return getTrenutnoStanje().getDozvolaDodavanjaZaVlasnika();
+    }
+
+    public boolean canDodeljenikAdd() {
+        return getTrenutnoStanje().getDozvolaDodavanjaZaZaduzenog();
+    }
+
+    public boolean canReview() {
+        return getTrenutnoStanje().getPotrebnoOdobrenjeZaPrelazak();
     }
 }

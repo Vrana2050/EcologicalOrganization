@@ -26,6 +26,8 @@ public class DokumentConverter extends BaseMapper<Dokument, DokumentDto> impleme
     private TokConverter tokConverter;
     private TokStatusConverter tokStatusConverter;
     private DokumentRevizijaConverter dokumentRevizijaConverter;
+    private DokumentAktivniFajlConverter dokumentAktivniFajlConverter;
+
 
 
     private ProjekatConverter getProjekatConverter() {
@@ -56,6 +58,10 @@ public class DokumentConverter extends BaseMapper<Dokument, DokumentDto> impleme
         if (tokStatusConverter == null) tokStatusConverter = new TokStatusConverter();
         return tokStatusConverter;
     }
+    private DokumentAktivniFajlConverter getDokumentAktivniFajlConverter() {
+        if (dokumentAktivniFajlConverter == null) dokumentAktivniFajlConverter = new DokumentAktivniFajlConverter();
+        return dokumentAktivniFajlConverter;
+    }
 
     @Override
     public Dokument ToEntity(DokumentDto dto) {
@@ -65,10 +71,14 @@ public class DokumentConverter extends BaseMapper<Dokument, DokumentDto> impleme
         dokument.setId(dto.getId());
         dokument.setNaziv(dto.getNaziv());
         dokument.setOpis(dto.getOpis());
-        dokument.setPrioritet(dto.getPrioritet());
+        if(dto.getPrioritet()!=null)
+        {
+            dokument.setPrioritet(dto.getPrioritet());
+        }
         dokument.setRokZavrsetka(dto.getRokZavrsetka());
         dokument.setPoslednjaIzmena(dto.getPoslednjaIzmena());
         dokument.setProcenatZavrsenosti(dto.getProcenatZavrsenosti());
+        dokument.setDatumKreiranja(dto.getDatumKreiranja());
 
         if (dto.getProjekat() != null) {
             dokument.setProjekat(getProjekatConverter().ToEntity(dto.getProjekat()));
@@ -98,7 +108,7 @@ public class DokumentConverter extends BaseMapper<Dokument, DokumentDto> impleme
         }
 
         if (dto.getAktivniFajlovi() != null) {
-            dokument.setAktivniFajlovi(getFajlConverter().ToEntities(dto.getAktivniFajlovi()));
+            dokument.setAktivniFajlovi(getDokumentAktivniFajlConverter().ToEntities(dto.getAktivniFajlovi()));
         }
 
         if (dto.getSviFajlovi() != null) {
@@ -132,6 +142,8 @@ public class DokumentConverter extends BaseMapper<Dokument, DokumentDto> impleme
         dto.setPripremna_verzija(dokument.getPripremna_verzija());
         dto.setPoslednjaIzmena(dokument.getPoslednjaIzmena());
         dto.setProcenatZavrsenosti(dokument.getProcenatZavrsenosti());
+        dto.setRokZavrsetka(dokument.getRokZavrsetka());
+        dto.setDatumKreiranja(dokument.getDatumKreiranja());
 
         if (Hibernate.isInitialized(dokument.getProjekat())) {
             dto.setProjekat(getProjekatConverter().ToDto(dokument.getProjekat()));
@@ -142,7 +154,7 @@ public class DokumentConverter extends BaseMapper<Dokument, DokumentDto> impleme
             dto.setProjekat(projekatDto);
         }
 
-        if (Hibernate.isInitialized(dokument.getTokIzradeDokumenta())) {
+        if (Hibernate.isInitialized(dokument.getTokIzradeDokumenta()) && dokument.getTokIzradeDokumenta() != null) {
             dto.setTokIzradeDokumenta(getTokConverter().ToDto(dokument.getTokIzradeDokumenta()));
         }
         else if (dokument.getTokIzradeDokumenta() != null) {
@@ -151,7 +163,7 @@ public class DokumentConverter extends BaseMapper<Dokument, DokumentDto> impleme
             dto.setTokIzradeDokumenta(tokDto);
         }
 
-        if (Hibernate.isInitialized(dokument.getStatus())) {
+        if (Hibernate.isInitialized(dokument.getStatus()) && dokument.getStatus() != null) {
             dto.setStatus(getTokStatusConverter().ToDto(dokument.getStatus()));
         } else if (dokument.getStatus() != null) {
             TokStatusDto statusDto = new TokStatusDto();
@@ -159,7 +171,7 @@ public class DokumentConverter extends BaseMapper<Dokument, DokumentDto> impleme
             dto.setStatus(statusDto);
         }
 
-        if (Hibernate.isInitialized(dokument.getRoditeljDokument())) {
+        if (Hibernate.isInitialized(dokument.getRoditeljDokument()) &&  dokument.getRoditeljDokument() != null) {
             dto.setRoditeljDokument(ToDto(dokument.getRoditeljDokument()));
         } else if (dokument.getRoditeljDokument() != null) {
             DokumentDto roditelj = new DokumentDto();
@@ -167,14 +179,14 @@ public class DokumentConverter extends BaseMapper<Dokument, DokumentDto> impleme
             dto.setRoditeljDokument(roditelj);
         }
 
-        if (Hibernate.isInitialized(dokument.getVlasnik())) {
+        if (Hibernate.isInitialized(dokument.getVlasnik()) &&  dokument.getVlasnik() != null) {
             dto.setVlasnik(getKorisnikConverter().ToDto(dokument.getVlasnik()));
         } else if (dokument.getVlasnik() != null) {
             KorisnikProjekatDto vlasnikDto = new KorisnikProjekatDto();
             vlasnikDto.setId(dokument.getVlasnik().getId());
             dto.setVlasnik(vlasnikDto);
         }
-        if (Hibernate.isInitialized(dokument.getIzmenaOd())) {
+        if (Hibernate.isInitialized(dokument.getIzmenaOd()) &&   dokument.getIzmenaOd() != null) {
             dto.setIzmenaOd(getKorisnikConverter().ToDto(dokument.getIzmenaOd()));
         } else if (dokument.getIzmenaOd() != null) {
             KorisnikProjekatDto izmenaOdDto = new KorisnikProjekatDto();
@@ -182,7 +194,7 @@ public class DokumentConverter extends BaseMapper<Dokument, DokumentDto> impleme
             dto.setIzmenaOd(izmenaOdDto);
         }
 
-        if (Hibernate.isInitialized(dokument.getGlavniFajl())) {
+        if (Hibernate.isInitialized(dokument.getGlavniFajl()) &&   dokument.getGlavniFajl() != null) {
             dto.setGlavniFajl(getFajlConverter().ToDto(dokument.getGlavniFajl()));
         } else if (dokument.getGlavniFajl() != null) {
             FajlDto fajlDto = new FajlDto();
@@ -191,7 +203,7 @@ public class DokumentConverter extends BaseMapper<Dokument, DokumentDto> impleme
         }
 
         if (Hibernate.isInitialized(dokument.getAktivniFajlovi())) {
-            dto.setAktivniFajlovi(getFajlConverter().ToDtos(dokument.getAktivniFajlovi()));
+            dto.setAktivniFajlovi(getDokumentAktivniFajlConverter().ToDtos(dokument.getAktivniFajlovi()));
         }
 
         if (Hibernate.isInitialized(dokument.getSviFajlovi())) {

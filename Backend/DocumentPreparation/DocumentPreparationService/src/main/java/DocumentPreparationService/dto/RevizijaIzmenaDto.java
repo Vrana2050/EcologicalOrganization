@@ -17,5 +17,6 @@ public class RevizijaIzmenaDto {
     private Boolean ispravljena;
     private LocalDate datumIspravljanja;
     private Long fajlId;
-    private Boolean ispravka_odobrena;
+    private Boolean ispravkaOdobrena;
+    private Long aktivniFajlId;
 }

@@ -83,4 +83,13 @@ public class Tok {
         }
         validate();
     }
+
+    public boolean canCreateDocumentInStatus(TokStatus status) {
+         for(TokStatus tokStatus : statusi) {
+             if(tokStatus.getId().equals(status.getId())) {
+                 return tokStatus.canCreate();
+             }
+         }
+         return false;
+    }
 }

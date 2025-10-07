@@ -5,6 +5,7 @@ import DocumentPreparationService.model.DokumentRevizija;
 import DocumentPreparationService.model.KorisnikProjekat;
 import DocumentPreparationService.model.Projekat;
 import DocumentPreparationService.model.Tok;
+import DocumentPreparationService.model.enumeration.ProjekatStatus;
 import DocumentPreparationService.model.enumeration.Uloga;
 import DocumentPreparationService.repository.ICrudRepository;
 import DocumentPreparationService.repository.IProjekatRepository;
@@ -16,6 +17,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
@@ -27,6 +30,8 @@ public class ProjekatService extends CrudService<Projekat,Long> implements IProj
     private TokService tokService;
     @Autowired
     private IProjekatRepository iProjekatRepository;
+    @Autowired
+    private KorisnikProjekatService korisnikProjekatService;
 
     protected ProjekatService(IProjekatRepository repository) {
         super(repository);
@@ -35,13 +40,15 @@ public class ProjekatService extends CrudService<Projekat,Long> implements IProj
     @Override
     public Projekat create(Projekat projekat) {
         try {
-            //Proveriti usera
             projekat.setProcenatZavrsenosti((float) 0);
+            projekat.setDatumKreiranja(LocalDate.now());
+            projekat.setStatus(ProjekatStatus.u_toku);
             projekat.validate();
             if(!tokService.findById(projekat.getTokProjekta().getId()).isPresent()){
                 throw new NotFoundException("Workflow not found");
             }
-            return super.create(projekat);
+            super.create(projekat);
+            return projekat;
         }
         catch (DataIntegrityViolationException e) {
             System.out.println(e.getMessage());
@@ -102,6 +109,18 @@ public class ProjekatService extends CrudService<Projekat,Long> implements IProj
         }
         projekat.get().setTokProjekta(tokService.findById(projekat.get().getTokProjekta().getId()).get());
         return projekat;
+    }
+
+    @Override
+    public Projekat findByIdEager(Long userId, Long projekatId) {
+        Projekat projekat = iProjekatRepository.findByIdEager(projekatId).orElseThrow(() -> new NotFoundException("Project not found"));
+        korisnikProjekatService.findByUserAndProjekat(userId, projekat.getId()).orElseThrow(() -> new ForbiddenException("User not found on project"));
+        return projekat;
+    }
+
+    @Override
+    public Projekat findByIdEager(Long projekatId) {
+        return iProjekatRepository.findByIdEager(projekatId).orElseThrow(() -> new NotFoundException("Project not found"));
     }
 
     @Override

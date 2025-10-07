@@ -39,6 +39,10 @@ public class Projekat {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tok_projekta_id")
     private Tok tokProjekta;
+    @Column(name = "datum_kreiranja")
+    private LocalDate datumKreiranja;
+    @Column(name = "datum_zavrsetka")
+    private LocalDate datumZavrsetka;
 
     @OneToMany(mappedBy = "projekat", fetch = FetchType.LAZY,cascade = CascadeType.ALL,orphanRemoval = true)
     private Set<KorisnikProjekat> korisniciProjekta = new HashSet<>();
@@ -62,12 +66,12 @@ public class Projekat {
         if(this.naziv == null) throw new InvalidRequestDataException("Invalid name");
         if(this.rokZavrsetka == null || this.rokZavrsetka.isBefore(LocalDate.now())) throw new InvalidRequestDataException("Invalid project due date");
         if(this.getKorisniciProjekta().isEmpty()) throw new InvalidRequestDataException("Project assignees cannot be empty");
-
     }
     public void update(Projekat projekat) {
         this.naziv = projekat.getNaziv();
         this.status = projekat.getStatus();
         this.rokZavrsetka = projekat.getRokZavrsetka();
+        this.datumZavrsetka = projekat.getDatumZavrsetka();
         if(!projekat.getKorisniciProjekta().isEmpty()) {
             setKorisniciProjekta(projekat.getKorisniciProjekta());
         }
@@ -76,7 +80,7 @@ public class Projekat {
     public boolean isMenadzer(Long userId){
         for(KorisnikProjekat kp : this.korisniciProjekta){
             if(kp.getKorisnikId().equals(userId)){
-                if(kp.getUlogaUProjektu() == Uloga.menadzer)
+                if(kp.getUlogaUProjektu().equals(Uloga.menadzer))
                 {
                     return true;
                 }
@@ -97,5 +101,35 @@ public class Projekat {
 
     public boolean isInProgress() {
         return status.equals(ProjekatStatus.u_toku);
+    }
+
+    public boolean canAddDocument(KorisnikProjekat korisnikProjekat, Long newStatusId) {
+        if(!isInProgress()) return false;
+
+        if(isMenadzer(korisnikProjekat.getKorisnikId()))
+        {
+                return CanVlasnikAddDocumentInStatus(newStatusId);
+        }
+        return false;
+    }
+    private boolean CanVlasnikAddDocumentInStatus(Long statusId)
+    {
+        for(TokStatus ts : this.tokProjekta.getStatusi()){
+            if(ts.getId().equals(statusId))
+            {
+                return ts.canVlasnikAdd();
+            }
+        }
+        return false;
+    }
+    private boolean CanDodeljenikAddDocumentInStatus(Long statusId)
+    {
+        for(TokStatus ts : this.tokProjekta.getStatusi()){
+            if(ts.getId().equals(statusId))
+            {
+                return ts.canDodeljenikAdd();
+            }
+        }
+        return false;
     }
 }

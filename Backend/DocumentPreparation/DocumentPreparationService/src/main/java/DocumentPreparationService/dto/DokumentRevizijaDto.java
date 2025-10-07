@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -19,6 +21,7 @@ public class DokumentRevizijaDto {
     private TokStatusDto trenutniStatus;
     private KorisnikProjekatDto pregledac;
     private Set<RevizijaIzmenaDto> izmene;
+    private LocalDate datumRevizije;
 
 
 }

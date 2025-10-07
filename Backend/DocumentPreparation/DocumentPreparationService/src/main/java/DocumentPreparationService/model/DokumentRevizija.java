@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,6 +36,9 @@ public class DokumentRevizija {
     @JoinColumn(name = "pregledac_id")
     private KorisnikProjekat pregledac;
 
+    @Column(name = "datum_revizije")
+    private LocalDate datumRevizije;
+
     @OneToMany(mappedBy = "revizija", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
     private Set<RevizijaIzmena> izmene = new HashSet<>();
     public void setIzmene(Set<RevizijaIzmena> izmene){
@@ -50,8 +54,8 @@ public class DokumentRevizija {
     public void validate(){
         if(dokument==null) throw new InvalidRequestDataException("Dokument is required");
         if(!trenutniStatus.getTrenutnoStanje().getPotrebnoOdobrenjeZaPrelazak()) throw new InvalidRequestDataException("Cannot review in current state");
+        if(datumRevizije==null)  throw new InvalidRequestDataException("Date is required");
         validatePregledac();
-        setOdobreno(getIzmene().isEmpty());
         if(odobreno)
         {
             this.approveAllIzmene();
@@ -67,12 +71,31 @@ public class DokumentRevizija {
 
     private void validatePregledac() {
         if(pregledac==null) throw new InvalidRequestDataException("Reviewer is required");
-        if(!dokument.isKorisnikVlasnik(pregledac)) throw  new ForbiddenException("Reviewer is not document owner");
     }
 
     public void update(DokumentRevizija newDokumentRevizija) {
         for(RevizijaIzmena revizijaIzmena : newDokumentRevizija.getIzmene()) {
-            izmene.forEach(izmena->{if(izmena.getId()==revizijaIzmena.getId()) izmena.update(izmena);});
+            for(RevizijaIzmena rI : this.getIzmene()) {
+                if(rI.getId().equals(revizijaIzmena.getId())) {
+                    rI.update(revizijaIzmena);
+                }
+            }
         }
+    }
+
+    public boolean IsResolved() {
+        return izmene.stream().allMatch(izmena->izmena.isResolved());
+    }
+
+    public boolean isOdobrena() {
+        return getOdobreno();
+    }
+
+    public boolean isResolved() {
+        return izmene.stream().allMatch(izmena->izmena.isResolved());
+    }
+
+    public boolean isIspravljena() {
+        return izmene.stream().allMatch(revizijaIzmena -> revizijaIzmena.isIspravljena());
     }
 }

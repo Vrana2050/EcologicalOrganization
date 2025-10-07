@@ -1,14 +1,13 @@
 package DocumentPreparationService.service;
 
+import DocumentPreparationService.dto.DokumentAktivniFajlDto;
 import DocumentPreparationService.dto.FajlDto;
 import DocumentPreparationService.exception.ForbiddenException;
 import DocumentPreparationService.exception.NotFoundException;
-import DocumentPreparationService.model.Dokument;
-import DocumentPreparationService.model.DokumentRevizija;
-import DocumentPreparationService.model.Fajl;
-import DocumentPreparationService.model.KorisnikProjekat;
+import DocumentPreparationService.model.*;
 import DocumentPreparationService.repository.ICrudRepository;
 import DocumentPreparationService.repository.IFajlRepository;
+import DocumentPreparationService.service.interfaces.IDokumentAktivniFajlService;
 import DocumentPreparationService.service.interfaces.IFajlService;
 import DocumentPreparationService.service.interfaces.IKorisnikProjekatService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class FajlService extends CrudService<Fajl,Long> implements IFajlService {
@@ -27,6 +27,9 @@ public class FajlService extends CrudService<Fajl,Long> implements IFajlService 
     private IFajlRepository fajlRepository;
     @Autowired
     private IKorisnikProjekatService  korisnikProjekatService;
+    @Autowired
+    private IDokumentAktivniFajlService  dokumentAktivniFajlService;
+
     protected FajlService(IFajlRepository repository) {
         super(repository);
     }
@@ -45,22 +48,22 @@ public class FajlService extends CrudService<Fajl,Long> implements IFajlService 
     @Override
     @Transactional
     public Fajl uploadFajl(Long dokumentId, Long userId, Fajl newFajl){
-        Dokument dokument = dokumentService.getDokumentWithFiles(dokumentId);
-        if(dokument == null){
-            throw new NotFoundException("Dokument not found");
-        }
         Fajl savedFajl = null;
-        for(Fajl fajl : dokument.getAktivniFajlovi()){
-            if(fajl.isNewVerzija(newFajl)) {
+        Set<DokumentAktivniFajl> dokumentAktivniFajlovi = dokumentAktivniFajlService.findByDokumentIdWithFajl(dokumentId);
+        Dokument dokument = dokumentService.findByIdWithAllFajlovi(dokumentId);
+        for(DokumentAktivniFajl daf : dokumentAktivniFajlovi){
+            if(daf.getFajl().isNewVerzija(newFajl)) {
                 savedFajl = createNewVerzija(dokument.getSviFajlovi(),newFajl);
-                dokument.getAktivniFajlovi().remove(fajl);
+                daf.setFajl(savedFajl);
             }
         }
-        if(savedFajl == null)
-        {
+        if(savedFajl == null){
             savedFajl = create(newFajl);
+            DokumentAktivniFajl daf = new DokumentAktivniFajl();
+            daf.setFajl(savedFajl);
+            daf.setDokument(dokument);
+            dokumentAktivniFajlService.create(daf);
         }
-        dokument.getAktivniFajlovi().add(savedFajl);
         dokument.getSviFajlovi().add(savedFajl);
         dokument = dokumentService.updateDokumentFiles(dokument,userId);
         return savedFajl;
@@ -72,8 +75,10 @@ public class FajlService extends CrudService<Fajl,Long> implements IFajlService 
     }
 
     @Override
-    public Set<Fajl> findAllActiveByDokument(Long dokumentId, Long userId) {
-        return dokumentService.getDokumentAktivneFajlove(dokumentId,userId);
+    public Set<DokumentAktivniFajl> findAllActiveByDokument(Long dokumentId, Long userId) {
+        Dokument dokument = dokumentService.findById(dokumentId).orElseThrow(() -> new NotFoundException("Document not found"));;
+        KorisnikProjekat kp = korisnikProjekatService.findByUserAndProjekat(userId,dokument.getProjekat().getId()).orElseThrow(() -> new ForbiddenException("User not found on project"));
+        return dokumentAktivniFajlService.findByDokumentIdWithFajl(dokumentId);
     }
 
     @Override
@@ -85,10 +90,25 @@ public class FajlService extends CrudService<Fajl,Long> implements IFajlService 
     @Override
     public Set<Fajl> findAllFileVersions(Long aktivniFajlId, Long userId,int page,int size){
         int offset = page * size;
-        //TREBA MI AKTIVNI FAJL SERVICE
-      /*  Dokument dokument = dokumentService.findById(dokumentId).orElseThrow(() -> new NotFoundException("Document not found"));;
-        KorisnikProjekat kp = korisnikProjekatService.findByUserAndProjekat(userId,dokument.getProjekat().getId()).orElseThrow(() -> new ForbiddenException("User not found on project"));*/
+        DokumentAktivniFajl aktivniFajl = dokumentAktivniFajlService.findById(aktivniFajlId).orElseThrow(() -> new NotFoundException("Document not found"));
+        Dokument dokument = dokumentService.findById(aktivniFajl.getDokument().getId()).orElseThrow(() -> new NotFoundException("Document not found"));;
+        KorisnikProjekat kp = korisnikProjekatService.findByUserAndProjekat(userId,dokument.getProjekat().getId()).orElseThrow(() -> new ForbiddenException("User not found on project"));
         return fajlRepository.findOtherVersions(aktivniFajlId,offset,size);
     }
-    
+
+    @Override
+    @Transactional
+    public Fajl restoreFajl(Long userId, Fajl fajl,Long dokumentAktivniFajlId) {
+        Fajl fajlToRestore = fajlRepository.findById(fajl.getId()).orElseThrow(() -> new NotFoundException("File not found"));
+        DokumentAktivniFajl daf = dokumentAktivniFajlService.findById(dokumentAktivniFajlId).orElseThrow(() -> new NotFoundException("Document active file not found"));
+        Dokument dokumentToUpdate = dokumentService.findByIdEager(daf.getDokument().getId());
+        daf.setFajl(fajlToRestore);
+        dokumentAktivniFajlService.create(daf);
+        if(dokumentToUpdate.getGlavniFajl().getId().equals(daf.getFajl().getId())) {
+            dokumentToUpdate.setGlavniFajl(fajlToRestore);
+        }
+        dokumentService.updateDokumentFiles(dokumentToUpdate,userId);
+        return fajlToRestore;
+    }
+
 }

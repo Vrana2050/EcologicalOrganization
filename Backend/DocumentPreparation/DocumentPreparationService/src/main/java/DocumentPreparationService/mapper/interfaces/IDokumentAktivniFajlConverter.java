@@ -1,0 +1,9 @@
+package DocumentPreparationService.mapper.interfaces;
+
+import DocumentPreparationService.dto.DokumentAktivniFajlDto;
+import DocumentPreparationService.dto.DokumentDto;
+import DocumentPreparationService.model.Dokument;
+import DocumentPreparationService.model.DokumentAktivniFajl;
+
+public interface IDokumentAktivniFajlConverter extends IBaseConverter<DokumentAktivniFajl, DokumentAktivniFajlDto> {
+}

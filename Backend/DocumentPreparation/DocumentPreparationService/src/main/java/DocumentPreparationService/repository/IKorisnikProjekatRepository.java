@@ -28,4 +28,6 @@ public interface IKorisnikProjekatRepository extends ICrudRepository<KorisnikPro
             @Param("userId") Long userId,
             @Param("projekatId") Long projekatId
     );
+
+    Set<KorisnikProjekat> getAllByProjekatId(Long projekatId);
 }

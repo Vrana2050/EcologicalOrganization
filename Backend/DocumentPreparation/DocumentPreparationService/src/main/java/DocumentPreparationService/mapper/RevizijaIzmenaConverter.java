@@ -30,8 +30,7 @@ public class RevizijaIzmenaConverter extends BaseMapper<RevizijaIzmena, Revizija
         entity.setIzmena(dto.getIzmena());
         entity.setIspravljena(dto.getIspravljena());
         entity.setDatumIspravljanja(dto.getDatumIspravljanja());
-        entity.setIspravkaOdobrena(dto.getIspravka_odobrena());
-
+        entity.setIspravkaOdobrena(dto.getIspravkaOdobrena());
         if (dto.getDokumentRevizijaId() != null) {
             DokumentRevizija dokumentRevizija = new  DokumentRevizija();
             dokumentRevizija.setId(dto.getDokumentRevizijaId());
@@ -41,6 +40,11 @@ public class RevizijaIzmenaConverter extends BaseMapper<RevizijaIzmena, Revizija
             Fajl fajl = new Fajl();
             fajl.setId(dto.getFajlId());
             entity.setFajl(fajl);
+        }
+        if (dto.getAktivniFajlId() != null) {
+            DokumentAktivniFajl aktivniFajl = new DokumentAktivniFajl();
+            aktivniFajl.setId(dto.getAktivniFajlId());
+            entity.setDokumentAktivniFajl(aktivniFajl);
         }
 
         return entity;
@@ -56,9 +60,15 @@ public class RevizijaIzmenaConverter extends BaseMapper<RevizijaIzmena, Revizija
         dto.setIspravljena(entity.getIspravljena());
         dto.setDokumentRevizijaId(entity.getRevizija().getId());
         dto.setDatumIspravljanja(entity.getDatumIspravljanja());
-        dto.setFajlId(entity.getFajl().getId());
-        dto.setIspravka_odobrena(entity.getIspravkaOdobrena());
-
+        if(entity.getFajl()!=null)
+        {
+            dto.setFajlId(entity.getFajl().getId());
+        }
+        dto.setIspravkaOdobrena(entity.getIspravkaOdobrena());
+        if (entity.getDokumentAktivniFajl() != null)
+        {
+            dto.setAktivniFajlId(entity.getDokumentAktivniFajl().getId());
+        }
         return dto;
     }
 }

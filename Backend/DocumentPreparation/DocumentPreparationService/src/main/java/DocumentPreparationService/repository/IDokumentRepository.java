@@ -38,28 +38,29 @@ public interface IDokumentRepository extends ICrudRepository<Dokument, Long> {
             "JOIN d.dodeljeniKorisnici k " +
             "WHERE k IN :korisnici")
     Set<Dokument> findAllByAnyDodeljeniKorisnici(@Param("korisnici") Set<KorisnikProjekat> korisnici);
-
-    @Query("SELECT d FROM Dokument d " +
-            "LEFT JOIN FETCH d.aktivniFajlovi "+
-            "LEFT JOIN FETCH d.sviFajlovi "+
-            "WHERE d.id = :dokumentId")
-    Dokument findByIdWithFiles(Long dokumentId);
     @Query("SELECT d FROM Dokument d " +
             "LEFT JOIN FETCH d.sviFajlovi "+
             "WHERE d.id = :dokumentId")
     Optional<Dokument> findByIdWithSviFajlovi(Long dokumentId);
     @Query("SELECT d FROM Dokument d " +
-            "LEFT JOIN FETCH d.aktivniFajlovi "+
-            "WHERE d.id = :dokumentId")
-    Optional<Dokument> findByIdWithAktivniFajlovi(Long dokumentId);
-    @Query("SELECT d FROM Dokument d " +
             "LEFT JOIN FETCH d.glavniFajl " +
             "LEFT JOIN FETCH d.zavisiOd " +
+            "LEFT JOIN FETCH d.dodeljeniKorisnici " +
             "WHERE d.projekat.id = :projekatId and d.roditeljDokument is null")
     Set<Dokument> getAllBoardDocumentsByProjectId(long projekatId);
     @Query("SELECT d FROM Dokument d " +
             "LEFT JOIN FETCH d.glavniFajl " +
             "LEFT JOIN FETCH d.zavisiOd " +
+            "LEFT JOIN FETCH d.dodeljeniKorisnici " +
             "WHERE d.roditeljDokument.id = :parentDocumentId")
     Set<Dokument> getAllBoardDocumentsByParentDocumentId(Long parentDocumentId);
+
+    @Query("SELECT d FROM Dokument d " +
+            "WHERE d.roditeljDokument.id = :parentDocumentId")
+    Set<Dokument> getAllDokumentiOnRoditeljDokument(Long parentDocumentId);
+    @Query("SELECT d FROM Dokument d " +
+            "WHERE d.projekat.id = :projekatId AND d.roditeljDokument is null ")
+    Set<Dokument> getAllDokumentiOnProjekat(Long projekatId);
+
+    Set<Dokument> findAllByIdIn(Collection<Long> ids);
 }

@@ -1,5 +1,6 @@
 package DocumentPreparationService.service.interfaces;
 
+import DocumentPreparationService.dto.DokumentDto;
 import DocumentPreparationService.model.Dokument;
 import DocumentPreparationService.model.DokumentRevizija;
 import DocumentPreparationService.model.Fajl;
@@ -17,13 +18,20 @@ public interface IDokumentService extends ICrudService<Dokument,Long> {
     public Dokument findById(Long id, Long userId);
     public Set<Dokument> findAll(Long userId);
     public Dokument updateStatus(Dokument newDokument,Long userId);
-    public Dokument getDokumentWithFiles(Long dokumentId);
     public Dokument updateDokumentFiles(Dokument dokument, Long userId);
     Set<Fajl> getDokumentSveFajlove(Long dokumentId, Long userId);
-
-    Set<Fajl> getDokumentAktivneFajlove(Long dokumentId, Long userId);
-
     Set<Dokument> findAllBoardDocumentsByProjectId(Long userId, Long projectId);
 
     Set<Dokument> findAllBoardDocumentsByParentDocumentId(Long userId, Long parentDocumentId);
+    public Dokument findByIdWithAllFajlovi(Long dokumentId);
+
+    Set<Dokument> getAllDocumentsOnProject(Long userId, Long projekatId);
+
+    Set<Dokument> getAllDocumentsOnParentDocument(Long userId, Long dokumentId);
+
+    public Dokument findByIdEager(Long id);
+
+    Dokument updateWorkflow(Dokument dokument, Long userId);
+
+    Dokument updateMainFile(Dokument dokument, Long userId);
 }

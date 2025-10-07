@@ -39,6 +39,11 @@ public class RevizijaIzmena {
     @JoinColumn(name = "fajl_id")
     private Fajl fajl;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "aktivni_fajl_id")
+    private DokumentAktivniFajl dokumentAktivniFajl;
+
+
     public RevizijaIzmena() {}
     public void validate(){
         if(this.izmena == null) throw new InvalidRequestDataException("Change is required");
@@ -50,10 +55,18 @@ public class RevizijaIzmena {
     }
 
     public void update(RevizijaIzmena izmena) {
-        this.ispravljena = izmena.getIspravljena();
-        if(izmena.getIspravljena()) {
+        if(!this.ispravljena && izmena.getIspravljena()) {
             this.setDatumIspravljanja(izmena.getDatumIspravljanja());
         }
+        this.ispravljena = izmena.getIspravljena();
         this.setIspravkaOdobrena(izmena.getIspravkaOdobrena());
+    }
+
+    public boolean isResolved() {
+        return ispravljena && ispravkaOdobrena;
+    }
+
+    public boolean isIspravljena() {
+        return ispravljena;
     }
 }

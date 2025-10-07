@@ -60,7 +60,7 @@ public class Fajl {
         Set<String> allowedExtensions = Set.of(
                 "txt",
                 "doc", "docx","pdf",
-                "jpg", "jpeg", "png", "gif", "bmp"
+                "jpg", "jpeg", "png", "bmp"
         );
         String lowerExt = ekstenzija.toLowerCase();
 

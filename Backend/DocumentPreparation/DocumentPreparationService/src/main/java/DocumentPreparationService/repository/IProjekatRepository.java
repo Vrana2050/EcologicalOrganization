@@ -19,4 +19,8 @@ public interface IProjekatRepository extends ICrudRepository<Projekat, Long> {
     Optional<Projekat> findByIdWithKorisnici(@Param("id") Long id);
     @EntityGraph(attributePaths = "korisniciProjekta")
     Set<Projekat> findDistinctByKorisniciProjekta_KorisnikId(Long userId);
+
+    @Query("SELECT p FROM Projekat p LEFT JOIN FETCH p.korisniciProjekta LEFT JOIN FETCH p.tokProjekta WHERE p.id = :projekatId")
+
+    Optional<Projekat> findByIdEager(Long projekatId);
 }

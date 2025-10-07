@@ -15,4 +15,6 @@ public interface IKorisnikProjekatService extends ICrudService<KorisnikProjekat,
     Set<KorisnikProjekat> findByUser(Long userId);
 
     boolean isKorisnikDodeljenik(Long userId,Long projekatId, Long dokumentId);
+
+    Set<KorisnikProjekat> getAllAvailableOnProject(Long projekatId, Long userId);
 }

@@ -57,7 +57,10 @@ public class TokStatusConverter extends BaseMapper<TokStatus, TokStatusDto> impl
 
         TokStatusDto dto = new TokStatusDto();
         dto.setId(entity.getId());
-        dto.setTokId(entity.getTok().getId());
+        if(entity.getTok()!=null)
+        {
+            dto.setTokId(entity.getTok().getId());
+        }
 
         if (Hibernate.isInitialized(entity.getTrenutnoStanje()) && entity.getTrenutnoStanje() != null) {
             dto.setTrenutnoStanje(getStatusConverter().ToDto(entity.getTrenutnoStanje()));

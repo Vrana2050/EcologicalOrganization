@@ -46,6 +46,8 @@ public class ProjekatConverter extends BaseMapper<Projekat, ProjekatDto>  implem
         entity.setStatus(dto.getStatus());
         entity.setRokZavrsetka(dto.getRokZavrsetka());
         entity.setProcenatZavrsenosti(dto.getProcenatZavrsenosti());
+        entity.setDatumKreiranja(dto.getDatumKreiranja());
+        entity.setDatumZavrsetka(dto.getDatumZavrsetka());
         if (dto.getTokProjekta() != null) {
             entity.setTokProjekta(getTokConverter().ToEntity(dto.getTokProjekta()));
         }
@@ -71,6 +73,8 @@ public class ProjekatConverter extends BaseMapper<Projekat, ProjekatDto>  implem
         dto.setStatus(entity.getStatus());
         dto.setRokZavrsetka(entity.getRokZavrsetka());
         dto.setProcenatZavrsenosti(entity.getProcenatZavrsenosti());
+        dto.setDatumKreiranja(entity.getDatumKreiranja());
+        dto.setDatumZavrsetka(entity.getDatumZavrsetka());
 
         if (Hibernate.isInitialized(entity.getTokProjekta())) {
             dto.setTokProjekta(getTokConverter().ToDto(entity.getTokProjekta()));

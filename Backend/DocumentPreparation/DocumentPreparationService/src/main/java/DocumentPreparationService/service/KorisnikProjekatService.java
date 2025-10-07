@@ -1,5 +1,6 @@
 package DocumentPreparationService.service;
 
+import DocumentPreparationService.exception.ForbiddenException;
 import DocumentPreparationService.model.Dokument;
 import DocumentPreparationService.model.DokumentRevizija;
 import DocumentPreparationService.model.KorisnikProjekat;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -52,6 +54,18 @@ public class KorisnikProjekatService extends CrudService<KorisnikProjekat,Long> 
             }
         }
         return false;
+    }
+
+    @Override
+    public Set<KorisnikProjekat> getAllAvailableOnProject(Long projekatId, Long userId) {
+        Set<KorisnikProjekat> dodeljenici = repository.getAllByProjekatId(projekatId);
+        KorisnikProjekat korisnik = dodeljenici.stream()
+                .filter(dodeljenik -> dodeljenik.getKorisnikId().equals(userId))
+                .findFirst()
+                .orElse(null);
+        if(korisnik == null) throw new ForbiddenException("Cannot load assignees on non assigned project");
+
+        return dodeljenici.stream().filter(dodeljenik-> !korisnik.isLowerRanked(dodeljenik)).collect(Collectors.toSet());
     }
 
     private Optional<KorisnikProjekat> findByUserAndProjekatWithDocuments(Long userId, Long projekatId) {

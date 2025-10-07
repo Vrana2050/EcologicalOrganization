@@ -21,5 +21,8 @@ public class ProjekatDto {
     private Set<DokumentDto> dokumenti;
     private Set<KorisnikProjekatDto>  korisniciProjekta;
     private Float procenatZavrsenosti;
+    private LocalDate datumZavrsetka;
+    private LocalDate datumKreiranja;
+
 
 }

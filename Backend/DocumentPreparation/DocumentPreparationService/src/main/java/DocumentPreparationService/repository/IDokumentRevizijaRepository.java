@@ -19,4 +19,6 @@ public interface IDokumentRevizijaRepository extends ICrudRepository<DokumentRev
 
     @Query("SELECT d FROM DokumentRevizija d JOIN FETCH d.dokument WHERE d.id = :id")
     Optional<DokumentRevizija> findByIdWithDokument(@Param("id") Long id);
+
+    Set<DokumentRevizija> findALlByDokument_Id(Long dokumentId);
 }

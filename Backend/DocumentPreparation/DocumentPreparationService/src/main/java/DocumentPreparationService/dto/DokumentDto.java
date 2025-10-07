@@ -1,9 +1,6 @@
 package DocumentPreparationService.dto;
 
-import DocumentPreparationService.model.Dokument;
-import DocumentPreparationService.model.DokumentRevizija;
-import DocumentPreparationService.model.KorisnikProjekat;
-import DocumentPreparationService.model.TokStatus;
+import DocumentPreparationService.model.*;
 import DocumentPreparationService.model.enumeration.Prioritet;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.Column;
@@ -34,6 +31,7 @@ public class DokumentDto {
 
     private Prioritet prioritet;
     private LocalDate poslednjaIzmena;
+    private LocalDate datumKreiranja;
     private KorisnikProjekatDto izmenaOd;
     private Float procenatZavrsenosti;
     private Boolean pripremna_verzija;
@@ -43,7 +41,7 @@ public class DokumentDto {
     private FajlDto glavniFajl;
     private KorisnikProjekatDto vlasnik;
 
-    private Set<FajlDto> aktivniFajlovi;
+    private Set<DokumentAktivniFajlDto> aktivniFajlovi;
     private Set<FajlDto> sviFajlovi;
 
     private Set<DokumentDto> zavisiOd;
