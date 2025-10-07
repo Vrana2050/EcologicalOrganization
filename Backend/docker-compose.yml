@@ -105,10 +105,6 @@ services:
   #  ports:
   #    - "8000:8000"
 
-volumes:
-  pg_data:
-
-
   # document-service:
   #   build:
   #     context: ./DocumentDatabaseService
@@ -207,19 +203,19 @@ volumes:
 #      SPRING_INFLUX_URL: http://influxdb:8086
 #      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
 
-#  influxdb:
-#    image: influxdb:2.7.6
-#    ports:
-#      - '8086:8086'
-#    volumes:
-#      - influxdb-storage:/var/lib/influxdb
-#    environment:
-#      - DOCKER_INFLUXDB_INIT_MODE=setup
-#      - DOCKER_INFLUXDB_INIT_USERNAME=nais
-#      - DOCKER_INFLUXDB_INIT_PASSWORD=password
-#      - DOCKER_INFLUXDB_INIT_ORG=nais_org
-#      - DOCKER_INFLUXDB_INIT_BUCKET=nais_bucket
-#      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token
+  influxdb:
+    image: influxdb:2.7.6
+    ports:
+      - '8086:8086'
+    volumes:
+      - influxdb-storage:/var/lib/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=iis
+      - DOCKER_INFLUXDB_INIT_PASSWORD=password
+      - DOCKER_INFLUXDB_INIT_ORG=iis_org
+      - DOCKER_INFLUXDB_INIT_BUCKET=iis_bucket
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token
 
   #neo4j:
    # image: neo4j
@@ -369,3 +365,6 @@ volumes:
   #     REDIS_HOST: redisdb
   #     REDIS_PORT: 6379
 
+volumes:
+  pg_data:
+  influxdb-storage:
