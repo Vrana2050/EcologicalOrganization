@@ -8,6 +8,7 @@ app = FastAPI()
 
 origins = [
     "http://localhost:9000",  # Gateway
+    "http://localhost:4200",
 ]
 
 app.add_middleware(

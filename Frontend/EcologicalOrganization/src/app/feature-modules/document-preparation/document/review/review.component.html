@@ -8,11 +8,16 @@
       <div class="issues-container">
         <div class="issue-header">
           <span class="issue-title">Global</span>
-          <button class="dp-positive"><img class="add-issue-img" src="assets/plus.png" alt="Add Issue"></button>
+          <button class="dp-positive"><img class="add-issue-img" src="assets/plus.png" alt="Add Issue" (click)="openAddGlobalIssue()"></button>
         </div>
-        <div class="issue-list" *ngIf="globalIssues &&  globalIssues.length > 0">
+        <div class="issue-list" *ngIf="(globalIssues &&  globalIssues.length > 0) || addGlobalIssue">
+          <div class="issue-item" *ngIf="addGlobalIssue">
+            <input type="text" class="issue-input" placeholder="Describe the issue..." [(ngModel)]="newGlobalIssueDescription" />
+            <img class="check-icon" src="assets/checked.png" alt="Add Issue" (click)="addGlobalIssueToDocument(newGlobalIssueDescription);" />
+          </div>
           <div class="issue-item" *ngFor="let issue of globalIssues">
-            <input type="checkbox" [checked]="issue.isApproved()" (change)="issue.correctionApproved = !issue.correctionApproved" />
+            <input type="checkbox" *ngIf="issue.id!==-1" [checked]="issue.isApproved()" (change)="issue.correctionApproved = !issue.correctionApproved" />
+            <img *ngIf="issue.id===-1" class="bin-icon" src="assets/bin.png" alt="Pending Approval" (click)="removeGlobalIssue(issue)" />
             <span class="issue-description">{{ issue.issue }}</span>
           </div>
         </div>
@@ -20,11 +25,21 @@
       <div class="issues-container"  *ngIf="selectedFile">
         <div class="issue-header">
           <span class="issue-title">Selected File</span>
-          <button class="dp-positive"><img class="add-issue-img" src="assets/plus.png" alt="Add Issue"></button>
+          <button class="dp-positive"><img class="add-issue-img" src="assets/plus.png" alt="Add Issue" (click)="openAddFileIssue()"></button>
         </div>
         <div class="issue-list">
+          <div class="issue-item" *ngIf="addFileIssue">
+            <input type="text" class="issue-input" placeholder="Describe the issue..." [(ngModel)]="newFileIssue" />
+            <img class="check-icon" src="assets/checked.png" alt="Add Issue" (click)="addFileIssueToSelectedFile(newFileIssue);" />
+          </div>
           <div class="issue-item" *ngFor="let issue of selectedFile.unApprovedIssues">
-            <input type="checkbox" [checked]="issue.isApproved()" (change)="issue.correctionApproved = !issue.correctionApproved" />
+            <input type="checkbox" *ngIf="issue.id!==-1" [checked]="issue.isApproved()" (change)="issue.correctionApproved = !issue.correctionApproved" />
+            <img *ngIf="issue.id===-1" class="bin-icon" src="assets/bin.png" alt="Pending Approval" (click)="removeFileIssue(issue)" />
+            <span class="issue-description">{{ issue.issue }}</span>
+          </div>
+          <div class="issue-item" *ngFor="let issue of getUserAddedFileIssuesForSelectedFile()">
+            <input type="checkbox" *ngIf="issue.id!==-1" [checked]="issue.isApproved()" (change)="issue.correctionApproved = !issue.correctionApproved" />
+            <img *ngIf="issue.id===-1" class="bin-icon" src="assets/bin.png" alt="Pending Approval" (click)="removeFileIssue(issue)" />
             <span class="issue-description">{{ issue.issue }}</span>
           </div>
         </div>
@@ -32,16 +47,16 @@
     </div>
     <div class="content-container" *ngIf="hasUnResolvedReview && unResolvedFiles && unResolvedFiles[i] !== undefined">
       <div class="file-container-wrapper">
-        <div class="file-container">
+        <div class="file-container" (click)="openFile(unResolvedFiles[i].activeFile.file)" >
           <span class="file-name">{{ this.unResolvedFiles[i].activeFile.file.name }}<img src="assets/new.png" alt="New File" class="new-file-icon" *ngIf="unResolvedFiles[i].isFileNew && unResolvedFiles[i].unApprovedIssues  && unResolvedFiles[i].unApprovedIssues!.length===0"></span>
           <img class="file-icon" src="assets/{{unResolvedFiles[i].activeFile.file.extension}}.png" alt="File Icon">
           <span class="file-upload-date">{{ unResolvedFiles[i].activeFile.file.dateUploaded | date:'medium' }}</span>
         </div>
       </div>
       <div class="action-buttons">
-        <button class="previous-action-button" [style.cursor]="canGoToPrevious() ? 'pointer' : 'not-allowed'" [style.backgroundColor]="canGoToPrevious() ? '#1976d2' : '#ccc'" [disabled]="!canGoToPrevious()" (click)="goToPrevious()">Previous</button>
-        <button class="next-action-button" *ngIf="canGoToNext()" (click)="goToNext()">Next</button>
-        <button class="finish-action-button next-action-button" (click)="goToNext()" *ngIf="!canGoToNext()">Finish</button>
+        <button class="previous-action-button" *ngIf="!showOnlyOneFile" [style.cursor]="canGoToPrevious() ? 'pointer' : 'not-allowed'" [style.backgroundColor]="canGoToPrevious() ? '#1976d2' : '#ccc'" [disabled]="!canGoToPrevious()" (click)="goToPrevious()">Previous</button>
+        <button class="next-action-button" *ngIf="canGoToNext() && !showOnlyOneFile" (click)="goToNext()">Next</button>
+        <button class="finish-action-button next-action-button" (click)="goToNext()" *ngIf="!canGoToNext() || showOnlyOneFile">Finish</button>
       </div>
     </div>
 
@@ -56,7 +71,8 @@
           <img *ngIf="!document.isFileApproved(file.id)" class="file-summary-icon" src="assets/cross.png" alt="Unresolved Issues">
           <img class="file-icon" src="assets/{{file.file.extension}}.png" alt="File Icon">
           <span class="file-summary-name">{{ file.file.name }}</span>
-          <span class="file-summary-issues" *ngIf="document.getUnApprovedIssuesForActiveFile(file.id).length > 0">{{ document.getUnApprovedIssuesForActiveFile(file.id).length }} Issues</span>
+          <span class="file-summary-issues" *ngIf="hasUnResolvedIssues(file.id)">{{ getUnResolvedIssuesCount(file.id) }} Issues</span>
+          <button class="view-file-button" *ngIf="selectedFile && selectedFile.activeFile.id === file.id" (click)="openReviewFile(file); $event.stopPropagation()">Review</button>
         </div>
       </div>
       <div class="summary-actions">

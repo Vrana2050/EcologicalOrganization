@@ -1,5 +1,5 @@
 <document-preparation-workflow-popup *ngIf="isWorkflowPopupVisible" (done)="handleWorkflowDone($event)" (close)="closePopup()"></document-preparation-workflow-popup>
-<div class="project-form-container">
+<div class="project-form-container" *ngIf="!isWorkflowPopupVisible">
   <div class="form-header">
     <span>Create New Project</span>
   </div>
@@ -67,7 +67,7 @@
 
     </div>
     <div class="form-actions">
-      <button class="cancel-button" type="button" (click)="projectForm.reset()">
+      <button class="cancel-button" type="button" (click)="cancel()">
         Cancel
       </button>
       <button class="submit-button" type="submit" [disabled]="projectForm.invalid">

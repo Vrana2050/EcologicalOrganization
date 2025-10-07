@@ -42,13 +42,15 @@ export interface IDocumentExtended extends IDocumentBase{
   assignees?: IUserProject[];
 }
 export interface IDocumentDetails extends IDocumentExtended{
+  canManageFile(userId: number): boolean;
   canReviewSubDocument(userId: number): boolean;
   canEditDocument(userId: number): boolean;
-  getNextStatus(): IWorkflowStatus | undefined;
+  getNextStatus(parentWorkflow: IWorkflow): IWorkflowStatus | undefined;
   hasPermissionForNextStatus(): boolean;
   doesActiveFileHaveUnCorrectedIssues(activeFileId: number): boolean;
   doesActiveFileHaveUnApprovedCorrections(activeFileId: number): boolean;
   canAddFile(userId: number): boolean;
+  canMoveToNextStatus(userId: number): any;
   canAddSubDocument(userId: number): boolean;
   workflow?:IWorkflow;
   vlasnik:IUserProject;

@@ -121,12 +121,18 @@ export class ProjectCreate {
   tokProjekta:{
     id: number;
   };
-  korisniciProjekta: UserProjectCreate[];
+  korisniciProjekta:[{
+    korisnikId: number,
+    ulogaUProjektu: ProjectRole,
+  }];
 
   constructor(data: any) {
     this.naziv = data.name;
     this.rokZavrsetka = new Date(data.dueDate);
     this.tokProjekta = { id: data.workflow.id };
-    this.korisniciProjekta = data.assignees.map((assignee: any) => new UserProjectCreate(assignee));
+    this.korisniciProjekta = data.assignees.map((assignee: any) => ({
+      korisnikId: assignee.userId,
+      ulogaUProjektu: assignee.projectRole,
+    }));
   }
 }

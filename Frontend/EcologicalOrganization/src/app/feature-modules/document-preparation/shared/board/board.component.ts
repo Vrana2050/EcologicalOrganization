@@ -23,7 +23,7 @@ export class BoardComponent implements OnInit {
 @Input() isUserOwner: boolean;
 @Input() isUserAssignee: boolean;
 @Input() canEdit: boolean = false;
-@Output() addDocument = new EventEmitter<IStatus>();
+@Output() addDocument = new EventEmitter<IWorkflowStatus>();
 
 boardWorkflow : IBoardWorkflow;
 statusColors: { [id: number]: string } = {};
@@ -58,6 +58,7 @@ connectDocumentsToStatuses() {
   this.boardWorkflow.statuses.forEach(status => {
     status.documents = this.documents.filter(doc => doc.status.id === status.status.id);
   });
+  console.log(this.boardWorkflow);
 }
 getDocumentCountByStatus(status: IBoardWorkflowStatus): number {
   return status.documents ? status.documents.length : 0;
@@ -66,7 +67,7 @@ canAddDocument(status: IStatus): boolean {
   if(!this.canEdit) {
     return false;
   }
-  return (this.isUserAssignee && status.assigneeAddPermission) || (this.isUserOwner && status.ownerAddPermission);
+  return (this.isUserOwner && status.ownerAddPermission);
 }
 generateStatusColors(count: number): string[] {
   const colors: string[] = [];
@@ -123,7 +124,7 @@ openDocumentAnalysis(event: MouseEvent, doc: DocumentBoard): void {
   event.stopPropagation();
   this.router.navigate(['document-preparation/analysis/document', doc.id]);
 }
-openCreateDocumentModal(event: MouseEvent, status: IStatus): void {
+openCreateDocumentModal(event: MouseEvent, status: IWorkflowStatus): void {
   event.stopPropagation();
   this.addDocument.emit(status);
 }

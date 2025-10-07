@@ -7,7 +7,7 @@ export interface IRevision{
   approved: boolean;
   workflowStatusId: number;
   reviewerId: number;
-  revisionIssues: IRevisionIssue[];
+  revisionIssues?: IRevisionIssue[];
   revisionDate: Date;
   getUnResolvedIssuesForActiveFile(activeFileId: number): IRevisionIssue[];
   getUnApprovedIssuesForActiveFile(activeFileId: number): IRevisionIssue[];
@@ -23,6 +23,7 @@ export interface IRevisionIssue{
   correctionDate: Date;
   correctionApproved: boolean;
   fileId?: number;
+  corrected: boolean;
   activeFileId?: number;
   isResolved(): boolean;
   isApproved(): boolean;

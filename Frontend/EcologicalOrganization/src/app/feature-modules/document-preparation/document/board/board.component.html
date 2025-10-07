@@ -8,4 +8,4 @@
   </div>
   <document-preparation-board class="document-preparation-board" *ngIf="parentDocument && documents" (addDocument)="openAddDocument($event)" [sortedWorkflow]="parentDocument.workflow!" [documents]="documents" [isUserOwner]="isUserOwner()" [isUserAssignee]="isUserAssignee()" [canEdit]="canEdit"></document-preparation-board>
 </div>
-<document-preparation-document-create  [status]="statusToCreateDocumentIn" [sortedWorkflow]="parentDocument.workflow!" [parentDocument]="parentDocument" [isUserOwner]="isUserOwner()" [isUserAssignee]="isUserAssignee()" *ngIf="showCreateDocumentModal"></document-preparation-document-create>
+<document-preparation-document-create  [workflowStatus]="statusToCreateDocumentIn" [sortedWorkflow]="parentDocument.workflow!" [parentDocument]="parentDocument" [isUserOwner]="isUserOwner()" [isUserAssignee]="isUserAssignee()" *ngIf="showCreateDocumentModal"></document-preparation-document-create>

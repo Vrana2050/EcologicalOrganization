@@ -8,7 +8,7 @@
         </div>
       </div>
       <div class="board-column-add" *ngIf="canAddDocument(status.status.currentStatus)">
-        <button class="add-button" [style.border-color]="statusColors[status.status.currentStatus.id]" (click)="openCreateDocumentModal($event, status.status.currentStatus)">
+        <button class="add-button" [style.border-color]="statusColors[status.status.currentStatus.id]" (click)="openCreateDocumentModal($event, status.status)">
           <i class="fa-solid fa-plus add-icon" [style.color]="statusColors[status.status.currentStatus.id]"></i>
         </button>
       </div>

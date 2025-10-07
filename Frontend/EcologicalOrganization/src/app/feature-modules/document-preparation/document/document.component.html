@@ -1,10 +1,12 @@
-<div class="document-container" *ngIf="document && !showCreateDocument && !showEditDocument">
+<div class="document-container" *ngIf="document && !showCreateDocument && !showEditDocument && showMain">
     <div class="document-header">
         <div class ="document-title-container">
             <span class="document-title">{{document.name}}</span>
             <img src="assets/edit.png" alt="edit icon" class="edit-icon" *ngIf="canEditDocument()" (click)="openEditDocument()">
         </div>
-        <span class="time-left">Time left: <span class="time-left" [style.color] = "getTimeLeftColor()">{{getTimeLeftFormatted()}}</span></span>
+        <span *ngIf="!document.isDraft" class="time-left">Time left: <span class="time-left" [style.color] = "getTimeLeftColor()">{{getTimeLeftFormatted()}}</span></span>
+        <span *ngIf="document.isDraft" class="time-left">Version: <span class="time-left" [style.color] = "'#FF0000'">Draft</span></span>
+
     </div>
     <div class="document-content">
       <div class="document-info-wrapper" [class.collapsed]="isCollapsed">
@@ -12,7 +14,13 @@
           <div class="info-label">
             <img src="assets/status.png" alt="status icon" class="status-icon info-icon">
             <span class="info-text">Status</span>
-            <button class="status-button" [style.backgroundColor]="statusColor"><span class="info-text status-text">{{document.status.currentStatus.name}}</span></button>
+            <div class="status-button" [style.backgroundColor]="statusColor" [style.paddingRight]="this.nextStatus && document.canMoveToNextStatus(this.userId!) ? '0' : '16px'">
+              <span class="info-text status-text">{{this.statusToShow!.currentStatus.name}}</span>
+              <div class="next-status-container" *ngIf="this.nextStatus && document.canMoveToNextStatus(this.userId!)" (click)="selectNextStatus()">
+                <img src="assets/play-button.png" alt="play icon" class="play-icon">
+              </div>
+            </div>
+            <img src="assets/checked.png" alt="sync icon" class="check-icon" *ngIf="showUpdateStatus" (click)="confirmStatusChange()">
           </div>
           <div class="info-label" *ngIf="document.assignees && document.assignees.length > 0">
             <img src="assets/team.png" alt="team icon" class="team-icon info-icon">
@@ -54,12 +62,12 @@
           </button>
       </div>
       <div class="document-main-content">
-        <div class="sub-document-section">
+        <div class="sub-document-section" *ngIf="document.subDocuments && document.subDocuments.length > 0 || canAddSubDocument()">
           <div class="sub-document-header">
             <span class="sub-document-title">Tasks</span>
             <document-preparation-progress-bar *ngIf="document.completionPercentage !== undefined" [percentage]="document.completionPercentage" class="progress-bar"/>
-            <button class="dp-positive" *ngIf="this.userId && document.canAddSubDocument(this.userId)" (click)="addSubDocument()"><img class="add-project-img" src="assets/plus.png" alt="Add Project"></button>
-            <span class="sub-document-board-view" (click)="openBoardView()">Board View</span>
+            <button class="dp-positive" *ngIf="userId && canAddSubDocument()" (click)="addSubDocument()"><img class="add-project-img" src="assets/plus.png" alt="Add Project" ></button>
+            <span class="sub-document-board-view" *ngIf="document.workflow" (click)="openBoardView()">Board View</span>
           </div>
           <div class="sub-document-list" *ngIf="document.subDocuments && document.subDocuments.length > 0">
             <div *ngFor="let subDoc of document.subDocuments" class="sub-document-item-wrapper">
@@ -85,13 +93,13 @@
             </div>
           </div>
         </div>
-        <div class="file-section" *ngIf="!isRestoring">
+        <div class="file-section" *ngIf="!isRestoring && document.isDraft === false">
           <div class="file-header">
             <span class="file-title">Files</span>
-            <button class="dp-positive" *ngIf="this.userId && document.canAddFile(this.userId)"><img class="add-project-img" src="assets/plus.png" alt="Add Project"></button>
+            <button class="dp-positive" *ngIf="this.userId && document.canAddFile(this.userId)" (click)="uploadFile()"><img class="add-project-img" src="assets/plus.png" alt="Add Project"></button>
           </div>
-          <div class="file-list" *ngIf="document.activeFiles && document.activeFiles.length > 0">
-            <div class="file-item-container upload-file-container" (click)="uploadFile()">
+          <div class="file-list">
+            <div class="file-item-container upload-file-container" (click)="uploadFile()" *ngIf="this.userId && document.canAddFile(this.userId)">
               <img src="assets/upload.png" alt="upload icon" class="upload-icon">
               <span class="upload-text">Upload new file</span>
                <input type="file" #fileInput style="display: none" (change)="onFileSelected($event)" />
@@ -102,10 +110,11 @@
               <img src="assets/warning.png" *ngIf="document.doesActiveFileHaveUnApprovedCorrections(activeFile.id)" alt="warning icon" class="exclamation-icon">
               <img src="assets/{{activeFile.file.extension}}.png" alt="file icon" class="file-icon">
               <span class="file-name">{{activeFile.file.name}}</span>
+              <span class="file-version">Version: {{activeFile.file.version}}</span>
               <span class="file-modification">{{activeFile.file.dateUploaded | date:'dd MMM yyyy':'':'en-GB'}}</span>
-              <div class="file-actions">
-                <img src="assets/sync.png" alt="restore options icon" class="file-action-icon" (click)="openRestoreOptions($event, activeFile)" *ngIf="!activeFile.isFirstVersion()">
-                <button *ngIf="!document.isFileMain(activeFile.file.id)" class="mark-as-main-button"><span class="mark-as-main">Mark as main</span></button>
+              <div class="file-actions" *ngIf="this.userId && document.canManageFile(this.userId)">
+                <img src="assets/sync.png" alt="restore options icon" class="file-action-icon" (click)="openRestoreOptions($event, activeFile)">
+                <button *ngIf="!document.isFileMain(activeFile.file.id)" class="mark-as-main-button" (click)="markAsMain($event,activeFile)"><span class="mark-as-main">Mark as main</span></button>
                 <img src="assets/bin.png" alt="delete icon" class="file-action-icon">
               </div>
             </div>
@@ -133,7 +142,7 @@
               <span class="file-modification">{{file.dateUploaded | date:'dd MMM yyyy':'':'en-GB'}}</span>
               <span class="file-version">Version: {{file.version}}</span>
               <div class="file-actions">
-                <button class="restore-button"><span class="restore">Restore</span></button>
+                <button class="restore-button" (click)="restoreFile($event,file)"><span class="restore">Restore</span></button>
               </div>
             </div>
           </div>
@@ -144,4 +153,5 @@
 </div>
 
 <document-preparation-document-create  [sortedWorkflow]="document.workflow!" [parentDocument]="document" [isUserOwner]="isUserAssignee" [isUserAssignee]="isUserSubAssignee" *ngIf="showCreateDocument"></document-preparation-document-create>
-<document-preparation-document-create [status]="document.status.currentStatus" [document]="document" [sortedWorkflow]="parentSortedWorkflow!" [project]="project" [parentDocument]="parentDocument" [isUserOwner]="document.isUserOwner(this.userId)" [isUserAssignee]="document.isUserAssignee(this.userId)" *ngIf="showEditDocument"></document-preparation-document-create>
+<document-preparation-document-create [workflowStatus]="document.status" [document]="document" [sortedWorkflow]="parentSortedWorkflow!" [project]="project" [parentDocument]="parentDocument" [isUserOwner]="document.isUserOwner(this.userId)" [isUserAssignee]="document.isUserAssignee(this.userId)" *ngIf="showEditDocument"></document-preparation-document-create>
+<document-preparation-workflow-popup  *ngIf="showWorkflowPopup" (selectedOption)="onSelectedOption()" (close)="closeWorkflowPopup()" (done)="onWorkflowDone($event)"></document-preparation-workflow-popup>

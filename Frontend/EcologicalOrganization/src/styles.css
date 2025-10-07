@@ -28,3 +28,63 @@ button.dp-negative {
 button.dp-negative:hover {
   background-color: #E57373;
 }
+
+
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 99999 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 20px!important;
+}
+.toast {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 12px;
+}
+@keyframes fadeInToast {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.toast-success {
+  background-color: #2E7D32 !important;
+  color: #fff !important;
+  font-weight: 500;
+  padding: 10px 20px !important;
+  border-radius: 5px;
+}
+
+.toast-error {
+  background-color: #C62828 !important;
+  color: #fff !important;
+  font-weight: 500;
+  padding: 10px 20px !important;
+  border-radius: 5px;
+}
+
+.toast-warning {
+  background-color: #F9A825 !important;
+  color: #000 !important;
+  font-weight: 500;
+  padding: 10px 20px !important;
+  border-radius: 5px;
+}
+
+.toast-info {
+  background-color: #1565C0 !important;
+  color: #fff !important;
+  font-weight: 500;
+  padding: 10px 20px !important;
+  border-radius: 5px;
+}

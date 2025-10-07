@@ -7,7 +7,7 @@ export class Revision implements IRevision {
   approved: boolean
   workflowStatusId: number
   reviewerId: number
-  revisionIssues: IRevisionIssue[]
+  revisionIssues?: IRevisionIssue[]
   revisionDate: Date
 
   constructor(data: any) {
@@ -44,22 +44,34 @@ export class Revision implements IRevision {
     this.revisionDate = new Date(data.datumRevizije);
   }
   getAllIssuesForActiveFile(activeFileId: number) {
+    if (!this.revisionIssues) {
+      return [];
+    }
     return this.revisionIssues.filter(issue => issue.activeFileId === activeFileId);
   }
   getUnCorrectedIssuesForActiveFile(activeFileId: number): IRevisionIssue[] {
+    if (!this.revisionIssues) {
+      return [];
+    }
     return this.revisionIssues.filter(issue => issue.activeFileId === activeFileId && !issue.isCorrected());
   }
   getUnApprovedIssuesForActiveFile(activeFileId: number): IRevisionIssue[] {
+    if (!this.revisionIssues) {
+      return [];
+    }
     return this.revisionIssues.filter(issue => issue.activeFileId === activeFileId && issue.isUnApproved());
   }
   getUnResolvedIssuesForActiveFile(activeFileId: number): IRevisionIssue[] {
+    if (!this.revisionIssues) {
+      return [];
+    }
     return this.revisionIssues.filter(issue => issue.activeFileId === activeFileId && !issue.isResolved());
   }
   isResolved(): boolean {
-    return this.approved || this.revisionIssues.every(issue => issue.isResolved());
+    return this.approved || this.revisionIssues!.every(issue => issue.isResolved());
   }
   getAllGlobalIssues(): IRevisionIssue[] {
-    return this.revisionIssues.filter(issue => issue.activeFileId === undefined);
+    return this.revisionIssues?.filter(issue => issue.activeFileId === undefined) || [];
   }
   isReviewAfter(date: Date): boolean {
     return this.revisionDate > date;
@@ -123,5 +135,45 @@ export class RevisionIssue implements IRevisionIssue {
   isUnApproved(): boolean {
     console.log(!this.correctionApproved && this.corrected);
     return !this.correctionApproved && this.corrected;
+  }
+}
+
+export class RevisionUpdate {
+  id?: number;
+  odobreno: boolean;
+  trenutniStatus: { id: number; };
+  dokument:{
+    id: number;
+    projekat: { id: number; };
+  };
+  izmene: RevisionIssueUpdate[];
+  datumRevizije: Date;
+  constructor(projekatId: number, odobreno: boolean, trenutniStatusId: number, dokumentId: number, izmene?: RevisionIssueUpdate[], id?: number) {
+    this.id = id  === undefined ? undefined : id;
+    this.odobreno = odobreno;
+    this.trenutniStatus = { id: trenutniStatusId };
+    this.dokument = { id: dokumentId, projekat: { id:projekatId } };
+    this.izmene = izmene === undefined ? [] : izmene;
+    this.datumRevizije = new Date();
+  }
+}
+export class RevisionIssueUpdate {
+  id?: number;
+  izmena: string;
+  datumIspravljanja?: Date;
+  ispravljena: boolean;
+  dokumentRevizijaId?: number;
+  fajlId?: number;
+  aktivniFajlId?: number
+  ispravkaOdobrena: boolean;
+  constructor(izmena: string, ispravljena: boolean, ispravkaOdobrena: boolean, datumIspravljanja?: Date, id?: number, dokumentRevizijaId?: number, fajlId?: number, aktivniFajlId?: number) {
+    this.id = id === undefined ? undefined : id;
+    this.izmena = izmena;
+    this.datumIspravljanja = datumIspravljanja === undefined ? new Date() : datumIspravljanja;
+    this.ispravljena = ispravljena;
+    this.dokumentRevizijaId = dokumentRevizijaId === undefined ? undefined : dokumentRevizijaId;
+    this.fajlId = fajlId === undefined ? undefined : fajlId;
+    this.aktivniFajlId = aktivniFajlId === undefined ? undefined : aktivniFajlId;
+    this.ispravkaOdobrena = ispravkaOdobrena;
   }
 }

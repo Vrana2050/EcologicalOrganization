@@ -14,26 +14,32 @@
           <img src="assets/status.png" alt="status icon" class="status-icon info-icon">
           <label for="status">Status</label>
           <div class="status-input-wrapper" [style.backgroundColor]="statusColor" (click)="toggleDropdown()">
-            <input class="status-input" type="text" id="status" [value]="status?.name" placeholder="Select status" />
+            <span class="status-input" placeholder="Select status">{{workflowStatus ? workflowStatus.currentStatus?.name : 'Select status'}}</span>
             <ul class="dropdown" *ngIf="dropdownOpen">
               <li *ngFor="let entry of allowedStatuses | keyvalue "
                   (click)="selectStatus(entry.key)">
-                  <div class="status-wrapper" [style.backgroundColor]="allowedStatuses.get(entry.key)" *ngIf="entry.key!==status"><span class="status-color-indicator">{{entry.key.name}}</span></div>
+                  <div class="status-wrapper" [style.backgroundColor]="allowedStatuses.get(entry.key)" *ngIf="entry.key!==workflowStatus!"><span class="status-color-indicator">{{entry.key.currentStatus.name}}</span></div>
               </li>
             </ul>
           </div>
         </div>
-        <div class="assignee-group" *ngIf="project">
+        <div class="assignee-group" *ngIf="project || parentDocument">
           <img src="assets/team.png" alt="assignee icon" class="assignee-icon info-icon">
           <label for="assignee">Assignees</label>
-          <input class="assignee-input" type="text" id="assignee" [formControl]="assigneeSearch" placeholder="Select assignees"/>
-           <div class="dropdown" *ngIf="filteredAssignees && filteredAssignees.length > 0">
-          <div class="dropdown-item"*ngFor="let user of availableUsers " (click)="selectAssignee(user)">
-              <span>{{ user.name }}</span>
+          <div class="assignee-input-wrapper">
+            <input class="assignee-input" type="text" id="assignee" [formControl]="assigneeSearch" placeholder="Select assignees"/>
+            <div class="dropdown" *ngIf="filteredAssignees && filteredAssignees.length > 0">
+              <div class="dropdown-item" *ngFor="let user of filteredAssignees" (click)="selectAssignee(user)">
+                <span>{{ user.name }}</span>
+              </div>
             </div>
           </div>
-          <div class="assignees-preview-container">
-            <img src="assets/man.png" alt="user icon" class="user-icon" *ngFor="let assignee of documentForm.get('assignees')?.value">
+          <span class="assign-to-self" *ngIf="!isSelfAssigned" (click)="assignToSelf()">Assign to me</span>
+          <div class="assignees-preview-container" *ngIf="assigneesArray.length > 0">
+            <div class="assignee-tag" *ngFor="let assignee of assigneesArray.controls; let i = index">
+              <span class="assignee-name">{{ assignee.value.name }}</span>
+              <button type="button" class="remove-assignee-btn" (click)="removeAssignee(i)">×</button>
+            </div>
           </div>
         </div>
       </div>

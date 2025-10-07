@@ -26,13 +26,16 @@ export class WorkflowService {
   private baseUrl = environment.apiHost + 'docPrep/';
   private apiUrl = this.baseUrl + "workflow";
   headers = new HttpHeaders({
-      'X-USER-ROLE': 'manager',
-      'X-USER-ID': '1001'
+      'X-USER-ROLE': this.authService.user$.value.role,
+      'X-USER-ID': this.authService.user$.value.id.toString()
   });
-  constructor(
+  constructor( private authService: AuthService,
     private http: HttpClient
   ) {}
     getAll(): Observable<IWorkflow[]> {
      return this.http.get<any[]>(this.apiUrl, { headers: this.headers }).pipe(map(files => files.map(f => new Workflow(f))));
+  }
+  getById(id: number): Observable<IWorkflow> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`, { headers: this.headers }).pipe(map(f => new Workflow(f)));
   }
 }

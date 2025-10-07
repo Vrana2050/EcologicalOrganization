@@ -30,6 +30,7 @@
     "cytoscape-popper": "^4.0.1",
     "jspdf": "^3.0.3",
     "ng2-charts": "^5.0.4",
+    "ngx-toastr": "^19.1.0",
     "rxjs": "~7.8.0",
     "tippy.js": "^6.3.7",
     "tslib": "^2.3.0",

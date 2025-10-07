@@ -4,8 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { OnInit } from '@angular/core';
 import { DocumentService } from '../service/document.service';
 import { IDocumentActiveFile, IDocumentBoard, IDocumentDetails } from '../model/interface/document.model';
-import { DocumentDetails } from '../model/implementation/document-impl.model';
-import { IWorkflow } from '../model/interface/workflow.model';
+import { DocumentActiveFileUpdate, DocumentCreate, DocumentDetails, DocumentStatusUpdate, DocumentWorkflowCreate } from '../model/implementation/document-impl.model';
+import { IWorkflow, IWorkflowStatus } from '../model/interface/workflow.model';
 import { AuthService } from 'src/app/infrastructure/auth/auth.service';
 import { FileService } from '../service/file.service';
 import { IFile } from '../model/interface/file.model';
@@ -13,6 +13,9 @@ import { FileViewerService } from '../service/Util/file-viewer.service';
 import { ElementRef, ViewChild } from '@angular/core';
 import { ProjectService } from '../service/project.service';
 import { IProject } from '../model/interface/project.model';
+import { NotificationService } from '../service/Util/toast-notification.service';
+import { WorkflowService } from '../service/workflow.service';
+import { DocumentMainFileUpdate } from '../model/implementation/document-impl.model';
 
 @Component({
   selector: 'document-preparation-document',
@@ -20,6 +23,8 @@ import { IProject } from '../model/interface/project.model';
   styleUrls: ['./document.component.css']
 })
 export class DocumentPreparationDocumentComponent implements OnInit {
+
+
   dokumentId!: number;
   document!: IDocumentDetails;
   statusColor!: any;
@@ -29,11 +34,14 @@ export class DocumentPreparationDocumentComponent implements OnInit {
   fileVersions: IFile[];
   activeVersion!: IDocumentActiveFile;
   isRestoring: boolean = false;
+  showMain: boolean = true;
   showCreateDocument: boolean = false;
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   isUserAssignee: boolean = false;
   isUserSubAssignee: boolean = false;
   isUserOwner: boolean;
+
+  showWorkflowPopup: boolean = false;
 
 
   documentToEdit: IDocumentDetails | undefined;
@@ -41,19 +49,34 @@ export class DocumentPreparationDocumentComponent implements OnInit {
   project: IProject | undefined;
   parentSortedWorkflow : IWorkflow;
   showEditDocument: boolean;
-  constructor(private route: ActivatedRoute, private documentService: DocumentService,private router : Router,private authService: AuthService,private fileService: FileService,private fileViewerService: FileViewerService,private projectService: ProjectService) { }
+
+  parentWorkflow: IWorkflow | undefined;
+  nextStatus:IWorkflowStatus | undefined;
+  nextStatusColor: string | undefined;
+
+  showUpdateStatus: boolean = false;
+
+  statusToShow: IWorkflowStatus | undefined;
+  constructor(private workflowService: WorkflowService,private route: ActivatedRoute, private documentService: DocumentService,private router : Router,private authService: AuthService,private fileService: FileService,private fileViewerService: FileViewerService,private projectService: ProjectService,private toastNotificationService: NotificationService) { }
 
   ngOnInit(): void {
         this.route.paramMap.subscribe(params => {
           this.dokumentId = Number(params.get('id'));
           this.documentService.getDocumentById(this.dokumentId).subscribe(document => {
             this.document = document;
+            this.statusToShow = this.document.status;
+             this.workflowService.getById(this.document.status.workflowId).subscribe(workflow => {
+              this.parentWorkflow = workflow;
+              this.nextStatus = this.document.getNextStatus(this.parentWorkflow!);
+              this.addParentStatusColors();
+            });
+
             this.isUserOwner = this.document.isUserOwner(this.userId!);
             this.documentService.getBoardDocumentsByParentDocumentId(this.dokumentId).subscribe(doc => {
             this.document.subDocuments = doc;
             this.isUserAssignee = this.document.isUserAssignee(this.userId!);
             this.isUserSubAssignee = this.document.isUserSubAssignee(this.userId!);
-            this.fileService.getMainFilesByDocumentId(this.dokumentId).subscribe(files => {
+            this.fileService.getActiveFilesByDocumentId(this.dokumentId).subscribe(files => {
               this.document.activeFiles = files;
             });
             console.log(this.document);
@@ -62,7 +85,7 @@ export class DocumentPreparationDocumentComponent implements OnInit {
           }
           });
           });
-          this.statusColor = history.state['statusColor'];
+          //this.statusColor = history.state['statusColor'];
           });
   }
   getTimeLeftFormatted(): string {
@@ -155,6 +178,20 @@ addStatusColors() {
     this.statusColors[s.currentStatus.id] = colors[i];
   });
 }
+addParentStatusColors() {
+  this.parentWorkflow?.sortStatuses();
+  const colors = this.generateStatusColors(this.parentWorkflow!.statuses.length);
+  console.log(colors);
+  this.parentWorkflow!.statuses.forEach((s, i) => {
+    if(s.id === this.document.status.id)
+    {
+      this.statusColor = colors[i];
+    }
+    if(s.id === this.nextStatus?.id){
+      this.nextStatusColor = colors[i];
+    }
+  });
+}
 generateStatusColors(count: number): string[] {
   const colors: string[] = [];
   const step = 360 / count;
@@ -209,19 +246,28 @@ onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
-      console.log('Odabran fajl:', file);
+      if (!file) return;
+      const formData = new FormData();
 
-      const reader = new FileReader();
-      reader.onload = () => {
-        const fileContent = reader.result;
-        console.log('Base64 sadržaj:', fileContent);
-      };
-      reader.readAsDataURL(file);
+      formData.append('file', file);
+
+      formData.append('dokumentId', this.document.id.toString());
+      formData.append('naziv', file.name);
+      const ext = file.name.split('.').pop();
+      formData.append('ekstenzija', ext || '');
+      this.fileService.uploadFile(formData).subscribe({
+        next: res => {
+          this.toastNotificationService.success("File uploaded successfully.","Success");
+          this.fileService.getActiveFileByDocumentAndFile(this.document.id, (res as any).id).subscribe(f => {
+            this.document.activeFiles?.push(f);
+          });
+        }
+      });
     }
   }
   addSubDocument() {
     if(!this.document.workflow){
-      alert("Document workflow is not set. Cannot add subdocument. TESTIRATI OVO KAD SE POJAVI CREATE TREBA DA IZADJE POPUP");
+      this.showWorkflowPopup = true;
       return;
     }
     this.showCreateDocument = true;
@@ -264,4 +310,89 @@ onFileSelected(event: Event) {
   canEditDocument(): boolean {
     return this.document.canEditDocument(this.userId!);
   }
+  closeWorkflowPopup() {
+    this.showWorkflowPopup = false;
+  }
+  onWorkflowDone(workflow: IWorkflow) {
+    this.document.workflow = workflow;
+    const createWorkflow: DocumentWorkflowCreate = new DocumentWorkflowCreate(this.document);
+    this.documentService.updateDocumentWorkflow(createWorkflow).subscribe(document => {
+      this.toastNotificationService.success("Workflow successfully set. You can now create sub-documents.","Success");
+    });
+    this.showWorkflowPopup = false;
+    this.document.workflow.sortStatuses();
+    this.showCreateDocument = true;
+  }
+  onSelectedOption() {
+    this.showMain = false;
+  }
+  selectNextStatus() {
+    if(!this.nextStatus){
+      return;
+    }
+    this.statusToShow = this.nextStatus;
+    this.statusColor = this.nextStatusColor;
+    this.nextStatus = undefined;
+    this.showUpdateStatus = true;
+  }
+  confirmStatusChange() {
+    const statusUpdate: DocumentStatusUpdate = {
+      id: this.document.id,
+      status: {
+        id: this.statusToShow!.id
+      }
+    }
+
+    this.documentService.updateDocumentStatus(statusUpdate).subscribe( {
+      next: (doc) => {
+
+      this.toastNotificationService.success("Status successfully updated.","Success");
+      this.showUpdateStatus = false;
+      this.document.status = this.statusToShow!;
+      this.nextStatus = this.document.getNextStatus(this.parentWorkflow!);
+      this.addParentStatusColors();
+    },
+      error: (err) => {
+        this.showUpdateStatus = false;
+        this.statusToShow = this.document.status;
+        this.nextStatus = this.document.getNextStatus(this.parentWorkflow!);
+        this.addParentStatusColors();
+      }
+    });
+
+  }
+  canAddSubDocument(): any {
+    return this.document.canAddSubDocument(this.userId);
+  }
+  markAsMain($event: any, activeFile: IDocumentActiveFile) {
+    $event.stopPropagation();
+    const updateMainFile: DocumentMainFileUpdate = {
+      id: this.document.id,
+      glavniFajl: { id: activeFile.file.id }
+    };
+    this.documentService.updateMainFile(updateMainFile).subscribe(() => {
+      this.toastNotificationService.success("Main file successfully updated.","Success");
+      this.document.mainFileId = activeFile.file.id;
+    });
+  }
+  restoreFile(event: any, file: IFile) {
+    event.stopPropagation();
+    if(!this.activeVersion){
+      return;
+    }
+    this.fileService.restoreFile(file.id, this.activeVersion.id).subscribe(() => {
+        this.document.activeFiles!.forEach(af => {
+          if(this.document.mainFileId === af.file.id){
+            this.document.mainFileId = file.id;
+          }
+          if(af.file.id === file.id){
+            af.file = file;
+          }
+        });
+
+      this.toastNotificationService.success("File successfully restored.","Success");
+      this.closeRestoreOptions();
+    });
+  }
+
 }

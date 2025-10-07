@@ -7,7 +7,7 @@ import { DocumentBoard } from '../../model/implementation/document-impl.model';
 import { DocumentService } from '../../service/document.service';
 import { AuthService } from 'src/app/infrastructure/auth/auth.service';
 import { Router } from '@angular/router';
-import { IStatus } from '../../model/interface/workflow.model';
+import { IStatus, IWorkflowStatus } from '../../model/interface/workflow.model';
 
 @Component({
   selector: 'document-preparation-board-project',
@@ -20,7 +20,7 @@ export class DocumentPreparationBoardProjectComponent implements OnInit {
   documents!: DocumentBoard[];
   canEdit: boolean;
   showCreateDocumentModal: boolean = false;
-  statusToCreateDocumentIn: IStatus;
+  statusToCreateDocumentIn: IWorkflowStatus;
   constructor(private route: ActivatedRoute, private projectService: ProjectService, private documentService: DocumentService,public authService: AuthService,private router: Router) {}
 
   ngOnInit(): void {
@@ -56,7 +56,7 @@ export class DocumentPreparationBoardProjectComponent implements OnInit {
   openProjectAnalysis(project: IProjectBoard): void {
     this.router.navigate(['document-preparation/analysis/project', project.id]);
   }
-  openAddDocument(status: IStatus): void {
+  openAddDocument(status: IWorkflowStatus): void {
     this.showCreateDocumentModal = true;
     this.statusToCreateDocumentIn = status;
   }

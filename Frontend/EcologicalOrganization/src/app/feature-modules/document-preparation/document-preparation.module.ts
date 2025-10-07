@@ -25,11 +25,16 @@ import { DocumentPreparationProjectCreateComponent } from './project/create/proj
 import { DocumentPreparationExistingWorkflowWindowComponent } from './shared/existing-workflow-window/existing-workflow-window.component';
 import { DocumentPreparationWorkflowGraphComponent } from './shared/workflow-graph/workflow-graph.component';
 
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ProjectNotificationInterceptor } from './interceptor/notification-interceptor';
 
 
 
 
 @NgModule({
+     providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: ProjectNotificationInterceptor, multi: true }
+  ],
   declarations: [
     DocumentPreparationLayoutComponent,
     SidebarComponent,
@@ -57,7 +62,8 @@ import { DocumentPreparationWorkflowGraphComponent } from './shared/workflow-gra
     AppRoutingModule,
     NgChartsModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+
   ]
 })
 export class DocumentPreparationModule { }

@@ -7,7 +7,7 @@ import { AuthService } from 'src/app/infrastructure/auth/auth.service';
 import { ProjectHome } from '../model/implementation/project-impl.model';
 import { HttpHeaders } from '@angular/common/http';
 import { ProjectBoard } from '../model/implementation/project-impl.model';
-import { DocumentBoard } from '../model/implementation/document-impl.model';
+import { DocumentActiveFileUpdate, DocumentBoard } from '../model/implementation/document-impl.model';
 import { Analysis } from '../model/implementation/analysis-impl.model';
 import { DocumentDetails } from '../model/implementation/document-impl.model';
 import { File } from '../model/implementation/file-impl.model';
@@ -24,13 +24,13 @@ export class FileService {
   private baseUrl = environment.apiHost + 'docPrep/';
   private apiUrl = this.baseUrl + "file";
   headers = new HttpHeaders({
-      'X-USER-ROLE': 'manager',
-      'X-USER-ID': '1001'
+      'X-USER-ROLE': this.authService.user$.value.role,
+      'X-USER-ID': this.authService.user$.value.id.toString()
   });
-  constructor(
+  constructor( private authService: AuthService,
     private http: HttpClient
   ) {}
-    getMainFilesByDocumentId(documentId: number): Observable<IDocumentActiveFile[]> {
+    getActiveFilesByDocumentId(documentId: number): Observable<IDocumentActiveFile[]> {
       const url = `${this.apiUrl}/active/${documentId}`;
      return this.http.get<any[]>(url, { headers: this.headers }).pipe(map(files => files.map(f => new DocumentActiveFile(f))));
   }
@@ -40,4 +40,16 @@ export class FileService {
       const url = `${this.apiUrl}/versions/${activeFileId}?page=${page}&pageSize=${pageSize}`;
       return this.http.get<any[]>(url, { headers: this.headers }).pipe(map(files => files.map(f => new File(f))));
     }
+    uploadFile(formData: FormData) {
+    const url = `${this.apiUrl}/upload`;
+    return this.http.post(url, formData, { headers: this.headers });
+  }
+  getActiveFileByDocumentAndFile(documentId: number, activeFileId: number): Observable<IDocumentActiveFile> {
+    const url = `${this.apiUrl}/active/file/${documentId}/${activeFileId}`;
+    return this.http.get<any>(url, { headers: this.headers }).pipe(map(f => new DocumentActiveFile(f)));
+  }
+  restoreFile(fileId:number, documentActiveFileId:number): Observable<any> {
+    const url = `${this.apiUrl}/restore/${documentActiveFileId}`;
+    return this.http.put(url,{id:fileId}, { headers: this.headers });
+  }
 }

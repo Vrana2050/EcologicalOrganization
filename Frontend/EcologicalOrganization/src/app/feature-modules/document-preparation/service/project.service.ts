@@ -18,17 +18,17 @@ import { Project } from '../model/implementation/project-impl.model';
 })
 export class ProjectService {
   private baseUrl = environment.apiHost + 'docPrep/';
-  private userUrl = this.baseUrl + (this.AuthService.isUserEmployee() ? '' : 'manager/');
+  private userUrl = this.baseUrl + (this.authService.isUserEmployee() ? '' : 'manager/');
   private apiUserUrl = this.userUrl + "project";
   private apiUrl = this.baseUrl + "project";
   headers = new HttpHeaders({
-      'X-USER-ROLE': 'manager',
-      'X-USER-ID': '1001'
+      'X-USER-ROLE': this.authService.user$.value.role,
+      'X-USER-ID': this.authService.user$.value.id.toString()
   });
   constructor(
     private http: HttpClient,
     private tokenStorage: TokenStorage,
-    private AuthService: AuthService,
+    private authService: AuthService,
   ) {}
    getAllHomeProjects(): Observable<ProjectHome[]> {
      return this.http.get<any[]>(this.apiUrl, { headers: this.headers }).pipe(map(projects => projects.map(p => new ProjectHome(p))));
@@ -45,7 +45,7 @@ export class ProjectService {
     const url = `${this.apiUrl}/eager/${id}`;
     return this.http.get<any>(url, { headers: this.headers }).pipe(map(p => new Project(p)));
   }
-  createProject(project: ProjectCreate): Observable<IProject> {
-    return this.http.post<any>(this.apiUserUrl, project, { headers: this.headers }).pipe(map(p => new Project(p)));
+  createProject(project: ProjectCreate): Observable<any> {
+    return this.http.post<any>(this.apiUserUrl, project, { headers: this.headers });
   }
 }

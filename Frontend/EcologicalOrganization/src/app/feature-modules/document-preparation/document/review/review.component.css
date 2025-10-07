@@ -16,6 +16,7 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  height:5%;
 }
 
 .content{
@@ -23,8 +24,8 @@
   flex-direction: row;
   align-items: flex-start;
   justify-content: flex-start;
-  height: 100%;
   width: 100%;
+  height: 95%;
   gap:2%;
 }
 
@@ -41,6 +42,7 @@
   justify-content: flex-start;
   width: auto;
   max-width: 30%;
+  min-width: 15%;
   height: 100%;
   border-right: 1px solid #ccc;
   padding:16px;
@@ -178,6 +180,22 @@
   background-color: #115293;
   color: #fff;
 }
+.view-file-button{
+  background-color: #1976d2;
+  color: #fff;
+  border: none;
+  width: 80px;
+  height: 30px;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s, color 0.3s;
+}
+.view-file-button:hover {
+  background-color: #115293;
+  color: #fff;
+}
 .next-action-button{
   background-color: #26A69A;
   color: #fff;
@@ -205,11 +223,16 @@
   justify-content: flex-start;
   gap:8px;
   padding:10px 0px;
+  box-sizing: border-box;
+  padding:8px 16px;
+}
+.file-summary-name{
+flex:1;
 }
 .file-summary-item.selected {
   background-color: #26A69A;
   border-radius: 8px;
-  padding:10px 0px;
+
 }
 .file-summary-icon{
   width:20px;
@@ -233,15 +256,15 @@
   font-weight: 500;
   margin-bottom: 8px;
 }
-.files-list-container{
-  flex:1;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: flex-start;
-  gap:8px;
-  overflow-y: auto;
-
+.files-list-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* dve kolone iste širine */                        /* razmak između elemenata */
+  padding: 8px;
+  column-gap: 32px;
+  row-gap: 16px;                             /* razmak između kolona */
+  max-height: 100%;                      /* zauzima dostupnu visinu */
+  overflow-y: auto;                      /* skrol samo ako ima viška redova */
+  box-sizing: border-box;
 }
 .summary-review-content{
   display: flex;
@@ -249,8 +272,9 @@
   align-items: flex-start;
   justify-content: flex-start;
   gap:16px;
+  max-height: 100%;
   min-width: 70%;
-  height: 100%;
+  flex:1;
   overflow-y: auto;
 }
 .summary-actions{
@@ -296,4 +320,24 @@
 .approve-button.disabled, .reject-button.disabled {
   background-color: #ccc;
   cursor: not-allowed;
+}
+.issue-input{
+  flex:1;
+  border:none;
+  font-size: 14px;
+  width: 100%;
+}
+.issue-input:focus {
+  outline: none;                /* isključuje plavi okvir */
+  border-color: #26A69A;        /* po želji: promeni boju kad je aktivan */
+  box-shadow: none;             /* za svaki slučaj, uklanja senku ako browser doda */
+}
+.check-icon{
+  width:20px;
+  height:20px;
+  cursor: pointer;
+}
+.bin-icon{
+  width:20px;
+  height:20px;
 }

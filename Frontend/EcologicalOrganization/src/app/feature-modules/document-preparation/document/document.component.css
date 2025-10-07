@@ -21,7 +21,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #ccc;
+  margin-bottom: 8px;
 }
 .document-title-container {
   display: flex;
@@ -101,14 +101,15 @@
 .info-label {
   display: flex;
   flex-direction:row;
-  align-items: flex-end;
+  align-items: center;
   justify-content: flex-start;
   gap: 8px;
 }
 .status-button{
   box-sizing: border-box;
   height: 25px;
-  padding: 8px 16px;
+  padding-left:16px;
+  padding-right:4px;
   border: none;
   border-radius: 5px;
   font-size: 16px;
@@ -118,8 +119,30 @@
   justify-content: center;
   margin-left: 10px;
   color: white;
+  gap:8px;
 }
-
+.next-status-container{
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex:1;
+  height: 100%;
+  padding-left:4px;
+  padding-right:4px;
+  border-left: 1px solid rgba(255, 255, 255, 0.5);
+}
+.play-icon{
+  width: 12px;
+  height: 12px;
+}
+.check-icon{
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+.check-icon:hover{
+  transform: scale(1.1);
+}
 .description-label {
   display: flex;
   flex-direction: column;
@@ -152,6 +175,9 @@
   height: 100%;
   box-sizing: border-box;
   overflow-y:auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2%;
 }
 .document-content {
   display: flex;
@@ -335,7 +361,7 @@
   gap:8px;
   box-sizing: border-box;
   width: 100%;
-  max-height: 49%;
+  max-height: 100%;
 }
 
 .file-header {
@@ -485,10 +511,8 @@
   justify-content: center;
   width: 200px;
   min-width: 200px;
-  min-height: 100%;
   box-sizing: border-box;
   padding: 10px;
-  margin-bottom: 8px;
   border: 2px dashed #26A69A;
   border-radius: 8px;
   background: #E0F2F1;

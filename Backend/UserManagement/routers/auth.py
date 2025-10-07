@@ -286,3 +286,11 @@ async def get_all_managers(db: db_dependency, subsystem: str):
                                           UserRoles.role == UserRole.MANAGER).all()
 
     return Managers(manager_ids=[m.user_id for m in managers])
+
+@router.get('/users/{subsystem}', status_code=200)
+async def get_all_users(db: db_dependency, subsystem: str):
+    if subsystem not in {s.value for s in Subsystem}:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail='Invalid subsystem')
+
+    return db.query(Users).all()
+

@@ -11,6 +11,7 @@ import { IWorkflow } from '../../model/interface/workflow.model';
 export class DocumentPreparationWorkflowPopupComponent  implements  OnInit {
   @Output() close = new EventEmitter<void>();
   @Output() done = new EventEmitter<IWorkflow>();
+  @Output() selectedOption = new EventEmitter<void>();
   showChooseExisting: boolean = false;
 
   constructor( ) { }
@@ -21,6 +22,7 @@ export class DocumentPreparationWorkflowPopupComponent  implements  OnInit {
     this.close.emit();
   }
   chooseExisting(): void {
+    this.selectedOption.emit();
     this.showChooseExisting = true;
   }
   handleWorkflowDone(workflow: IWorkflow): void {

@@ -1,4 +1,4 @@
-import { IUserProject } from '../interface/user-project.model';
+import { IUserProject, ProjectRole } from '../interface/user-project.model';
 import { IStatus, IWorkflow } from '../interface/workflow.model';
 import { IWorkflowStatus } from '../interface/workflow.model';
 import { IDocumentActiveFile, IDocumentDetails, IRevisionDocumentActiveFile, Priority } from '../interface/document.model';
@@ -129,17 +129,20 @@ export class DocumentExtended extends DocumentBase {
       this.parentDocument = data.roditeljDokument ? new DocumentBase(data.roditeljDokument) : undefined;
       this.revisions = data.revizije ? data.revizije.map((rev: any) => new Revision(rev)) : undefined;
     }
-    getNextStatus(): IWorkflowStatus | undefined {
+    getNextStatus(parentWorkflow: IWorkflow): IWorkflowStatus | undefined {
+      if(parentWorkflow.id !== this.status.workflowId) {
+      throw new Error('DocumentDetails: Provided workflow does not match document workflow.');
+      }
        if(this.status.needsPermissionForNext()) {
           if(this.hasPermissionForNextStatus()) {
-            return this.workflow!.getNextStatus(this.status);
+            return parentWorkflow!.getNextStatus(this.status);
           }
           else
           {
-            return this.workflow!.getDeniedStatus(this.status);
+            return parentWorkflow!.getDeniedStatus(this.status);
           }
       }
-      return this.workflow!.getNextStatus(this.status);
+      return parentWorkflow!.getNextStatus(this.status);
     }
     getAllReviewIssuesForActiveFile(activeFileId: number): IRevisionIssue[] {
       return this.revisions?.flatMap(revision => revision.getAllIssuesForActiveFile(activeFileId)) || [];
@@ -148,19 +151,21 @@ export class DocumentExtended extends DocumentBase {
       return this.vlasnik.userId === userId;
     }
     canAddSubDocument(userId: number): boolean {
+      if(this.isDraft)
+      {
+        return false;
+      }
       if(this.canEditInCurrentStatus(userId))
       {
-        if(this.isUserAssignee(userId)){
-          return true;
-        }
-        else if( this.canSubAssigneeAddDocument() && this.isUserSubAssignee(userId)){
-          return true;
-        }
-        return false;
+        return this.isUserAssignee(userId)
       }
       return false;
     }
     canAddFile(userId: number): boolean {
+      if(this.isDraft)
+      {
+        return false;
+      }
       if(this.canEditInCurrentStatus(userId))
       {
         return true;
@@ -229,6 +234,15 @@ export class DocumentExtended extends DocumentBase {
     canReviewSubDocument(userId: number): boolean {
       return this.isUserAssignee(userId) && this.canEditInCurrentStatus(userId);
     }
+    canMoveToNextStatus(userId: number): any {
+     return this.canEditInCurrentStatus(userId);
+    }
+    canManageFile(userId: number): boolean {
+      return this.canEditInCurrentStatus(userId) && !this.isInReview();
+    }
+    isInReview(): boolean {
+      return this.status.isReview();
+    }
   }
   export class DocumentActiveFile implements IDocumentActiveFile {
     id: number;
@@ -275,4 +289,62 @@ export class DocumentExtended extends DocumentBase {
     hasUnApprovedIssues(): boolean {
       return this.unApprovedIssues !== undefined && this.unApprovedIssues.length > 0;
     }
+  }
+  export class DocumentCreate{
+    id?: number;
+    naziv: string;
+    projekat?:{id:number};
+    opis?: string
+    rokZavrsetka?: Date;
+    status?: {id:number};
+    prioritet?: Priority;
+    roditeljDokument?: {id:number};
+    zavisiOd?: {id:number}[];
+    dodeljeniKorisnici?: {id:number}[]
+    vlasnik?: {id:number, korisnikId:number, ulogaUProjektu:ProjectRole};
+    tokIzradeDokumenta?: {id:number};
+    constructor(data: any) {
+      this.id = data.id;
+      this.naziv = data.name;
+      this.projekat = data.projectId ? {id: data.projectId} : undefined;
+      this.opis = data.description;
+      this.rokZavrsetka = data.dueDate ? new Date(data.dueDate) : undefined;
+      this.status = data.statusId ? {id: data.statusId} : undefined;
+      this.prioritet = data.priority || undefined;
+      this.roditeljDokument = data.parentDocumentId ? {id: data.parentDocumentId} : undefined;
+      this.zavisiOd = data.dependencies ? data.dependencies.map((doc: IDocumentBase) => ({id: doc.id})) : [];
+      this.dodeljeniKorisnici = data.assignees ? data.assignees.map((user: IUserProject) => ({id: user.id})) : [];
+    }
+  }
+  export class DocumentWorkflowCreate{
+    id?: number;
+    tokIzradeDokumenta?: {id:number}
+    constructor(data: IDocumentDetails) {
+      this.id = data.id;
+      this.tokIzradeDokumenta = data.workflow ? {id: data.workflow.id} : undefined;
+
+    }
+  }
+    export class DocumentStatusUpdate{
+    id?: number;
+    status?: {id:number}
+    constructor(data: IDocumentDetails) {
+      this.id = data.id;
+      this.status = data.status ? {id: data.status.id} : undefined;
+
+    }
+  }
+    export class DocumentMainFileUpdate{
+    id?: number;
+    glavniFajl?: {id:number}
+    constructor(data: IDocumentDetails) {
+      this.id = data.id;
+      this.glavniFajl = {id: data.mainFileId!};
+
+    }
+  }
+  export class DocumentActiveFileUpdate{
+    id?: number;
+    fajl?: {id:number}
+    dokumentId?: number
   }

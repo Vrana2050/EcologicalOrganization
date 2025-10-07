@@ -13,6 +13,7 @@ import { DocumentManagementModule } from './feature-modules/document-management/
 import { DocumentPreparationModule } from './feature-modules/document-preparation/document-preparation.module';
 import { WrittingAssistantModule } from './feature-modules/writting-assistant/writting-assistant.module';
 import { ProjectRealizationModule } from './feature-modules/project-realization/project-realization.module';
+import { IndividualConfig, ToastrModule } from 'ngx-toastr';
 @NgModule({
   declarations: [AppComponent],
   imports: [
@@ -27,6 +28,16 @@ import { ProjectRealizationModule } from './feature-modules/project-realization/
     DocumentPreparationModule,
     WrittingAssistantModule,
     ProjectRealizationModule,
+     ToastrModule.forRoot(<Partial<IndividualConfig>>{
+      positionClass: 'toast-bottom-right',
+      timeOut: 3000,
+      preventDuplicates: true,
+      extendedTimeOut: 1000,
+      newestOnTop: true,
+      tapToDismiss: true,
+      progressBar: true,
+      progressAnimation: 'increasing',
+    }),
   ],
   providers: [
     {

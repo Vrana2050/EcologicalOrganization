@@ -11,6 +11,9 @@ import { UserProjectCreate } from '../../model/implementation/user-project-impl.
 import { AbstractControl, FormArray, ValidationErrors } from '@angular/forms';
 import { ProjectCreate } from '../../model/implementation/project-impl.model';
 import { ProjectService } from '../../service/project.service';
+import { NotificationService } from '../../service/Util/toast-notification.service';
+import { AuthService } from 'src/app/infrastructure/auth/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'xp-create',
@@ -27,11 +30,11 @@ export class DocumentPreparationProjectCreateComponent implements OnInit {
   filteredMembers: IUser[] = [];
   projectRoles: ProjectRole[] = [ProjectRole.Leader, ProjectRole.Member];
 
-  constructor(private fb: FormBuilder,private userProjectService: UserProjectService, private projectService: ProjectService) { }
+  constructor(private authService: AuthService, private router: Router, private fb: FormBuilder, private userProjectService: UserProjectService, private projectService: ProjectService, private toastNotificationService: NotificationService) { }
 
   ngOnInit(): void {
     this.userProjectService.getAllUsers().subscribe(members => {
-      this.availableMembers = members;
+      this.availableMembers = members.filter(member => member.id !== this.authService.user$.value?.id);
       console.log('Available Members:', this.availableMembers);
     });
 
@@ -74,7 +77,9 @@ export class DocumentPreparationProjectCreateComponent implements OnInit {
       const project: ProjectCreate = new ProjectCreate(projectData);
       console.log('Project to be created:', project);
       this.projectService.createProject(project).subscribe(response => {
-        console.log('Project created successfully:', response);
+        this.toastNotificationService.success('Project created successfully!');
+        this.router.navigate(['document-preparation']);
+
       }, error => {
         console.error('Error creating project:', error);
       });
@@ -121,5 +126,8 @@ export class DocumentPreparationProjectCreateComponent implements OnInit {
       currentAssignees[index].projectRole = role.value;
       this.projectForm.patchValue({ assignees: currentAssignees });
     }
+  }
+  cancel() {
+    this.router.navigate(['document-preparation']);
   }
 }
