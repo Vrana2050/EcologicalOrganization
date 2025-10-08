@@ -21,7 +21,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  height: 5%;
 }
 .document-title-container {
   display: flex;
@@ -182,7 +182,7 @@
 .document-content {
   display: flex;
   flex-direction: row;
-  height: 100%;
+  height: 95%;
   width: 100%;
   gap: 2%;
 }
@@ -194,7 +194,7 @@
   gap:8px;
   box-sizing: border-box;
   width: 100%;
-  max-height: 51%;
+  max-height: 41%;
 }
 .sub-document-header {
   display: flex;
@@ -527,4 +527,271 @@
   width: 60px;
   height: 60px;
   object-fit: contain;
+}
+.issues-title {
+  font-size: 20px;
+  font-weight: 300;
+}
+.issue-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap:8px;
+  box-sizing: border-box;
+  width: 100%;
+  max-height: 20%;
+}
+.issues-header{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 8px;
+  padding-right: 8px;
+  gap: 8px;
+}
+.issues-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  height: auto;
+  box-sizing: border-box;
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 8px;
+  gap: 8px;
+}
+.issue-item-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  box-sizing: border-box;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+.issue-checkbox {
+  appearance: none;           /* sklanja podrazumevani izgled browsera */
+  width: 20px;
+  height: 20px;
+  border: 2px solid #4caf50;  /* zelena ivica */
+  border-radius: 4px;         /* blago zaobljeni uglovi */
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.issue-checkbox:checked {
+  background-color: #4caf50;  /* popuni zeleno */
+  border-color: #4caf50;
+}
+.issue-status-indicator{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.issue-checkbox:checked::after {
+  content: "✔";
+  position: absolute;
+  top: 0;
+  left: 3px;
+  font-size: 14px;
+  color: white;
+}
+
+.issue-checkbox:hover {
+  box-shadow: 0 0 4px rgba(76, 175, 80, 0.5);
+}
+.issue-text {
+  font-size: 14px;
+  color: #000000;
+  font-weight: 300;
+  flex: 1; /* zauzima preostali prostor */
+}
+.file-issue-text{
+  font-size: 13px;
+  color: #000000;
+  font-weight: 300;
+  text-decoration: underline;
+  cursor: pointer;
+  text-decoration-color: #f44336; /* crvena boja (Google red) */
+  text-underline-offset: 3px;     /* razmak između teksta i linije */
+}
+.dependency-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 8px;
+  width: 100%;
+}
+.dependency-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  max-height: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  gap: 4px;
+}
+.dependency-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  width: 100%;
+  cursor: pointer;
+}
+.dependency-text {
+  font-size: 14px;
+  color: #000000;
+  font-weight: 300;
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.dependency-status {
+  font-size: 13px;
+  color: #f44336;
+  font-weight: 300;
+}
+.dependency-header{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  box-sizing: border-box;
+  gap: 8px;
+}
+.edit-dependency-icon{
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+.bin-icon{
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+.save-changes-button{
+  background-color: #26A69A;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 14px;
+  width: 60px;
+  transition: background-color 0.2s ease-in-out;
+}
+.save-changes-button:hover{
+  background-color: #1E8E89;
+}
+.cancel-changes-button{
+  background-color: #de3a3a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 14px;
+  width: 60px;
+  transition: background-color 0.2s ease-in-out;
+}
+.cancel-changes-button:hover{
+  background-color: #bc3030;
+}
+.edit-dependency-actions{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.add-dependency-item{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+.add-dependency-input{
+  width: 100%;
+  padding: 4px 8px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.add-dependency-container {
+  position: relative;
+  width: 100%;
+}
+
+.available-dependencies-dropdown {
+  position: fixed;
+  top: auto;
+  left: auto;
+  width: 250px; /* fiksna širina ili prema inputu */
+  max-height: 200px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  padding: 0 4px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+  animation: dropdownFade 0.15s ease-out;
+}
+
+/* Scrollbar elegantno */
+.available-dependencies-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+.available-dependencies-dropdown::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 3px;
+}
+
+.available-dependency-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.available-dependency-item:hover {
+  background-color: #f1f8e9;
+  transform: scale(1.01);
+}
+
+.available-dependency-text {
+  font-size: 14px;
+  color: #333;
+}
+
+@keyframes dropdownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

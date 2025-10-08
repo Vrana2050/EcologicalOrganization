@@ -79,13 +79,19 @@ export class Revision implements IRevision {
   hasApprovedRevisionForStatus(workflowStatusId: number): boolean {
     return this.approved && this.workflowStatusId === workflowStatusId;
   }
+  hasUnApprovedIssues(): boolean {
+    return this.revisionIssues !== undefined && this.revisionIssues.some(issue => !issue.isApproved());
+  }
+  getUnApprovedIssues(): IRevisionIssue[] {
+    return this.revisionIssues?.filter(issue => !issue.isApproved()) || [];
+  }
 }
 
 export class RevisionIssue implements IRevisionIssue {
   id: number
   revisionId: number
   issue: string
-  correctionDate: Date
+  correctionDate?: Date
   correctionApproved: boolean
   corrected: boolean
   fileId?: number
@@ -104,9 +110,6 @@ export class RevisionIssue implements IRevisionIssue {
     if (!data.izmena) {
       throw new Error('RevisionChange: "change" is required.');
     }
-    if (data.datumIspravljanja == null) {
-      throw new Error('RevisionChange: "correctionDate" is required.');
-    }
     if (data.ispravljena == null) {
       throw new Error('RevisionChange: "ispravljena" is required.');
     }
@@ -117,7 +120,7 @@ export class RevisionIssue implements IRevisionIssue {
     this.id = data.id;
     this.revisionId = data.dokumentRevizijaId;
     this.issue = data.izmena;
-    this.correctionDate = new Date(data.datumIspravljanja);
+    this.correctionDate = data.datumIspravljanja ? new Date(data.datumIspravljanja) : undefined;
     this.correctionApproved = data.ispravkaOdobrena;
     this.corrected = data.ispravljena;
     this.fileId = data.fajl ? data.fajl.id : undefined;
@@ -133,8 +136,15 @@ export class RevisionIssue implements IRevisionIssue {
     return this.correctionApproved && this.corrected;
   }
   isUnApproved(): boolean {
-    console.log(!this.correctionApproved && this.corrected);
     return !this.correctionApproved && this.corrected;
+  }
+  CorrectIssue(): void {
+    this.corrected = true;
+    this.correctionDate = new Date();
+  }
+  UnCorrectIssue(): void {
+    this.corrected = false;
+    this.correctionDate = undefined!;
   }
 }
 

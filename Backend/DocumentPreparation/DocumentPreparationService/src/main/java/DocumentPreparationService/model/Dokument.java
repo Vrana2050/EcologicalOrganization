@@ -121,12 +121,23 @@ public class Dokument {
     public void validate() {
         if (this.naziv == null || this.naziv.isEmpty()) throw new InvalidRequestDataException("Name is required");
         validateVlasnik();
+        validateZavisiOd();
         List<String> errors = isInDraft();
         boolean isInPripremna_verzija = !errors.isEmpty();
         this.setPripremna_verzija(isInPripremna_verzija);
         this.poslednjaIzmena = LocalDate.now();
     }
 
+    private void validateZavisiOd()
+    {
+        for(Dokument zavisiOd : this.zavisiOd)
+        {
+            if(zavisiOd.doesZavisiOd(this.getId()))
+            {
+                throw new InvalidRequestDataException("Cannot add dependency: circular dependency detected between documents.");
+            }
+        }
+    }
     private void validateVlasnik() {
         if (this.vlasnik == null)
             throw new InvalidRequestDataException("Owner not selected");
@@ -337,5 +348,13 @@ public class Dokument {
 
     public boolean canEditFiles() {
         return !isInReview();
+    }
+
+    public boolean isRokZavrsetkaAfter(LocalDate rokZavrsetka) {
+        return this.getRokZavrsetka().isAfter(rokZavrsetka);
+    }
+
+    public boolean doesZavisiOd(Long id) {
+        return this.getZavisiOd().stream().anyMatch(dokument -> dokument.getId().equals(id));
     }
 }

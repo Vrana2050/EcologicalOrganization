@@ -56,11 +56,46 @@
               {{document.description}}
             </div>
           </div>
+
+
+
+
+          <div class="dependency-section">
+            <div class="dependency-header">
+              <span class="info-text">Dependencies</span>
+              <img src="assets/pen.png" alt="dependency icon" class="edit-dependency-icon" *ngIf="document.canEditDependency(userId) && !showEditDependency" (click)="openEditDependencies()">
+              <div class="edit-dependency-actions" *ngIf="showEditDependency">
+                <button class="save-changes-button" (click)="saveDependencies()">Save</button>
+                <button class="cancel-changes-button" (click)="cancelEditDependencies()">Cancel</button>
+              </div>
+            </div>
+            <div class="dependency-list">
+              <div class="add-dependency-container" *ngIf="showEditDependency">
+                <div class="add-dependency-item dependency-item" (click)="showAllAvailableDependencies()">
+                  <input type="text" placeholder="Search document..." class="add-dependency-input" [(ngModel)]="dependencySearchTerm" (input)="searchDependencies()">
+                </div>
+                <div class="available-dependencies-dropdown" *ngIf="showEditDependency && filteredDependencies.length > 0">
+                  <div *ngFor="let doc of filteredDependencies" class="available-dependency-item" (click)="addDependency(doc)">
+                    <span class="info-text available-dependency-text">{{doc.name}}</span>
+                  </div>
+                </div>
+              </div>
+              <div  *ngFor="let dependency of document.getActiveDependencies()" class="dependency-item" (click)="openDependency(dependency)">
+                <img src="assets/bin.png" alt="status icon" class="bin-icon dependency-icon" *ngIf="showEditDependency" (click)="removeDependency($event,dependency)">
+                <span class="info-text dependency-text">{{dependency.name}}</span>
+                <span class ="info-text dependency-status">{{dependency.dueDate | date:'dd MMM yyyy':'':'en-GB'}}</span>
+              </div>
+            </div>
+          </div>
+
+
         </div>
           <button class="toggle-btn" (click)="togglePanel()">
           {{ isCollapsed ? '⮞' : '⮜' }}
           </button>
       </div>
+
+
       <div class="document-main-content">
         <div class="sub-document-section" *ngIf="document.subDocuments && document.subDocuments.length > 0 || canAddSubDocument()">
           <div class="sub-document-header">
@@ -143,6 +178,23 @@
               <span class="file-version">Version: {{file.version}}</span>
               <div class="file-actions">
                 <button class="restore-button" (click)="restoreFile($event,file)"><span class="restore">Restore</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="issues-section" *ngIf="document.revisions && document.hasUnApprovedIssues()">
+          <div class="issues-header">
+            <span class="issues-title">Issues</span>
+          </div>
+          <div class="issues-list">
+            <div *ngFor="let issue of document.getUnApprovedIssues()" class="issue-item-container">
+              <div class="issue-status-indicator">
+                <input type="checkbox" class="issue-checkbox" [checked]="issue.corrected" (change)="toggleIssueCorrection(issue)">
+              </div>
+              <span class="issue-text">{{issue.issue}}</span>
+              <div class="file-issue" *ngIf="issue.activeFileId">
+                <span class="file-issue-text" [style.text-decoration-color]="issue.corrected ? '#4caf50' : '#f44336'">{{document.getFileNameById(issue.activeFileId!)}}</span>
               </div>
             </div>
           </div>

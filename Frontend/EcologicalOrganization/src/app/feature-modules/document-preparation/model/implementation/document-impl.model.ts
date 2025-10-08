@@ -106,6 +106,9 @@ export class DocumentExtended extends DocumentBase {
     isUserAssignee(userId: number): boolean {
       return this.assignees ? this.assignees.some(assignee => assignee.userId === userId) : false;
     }
+    getActiveDependencies(): IDocumentBase[] {
+      return this.dependsOn ? this.dependsOn.filter(doc => !doc.isDone()) : [];
+    }
 }
   export class DocumentBoard extends DocumentExtended implements IDocumentBoard {
     mainFile?: IFile;
@@ -240,8 +243,24 @@ export class DocumentExtended extends DocumentBase {
     canManageFile(userId: number): boolean {
       return this.canEditInCurrentStatus(userId) && !this.isInReview();
     }
+    canEditDependency(userId: number): boolean {
+      return this.canEditInCurrentStatus(userId) && !this.isInReview();
+    }
     isInReview(): boolean {
       return this.status.isReview();
+    }
+    hasUnApprovedIssues(): boolean {
+      return this.revisions !== undefined && this.revisions.some(revision => revision.hasUnApprovedIssues());
+    }
+    getUnApprovedIssues(): IRevisionIssue[] {
+      return this.revisions?.flatMap(revision => revision.getUnApprovedIssues()) || [];
+    }
+    canCorrectIssue(userId: number): boolean {
+      return this.isUserAssignee(userId) && this.canManageFile(userId);
+    }
+    getFileNameById(activeFileId: number): string | undefined {
+      const activeFile = this.activeFiles?.find(af => af.id === activeFileId);
+      return activeFile ? activeFile.file.name : undefined;
     }
   }
   export class DocumentActiveFile implements IDocumentActiveFile {
@@ -347,4 +366,12 @@ export class DocumentExtended extends DocumentBase {
     id?: number;
     fajl?: {id:number}
     dokumentId?: number
+  }
+  export class DocumentDependencyUpdate{
+    id: number;
+    zavisiOd?: {id:number}[]
+    constructor(data: IDocumentDetails) {
+      this.id = data.id;
+      this.zavisiOd = data.dependsOn ? data.dependsOn.map(doc => ({id: doc.id})) : [];
+    }
   }

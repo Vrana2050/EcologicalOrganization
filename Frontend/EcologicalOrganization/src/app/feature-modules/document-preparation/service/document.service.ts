@@ -7,10 +7,10 @@ import { AuthService } from 'src/app/infrastructure/auth/auth.service';
 import { ProjectHome } from '../model/implementation/project-impl.model';
 import { HttpHeaders } from '@angular/common/http';
 import { ProjectBoard } from '../model/implementation/project-impl.model';
-import { DocumentBase, DocumentBoard, DocumentCreate, DocumentMainFileUpdate, DocumentStatusUpdate, DocumentWorkflowCreate } from '../model/implementation/document-impl.model';
+import { DocumentBase, DocumentBoard, DocumentCreate, DocumentDependencyUpdate, DocumentMainFileUpdate, DocumentStatusUpdate, DocumentWorkflowCreate } from '../model/implementation/document-impl.model';
 import { Analysis } from '../model/implementation/analysis-impl.model';
 import { DocumentDetails } from '../model/implementation/document-impl.model';
-import { IDocumentBase } from '../model/interface/document.model';
+import { IDocumentBase, IDocumentDetails } from '../model/interface/document.model';
 import { RevisionUpdate } from '../model/implementation/revision-impl.model';
 
 
@@ -77,5 +77,13 @@ export class DocumentService {
   updateMainFile(updateMainFile: DocumentMainFileUpdate) {
     const url = `${this.apiUrl}/mainFile`;
     return this.http.patch<any>(url, updateMainFile, { headers: this.headers });
+  }
+  updateDocumentDependencies(document: DocumentDependencyUpdate) {
+    const url = `${this.apiUrl}/dependencies`;
+    return this.http.patch<any>(url, document, { headers: this.headers });
+  }
+  getDocumentsWithSameParent(documentId: number): Observable<IDocumentBase[]> {
+    const url = `${this.apiUrl}/${documentId}/parentDocuments`;
+    return this.http.get<any[]>(url, { headers: this.headers }).pipe(map(documents => documents.map(d => new DocumentBase(d))));
   }
 }

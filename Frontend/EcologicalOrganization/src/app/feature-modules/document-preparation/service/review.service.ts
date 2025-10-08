@@ -35,4 +35,8 @@ export class ReviewService {
     const url = `${this.apiUrl}`;
     return this.http.post<any>(url, revisions, { headers: this.headers });
   }
+  updateReview(revisions: RevisionUpdate[]): Observable<any> {
+    const url = `${this.apiUrl}`;
+    return this.http.put<any>(url, revisions, { headers: this.headers });
+  }
 }

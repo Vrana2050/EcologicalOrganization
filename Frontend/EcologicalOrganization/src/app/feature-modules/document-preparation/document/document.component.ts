@@ -3,8 +3,8 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OnInit } from '@angular/core';
 import { DocumentService } from '../service/document.service';
-import { IDocumentActiveFile, IDocumentBoard, IDocumentDetails } from '../model/interface/document.model';
-import { DocumentActiveFileUpdate, DocumentCreate, DocumentDetails, DocumentStatusUpdate, DocumentWorkflowCreate } from '../model/implementation/document-impl.model';
+import { IDocumentActiveFile, IDocumentBase, IDocumentBoard, IDocumentDetails } from '../model/interface/document.model';
+import { DocumentActiveFileUpdate, DocumentCreate, DocumentDependencyUpdate, DocumentDetails, DocumentStatusUpdate, DocumentWorkflowCreate } from '../model/implementation/document-impl.model';
 import { IWorkflow, IWorkflowStatus } from '../model/interface/workflow.model';
 import { AuthService } from 'src/app/infrastructure/auth/auth.service';
 import { FileService } from '../service/file.service';
@@ -16,6 +16,9 @@ import { IProject } from '../model/interface/project.model';
 import { NotificationService } from '../service/Util/toast-notification.service';
 import { WorkflowService } from '../service/workflow.service';
 import { DocumentMainFileUpdate } from '../model/implementation/document-impl.model';
+import { IRevisionIssue } from '../model/interface/revision.model';
+import { ReviewService } from '../service/review.service';
+import { RevisionUpdate } from '../model/implementation/revision-impl.model';
 
 @Component({
   selector: 'document-preparation-document',
@@ -55,9 +58,16 @@ export class DocumentPreparationDocumentComponent implements OnInit {
   nextStatusColor: string | undefined;
 
   showUpdateStatus: boolean = false;
+  showEditDependency: boolean = false;
 
   statusToShow: IWorkflowStatus | undefined;
-  constructor(private workflowService: WorkflowService,private route: ActivatedRoute, private documentService: DocumentService,private router : Router,private authService: AuthService,private fileService: FileService,private fileViewerService: FileViewerService,private projectService: ProjectService,private toastNotificationService: NotificationService) { }
+  removedDependencies: IDocumentBase[] = [];
+  addedDependencies: IDocumentBase[] = [];
+
+  dependencySearchTerm: string = '';
+  availableDependencies: IDocumentBase[] = [];
+  filteredDependencies: IDocumentBase[] = [];
+  constructor(private reviewService: ReviewService,private workflowService: WorkflowService,private route: ActivatedRoute, private documentService: DocumentService,private router : Router,private authService: AuthService,private fileService: FileService,private fileViewerService: FileViewerService,private projectService: ProjectService,private toastNotificationService: NotificationService) { }
 
   ngOnInit(): void {
         this.route.paramMap.subscribe(params => {
@@ -394,5 +404,106 @@ onFileSelected(event: Event) {
       this.closeRestoreOptions();
     });
   }
+toggleIssueCorrection(issue: IRevisionIssue) {
+  if (issue.isCorrected()) {
+    issue.UnCorrectIssue()
+  } else {
+    issue.CorrectIssue();
+  }
+  const updatedIssue: RevisionUpdate = new RevisionUpdate(this.document.projectId, false, this.document.status.id, this.document.id, [{id: issue.id, izmena: issue.issue, ispravljena: issue.isCorrected(), ispravkaOdobrena: issue.isApproved(), datumIspravljanja: issue.correctionDate, dokumentRevizijaId: issue.revisionId, fajlId: issue.fileId, aktivniFajlId: issue.activeFileId}],issue.revisionId);
+  this.reviewService.updateReview([updatedIssue]).subscribe(() => {
+    this.toastNotificationService.success("Issue successfully updated.","Success");
+  });
+}
+openDependency(dependency: IDocumentBase) {
+  this.router.navigate(['document-preparation/document', dependency.id], { state: { statusColor: this.statusColors[dependency.status.id] } });
+}
+openEditDependencies() {
+  this.showEditDependency = true;
+  this.loadAvailableDependencies();
+}
+removeDependency(event: any, dependency: IDocumentBase) {
+  event.stopPropagation();
+  this.document.dependsOn = this.document.dependsOn?.filter(d => d.id !== dependency.id);
+  this.removedDependencies.push(dependency);
+  const docToUpdate: DocumentCreate = new DocumentCreate(this.document);
+}
+addDependency(dependency: IDocumentBase) {
+  if(!this.document.dependsOn){
+    this.document.dependsOn = [];
+  }
+  if(this.document.dependsOn.find(d => d.id === dependency.id)){
+    return;
+  }
+  this.document.dependsOn.push(dependency);
+  this.addedDependencies.push(dependency);
+  this.filteredDependencies = [];
+  this.dependencySearchTerm = '';
+}
+cancelEditDependencies() {
+  const trulyAdded = this.addedDependencies.filter(
+    a => !this.removedDependencies.some(r => r.id === a.id)
+  );
+  const trulyRemoved = this.removedDependencies.filter(
+    r => !this.addedDependencies.some(a => a.id === r.id)
+  );
 
+  // Ako posle čišćenja nema stvarnih promena — ništa ne radi
+  if (trulyAdded.length === 0 && trulyRemoved.length === 0) {
+    this.showEditDependency = false;
+    this.removedDependencies = [];
+    this.addedDependencies = [];
+    this.dependencySearchTerm = '';
+    this.filteredDependencies = [];
+    return;
+  }
+
+  // Primeni samo realne promene
+  if (trulyAdded.length > 0) {
+    this.document.dependsOn = this.document.dependsOn?.filter(
+      d => !trulyAdded.find(added => added.id === d.id)
+    );
+  }
+  if (trulyRemoved.length > 0) {
+    this.document.dependsOn?.push(...trulyRemoved);
+  }
+  this.showEditDependency = false;
+  this.removedDependencies = [];
+  this.addedDependencies = [];
+  this.dependencySearchTerm = '';
+  this.filteredDependencies = [];
+}
+saveDependencies() {
+  const docToUpdate: DocumentDependencyUpdate = new DocumentDependencyUpdate(this.document);
+  this.documentService.updateDocumentDependencies(docToUpdate).subscribe( {
+    next: (doc) => {
+      this.toastNotificationService.success("Dependencies successfully updated.","Success");
+      this.showEditDependency = false;
+      this.removedDependencies = [];
+      this.addedDependencies = [];
+    },
+    error: (err) => {
+      this.cancelEditDependencies();
+    }
+  });
+}
+loadAvailableDependencies() {
+  this.documentService.getDocumentsWithSameParent(this.document.id).subscribe(docs => {
+    this.availableDependencies = docs.filter(d => d.id !== this.document.id);
+  });
+}
+searchDependencies() {
+  if(this.dependencySearchTerm.trim() === ''){
+    this.filteredDependencies = this.availableDependencies;
+    return;
+  }
+  const term = this.dependencySearchTerm.toLowerCase();
+  this.filteredDependencies = this.availableDependencies.filter(d => d.name.toLowerCase().includes(term) && !this.document.dependsOn?.find(dep => dep.id === d.id));
+}
+showAllAvailableDependencies() {
+  if(this.filteredDependencies.length>0){
+    return;
+  }
+  this.filteredDependencies = this.availableDependencies.filter(d => !this.document.dependsOn?.find(dep => dep.id === d.id));
+}
 }

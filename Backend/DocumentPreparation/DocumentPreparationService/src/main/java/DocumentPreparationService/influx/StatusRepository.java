@@ -37,4 +37,18 @@ public class StatusRepository {
         influxDBClient.close();
         return isSuccess;
     }
+
+    public List<StatusAvg> getStatusAvgs(String projekatId, String dokumentId, DateRangeDto dateRangeDto) {
+        InfluxDBClient influxDBClient = inConn.buildConnection();
+        List<StatusAvg> statuses= inConn.getReport(influxDBClient,projekatId,dokumentId,dateRangeDto);
+        influxDBClient.close();
+        return statuses;
+    }
+
+    public MaxStatusTime getTimeSpentForStatus(Long statusId, String projekatId, String dokumentId, DateRangeDto dateRangeDto) {
+        InfluxDBClient influxDBClient = inConn.buildConnection();
+        MaxStatusTime maxStatus= inConn.getTimeSpentForStatus(influxDBClient,statusId,projekatId,dokumentId,dateRangeDto);
+        influxDBClient.close();
+        return maxStatus;
+    }
 }

@@ -70,6 +70,16 @@ public class DokumentController  {
         Dokument updatedEntity = dokumentService.updateMainFile(mapper.ToEntity(entityDto),userId);
         return ResponseEntity.ok(mapper.ToDto(updatedEntity));
     }
+    @PatchMapping("/dependencies")
+    public ResponseEntity<DokumentDto> updateDependencies(@RequestHeader(name = "X-USER-ID") Long userId, @RequestBody DokumentDto entityDto) {
+        Dokument updatedEntity = dokumentService.updateDependencies(mapper.ToEntity(entityDto),userId);
+        return ResponseEntity.ok(mapper.ToDto(updatedEntity));
+    }
+    @GetMapping("/{dokumentId}/parentDocuments")
+    public ResponseEntity<Set<DokumentDto>> getAllParentDocuments(@RequestHeader(name = "X-USER-ID") Long userId, @PathVariable Long dokumentId) {
+        Set<Dokument> entities = dokumentService.findAllParentDocuments(userId,dokumentId);
+        return ResponseEntity.ok(mapper.ToDtos(entities));
+    }
     @GetMapping("/board/project/{projekatId}")
     public ResponseEntity<Set<DokumentDto>> getBoardDocumentsByProjectId(@RequestHeader(name = "X-USER-ID") Long userId, @PathVariable Long projekatId) {
         Set<Dokument> entities = dokumentService.findAllBoardDocumentsByProjectId(userId,projekatId);

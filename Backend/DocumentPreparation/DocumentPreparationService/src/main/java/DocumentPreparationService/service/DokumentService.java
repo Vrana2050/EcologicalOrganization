@@ -1,6 +1,7 @@
 package DocumentPreparationService.service;
 
 import DocumentPreparationService.exception.ForbiddenException;
+import DocumentPreparationService.exception.InvalidRequestDataException;
 import DocumentPreparationService.exception.NotFoundException;
 import DocumentPreparationService.model.*;
 import DocumentPreparationService.repository.ICrudRepository;
@@ -70,7 +71,7 @@ public class DokumentService extends CrudService<Dokument,Long> implements IDoku
                     .map(Dokument::getId)
                     .collect(Collectors.toSet());
 
-            Set<Dokument> zavisiOd = new HashSet<>(repository.findAllById(ids));
+            Set<Dokument> zavisiOd = new HashSet<>(repository.findAllByIdEager(ids));
             newDokument.setZavisiOd(zavisiOd);
         }
         if(newDokument.getDodeljeniKorisnici()!=null) {
@@ -113,7 +114,7 @@ public class DokumentService extends CrudService<Dokument,Long> implements IDoku
             oldDokument.setDodeljeniKorisnici(korisnikProjekatService.findByIds(newDokument.getDodeljeniKorisnici().stream().map(KorisnikProjekat::getId).collect(Collectors.toSet())));
         }
         if(newDokument.getZavisiOd()!=null) {
-            Set<Dokument> zavisiOd = repository.findAllByIdIn(newDokument.getZavisiOd().stream().map(Dokument::getId).collect(Collectors.toSet()));
+            Set<Dokument> zavisiOd = repository.findAllByIdEager(newDokument.getZavisiOd().stream().map(Dokument::getId).collect(Collectors.toSet()));
             oldDokument.setZavisiOd(zavisiOd);
         }
         if(newDokument.getStatus()!=null) {
@@ -314,6 +315,38 @@ public class DokumentService extends CrudService<Dokument,Long> implements IDoku
         dokumentToUpdate.setGlavniFajl(dokument.getGlavniFajl());
         return updateDokumentFiles(dokumentToUpdate,userId);
     }
+
+    @Override
+    public Dokument updateDependencies(Dokument newDokument, Long userId) {
+       Dokument dokumenToUpdate = repository.findByIdEager(newDokument.getId()).orElseThrow(() -> new NotFoundException("Document not found"));
+       for(Dokument dokument : newDokument.getZavisiOd()){
+           Dokument zavisiOd = repository.findByIdEager(dokument.getId()).orElseThrow(() -> new NotFoundException("Document not found"));
+           if(!dokumenToUpdate.isRokZavrsetkaAfter(zavisiOd.getRokZavrsetka())){
+               throw new InvalidRequestDataException("Dependency due date must not be later than the due date of the document it depends on.");
+           }
+       }
+       dokumenToUpdate.setZavisiOd(newDokument.getZavisiOd());
+       return update(dokumenToUpdate,userId);
+    }
+
+    @Override
+    public Set<Dokument> findAllParentDocuments(Long userId, Long dokumentId) {
+        Dokument dokument = repository.findByIdEager(dokumentId).orElseThrow(() -> new NotFoundException("Document not found"));
+        KorisnikProjekat kp = korisnikProjekatService.findByUserAndProjekat(userId,dokument.getProjekat().getId()).orElseThrow(() -> new ForbiddenException("User not found on project"));
+        if(!dokument.isKorisnikDodeljenik(kp) && !dokument.isKorisnikVlasnik(kp))
+        {
+            throw new  ForbiddenException("Document not found");
+
+        }
+        if(dokument.getRoditeljDokument()==null)
+        {
+            return repository.getAllDokumentiOnProjekat(dokument.getProjekat().getId());
+        }
+        else {
+            return repository.getAllDokumentiOnRoditeljDokument(dokument.getRoditeljDokument().getId());
+        }
+    }
+
     private boolean canEditFiles(Dokument dokument,KorisnikProjekat korisnikProjekat) {
         return canEdit(dokument,korisnikProjekat) && dokument.canUpdate(korisnikProjekat) &&  dokument.canEditFiles();
     }

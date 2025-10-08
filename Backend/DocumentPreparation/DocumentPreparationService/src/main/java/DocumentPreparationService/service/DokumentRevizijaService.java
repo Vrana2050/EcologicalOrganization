@@ -129,8 +129,13 @@ public class DokumentRevizijaService  extends CrudService<DokumentRevizija,Long>
         {
             throw new InvalidRequestDataException("Cannot update reviews on different documents");
         }
-        boolean isKorisnikDodeljenik = korisnikProjekatService.isKorisnikDodeljenik(userId,dR.getDokument().getProjekat().getId(), dR.getId());
-        if(!isKorisnikDodeljenik)
+        Dokument dokument = dokumentService.findById(dR.getDokument().getId()).orElseThrow(() -> new NotFoundException("Document not found"));
+        if(dokument.isInReview())
+        {
+            throw new InvalidRequestDataException("Cannot update reviews. Document is in review");
+        }
+        KorisnikProjekat kp = korisnikProjekatService.findByUserAndProjekat(userId,dokument.getProjekat().getId()).orElseThrow(() -> new NotFoundException("User not found on project"));
+        if(!dokument.isKorisnikDodeljenik(kp))
         {
             throw new ForbiddenException("Cannot update reviews on non assigned documents");
         }

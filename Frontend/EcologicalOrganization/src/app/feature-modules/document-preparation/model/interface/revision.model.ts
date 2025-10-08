@@ -1,4 +1,6 @@
 export interface IRevision{
+  getUnApprovedIssues(): IRevisionIssue[];
+  hasUnApprovedIssues(): boolean;
   hasApprovedRevisionForStatus(workflowStatusId: number): boolean;
   isReviewAfter(date: Date): boolean;
   isResolved(): boolean;
@@ -17,10 +19,12 @@ export interface IRevision{
 
 }
 export interface IRevisionIssue{
+  CorrectIssue(): void;
+  UnCorrectIssue(): void;
   id: number;
   revisionId: number;
   issue: string;
-  correctionDate: Date;
+  correctionDate?: Date;
   correctionApproved: boolean;
   fileId?: number;
   corrected: boolean;

@@ -34,4 +34,8 @@ public interface IDokumentService extends ICrudService<Dokument,Long> {
     Dokument updateWorkflow(Dokument dokument, Long userId);
 
     Dokument updateMainFile(Dokument dokument, Long userId);
+
+    Dokument updateDependencies(Dokument dokument, Long userId);
+
+    Set<Dokument> findAllParentDocuments(Long userId, Long dokumentId);
 }

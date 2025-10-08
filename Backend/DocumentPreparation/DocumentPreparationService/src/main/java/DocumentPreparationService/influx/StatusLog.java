@@ -28,4 +28,13 @@ public class StatusLog {
     private Long prethodnoStanjeId;
     @Column
     private Long novoStanjeId;
+
+    public StatusLog(Instant datum,String dokumentId,String projekatId,Long prethodnoStanjeId,Long novoStanjeId) {
+        this.dokumentId = dokumentId;
+        this.projekatId = projekatId;
+        this.prethodnoStanjeId = prethodnoStanjeId;
+        this.novoStanjeId = novoStanjeId;
+        this.datum = datum;
+    }
+    public StatusLog() {}
 }

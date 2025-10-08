@@ -63,4 +63,17 @@ public interface IDokumentRepository extends ICrudRepository<Dokument, Long> {
     Set<Dokument> getAllDokumentiOnProjekat(Long projekatId);
 
     Set<Dokument> findAllByIdIn(Collection<Long> ids);
+
+    @Query("SELECT DISTINCT d FROM Dokument d " +
+            "LEFT JOIN FETCH d.projekat " +
+            "LEFT JOIN FETCH d.tokIzradeDokumenta " +
+            "LEFT JOIN FETCH d.status " +
+            "LEFT JOIN FETCH d.roditeljDokument " +
+            "LEFT JOIN FETCH d.vlasnik " +
+            "LEFT JOIN FETCH d.zavisiOd " +
+            "LEFT JOIN FETCH d.dodeljeniKorisnici " +
+            "LEFT JOIN FETCH d.revizije " +
+            "WHERE d.id IN :ids")
+    Set<Dokument> findAllByIdEager(@Param("ids") Set<Long> ids);
+
 }

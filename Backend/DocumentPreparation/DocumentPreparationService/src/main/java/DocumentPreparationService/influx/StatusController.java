@@ -9,6 +9,7 @@ import DocumentPreparationService.model.Dokument;
 import DocumentPreparationService.model.DokumentRevizija;
 import DocumentPreparationService.service.StatusService;
 import DocumentPreparationService.service.interfaces.IDokumentRevizijaService;
+import jakarta.ws.rs.QueryParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,8 @@ import java.util.List;
 public class StatusController {
     @Autowired
     private StatusServiceInflux statusService;
+    @Autowired
+    private SeederService seederService;
     @PostMapping
     public ResponseEntity<StatusLog> create( @RequestBody StatusLog entity) {
         StatusLog savedEntity = statusService.create(entity);
@@ -35,5 +38,14 @@ public class StatusController {
     @DeleteMapping("/{dokumentId}")
     public ResponseEntity<Boolean> delete( @PathVariable Long dokumentId,@RequestBody DateRangeDto dateRangeDto) {
         return ResponseEntity.ok(statusService.delete(dokumentId,dateRangeDto));
+    }
+    @PostMapping("/generate")
+    public String generate() {
+        seederService.seedStatuses(2000);
+        return "✅ Uspesno generisano 2000 slogova u InfluxDB (measurement: statuses)";
+    }
+    @PostMapping("/report")
+    public ResponseEntity<ReportDto> getAll(@RequestParam() String projekatId,@RequestParam String dokumentId, @RequestBody DateRangeDto dateRangeDto) {
+        return ResponseEntity.ok(statusService.getReport(projekatId,dokumentId,dateRangeDto));
     }
 }

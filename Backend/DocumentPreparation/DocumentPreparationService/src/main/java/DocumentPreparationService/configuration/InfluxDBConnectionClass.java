@@ -1,5 +1,8 @@
 package DocumentPreparationService.configuration;
 
+import DocumentPreparationService.influx.DateRangeDto;
+import DocumentPreparationService.influx.MaxStatusTime;
+import DocumentPreparationService.influx.StatusAvg;
 import DocumentPreparationService.influx.StatusLog;
 import com.influxdb.client.*;
 import com.influxdb.client.domain.WritePrecision;
@@ -76,7 +79,6 @@ public class InfluxDBConnectionClass {
         boolean flag = false;
         try {
             WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
-            status.setDatum(Instant.now());
             Point point = Point.measurement("statuses")
                     .addTag("projekatId", status.getProjekatId())
                     .addTag("dokumentId", status.getDokumentId())
@@ -156,5 +158,102 @@ public class InfluxDBConnectionClass {
             System.out.println("InfluxException: " + ie);
         }
         return flag;
+    }
+
+    public List<StatusAvg> getReport(InfluxDBClient influxDBClient, String projekatId, String dokumentId, DateRangeDto dateRangeDto) {
+        String start = dateRangeDto != null && dateRangeDto.getStart() != null
+                ? dateRangeDto.getStart().toInstant().toString()
+                : "-30d";
+
+        String stop = dateRangeDto != null && dateRangeDto.getStart() != null
+                ? dateRangeDto.getEnd().toInstant().toString()
+                : "now()";
+
+        // 🧱 Dinamički filter — koristi projekatId ili dokumentId ako postoji
+        String idFilter = dokumentId != null && !dokumentId.isBlank()
+                ? "r.dokumentId == \"" + dokumentId + "\""
+                : "r.projekatId == \"" + projekatId + "\"";
+
+        // 🔥 Flux query string
+        String flux = String.format("""
+                from(bucket: "iis_bucket")
+                  |> range(start: %s, stop: %s)
+                  |> filter(fn: (r) => r._measurement == "statuses")
+                  |> filter(fn: (r) => r._field == "novoStanjeId")
+                  |> filter(fn: (r) => %s)
+                  |> sort(columns: ["_time"])
+                  |> elapsed(unit: 1s)
+                  |> filter(fn: (r) => exists r.elapsed)
+                  |> group(columns: ["_value"], mode: "by")
+                  |> mean(column: "elapsed")
+                  |> rename(columns: {_value: "statusId", elapsed: "avg_duration_seconds"})
+                  |> yield(name: "avg_duration_per_status")
+                """, start, stop, idFilter);
+
+        // 🧩 Query execution
+        QueryApi queryApi = influxDBClient.getQueryApi();
+        List<FluxTable> tables = queryApi.query(flux);
+
+        List<StatusAvg> results = new ArrayList<>();
+
+        for (FluxTable table : tables) {
+            for (FluxRecord record : table.getRecords()) {
+                Long statusId = ((Long) record.getValueByKey("statusId"));
+                Double avg = record.getValueByKey("avg_duration_seconds") != null
+                        ? ((Number) record.getValueByKey("avg_duration_seconds")).doubleValue()
+                        : null;
+
+                results.add(new StatusAvg(statusId, avg));
+            }
+        }
+        return results;
+    }
+
+
+    public MaxStatusTime getTimeSpentForStatus(InfluxDBClient influxDBClient,Long statusId, String projekatId, String dokumentId, DateRangeDto dateRangeDto) {
+
+        // 📅 Dinamički opseg (ili poslednjih 30 dana ako nije zadat)
+        String start = (dateRangeDto != null && dateRangeDto.getStart() != null)
+                ? dateRangeDto.getStart().toString()
+                : "-30d";
+        String stop = (dateRangeDto != null && dateRangeDto.getEnd() != null)
+                ? dateRangeDto.getEnd().toString()
+                : "now()";
+
+        // 🧩 Dinamički deo filtera
+        String idFilter = (projekatId != null)
+                ? String.format("r.projekatId == \"%s\"", projekatId)
+                : String.format("r.dokumentId == \"%s\"", dokumentId);
+
+        // 🧮 Flux upit
+        String flux = String.format("""
+            from(bucket: "iis_bucket")
+              |> range(start: %s, stop: %s)
+              |> filter(fn: (r) => r._measurement == "statuses")
+              |> filter(fn: (r) => r._field == "novoStanjeId")
+              |> filter(fn: (r) => r._value == %d)
+              |> filter(fn: (r) => %s)
+              |> sort(columns: ["_time"])
+              |> elapsed(unit: 1s)
+              |> filter(fn: (r) => exists r.elapsed)
+              |> group()
+              |> sum(column: "elapsed")
+              |> rename(columns: {elapsed: "total_duration_seconds"})
+              |> yield(name: "total_duration_for_status")
+            """, start, stop, statusId, idFilter);
+
+        QueryApi queryApi = influxDBClient.getQueryApi();
+        List<FluxTable> tables = queryApi.query(flux);
+
+        if (tables.isEmpty() || tables.get(0).getRecords().isEmpty()) {
+            return new MaxStatusTime(statusId, 0.0);
+        }
+
+        FluxRecord record = tables.get(0).getRecords().get(0);
+        Double totalDuration = record.getValueByKey("total_duration_seconds") != null
+                ? ((Number) record.getValueByKey("total_duration_seconds")).doubleValue()
+                : 0.0;
+
+        return new MaxStatusTime(statusId, totalDuration);
     }
 }

@@ -40,11 +40,17 @@ export interface IDocumentExtended extends IDocumentBase{
   isUserAssignee(userId: number): boolean;
   dependsOn?: IDocumentBase[];
   assignees?: IUserProject[];
+  getActiveDependencies(): IDocumentBase[];
 }
 export interface IDocumentDetails extends IDocumentExtended{
+getFileNameById(fileId: number): string | undefined;
+ canCorrectIssue(userId: number): boolean;
+  getUnApprovedIssues(): IRevisionIssue[];
+  hasUnApprovedIssues(): boolean;
   canManageFile(userId: number): boolean;
   canReviewSubDocument(userId: number): boolean;
   canEditDocument(userId: number): boolean;
+  canEditDependency(userId: number): boolean;
   getNextStatus(parentWorkflow: IWorkflow): IWorkflowStatus | undefined;
   hasPermissionForNextStatus(): boolean;
   doesActiveFileHaveUnCorrectedIssues(activeFileId: number): boolean;
