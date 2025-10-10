@@ -1,16 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map, filter, distinctUntilChanged } from 'rxjs/operators';
-import { Prompt } from '../../models/prompt.model';
-import { PromptService } from '../../services/prompt.service';
+import { distinctUntilChanged, filter, map } from 'rxjs/operators';
+import { DocumentType } from '../../models/document-type.model';
 import { PromptVersion } from '../../models/prompt-version.model';
-import { PromptVersionService } from '../../services/prompt-version.service';
-import { CommonModule } from '@angular/common';
+import { Prompt } from '../../models/prompt.model';
 import { DocumentTypeService } from '../../services/document-type.service';
-import {
-  DocumentTypePage,
-  DocumentType,
-} from '../../models/document-type.model';
+import { PromptVersionService } from '../../services/prompt-version.service';
+import { PromptService } from '../../services/prompt.service';
 
 @Component({
   selector: 'pa-admin-page',

@@ -10,6 +10,8 @@ import com.ekoloskaorg.pr.repositories.ProjectRepository;
 import com.ekoloskaorg.pr.repositories.TaskRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +47,11 @@ public class LogService extends AbstractCrudService<Log, Long, LogDto> {
 
     @Override protected void beforeCreate(LogDto dto, Log e) { validate(dto); wire(dto, e); defaults(dto, e); }
     @Override protected void beforeUpdate(LogDto dto, Log e) { validate(dto); wire(dto, e); }
+
+    public Page<LogDto> findAllByProjectId(Pageable pageable,Long projectId) {
+        return repo.findAllByProjectId(pageable, projectId).map(mapper::toDto);
+    }
+
 
     private void validate(LogDto dto) {
         if (dto.projectId() == null) throw new IllegalArgumentException("projectId is required");

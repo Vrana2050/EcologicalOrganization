@@ -11,8 +11,11 @@ import com.ekoloskaorg.pr.repositories.ProjectRepository;
 import com.ekoloskaorg.pr.repositories.TemplateRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +31,18 @@ public class ProjectService extends AbstractCrudService<Project, Long, ProjectDt
     @Override protected void beforeCreate(ProjectDto dto, Project e) { validate(dto); wireTemplate(dto, e); }
     @Override protected void beforeUpdate(ProjectDto dto, Project e) { validate(dto); wireTemplate(dto, e); }
 
+
+    @Transactional(readOnly = true)
+    public Page<ProjectDto> listActive(Pageable pageable) {
+        return repo.findAllByArchivedFalse(pageable).map(mapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProjectDto> listArchived(Pageable pageable) {
+        return repo.findAllByArchivedTrue(pageable).map(mapper::toDto);
+    }
+
+
     private void validate(ProjectDto dto) {
         if (dto.name() == null || dto.name().isBlank())
             throw new IllegalArgumentException("Project.name is required");
@@ -41,4 +56,6 @@ public class ProjectService extends AbstractCrudService<Project, Long, ProjectDt
                 .orElseThrow(() -> new EntityNotFoundException("Template %d not found".formatted(dto.templateId())));
         e.setTemplate(t);
     }
+
+
 }

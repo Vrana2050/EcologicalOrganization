@@ -1,8 +1,10 @@
 package com.ekoloskaorg.pr.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name = "STATUSES")
@@ -22,4 +24,9 @@ public class Status {
 
     @Column(name = "NAME", nullable = false)
     private String name;
+
+    @NotNull
+    @ColumnDefault("0")
+    @Column(name = "TERMINAL", nullable = false)
+    private Boolean terminal = false;
 }

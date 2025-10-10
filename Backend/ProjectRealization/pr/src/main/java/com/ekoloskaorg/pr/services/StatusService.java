@@ -30,6 +30,19 @@ public class StatusService extends AbstractCrudService<Status, Long, StatusDto> 
     @Override protected void beforeCreate(StatusDto dto, Status e) { validate(dto); wire(dto, e); }
     @Override protected void beforeUpdate(StatusDto dto, Status e) { validate(dto); wire(dto, e); }
 
+    @Transactional(readOnly = true)
+    public List<StatusDto> findAllByProjectId(long projectId) {
+        var entities = repo.findAllByProjectIdOrderByOrderNum(projectId);
+        return entities.stream().map(mapper::toDto).toList();
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<StatusDto> getAllowedNext(long projectId, long taskId) {
+        var entities = repo.findAllowedNextStatuses(projectId, taskId);
+        return entities.stream().map(mapper::toDto).toList();
+    }
+
     private void validate(StatusDto dto) {
         if (dto.projectId() == null) throw new IllegalArgumentException("projectId is required");
         if (dto.orderNum() == null)  throw new IllegalArgumentException("orderNum is required");
@@ -43,10 +56,5 @@ public class StatusService extends AbstractCrudService<Status, Long, StatusDto> 
         e.setProject(p);
     }
 
-    @Transactional(readOnly = true)
-    public List<StatusDto> getAllowedNext(long projectId, long taskId) {
-        var entities = repo.findAllowedNextEntities(projectId, taskId);
-        return entities.stream().map(mapper::toDto).toList();
-    }
 
 }

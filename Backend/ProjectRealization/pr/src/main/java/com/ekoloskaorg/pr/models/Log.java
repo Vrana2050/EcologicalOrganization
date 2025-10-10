@@ -44,7 +44,7 @@ public class Log {
     @Column(name = "ACTION", nullable = false, length = 50)
     private String action;
 
-    @Column(name = "TIMESTAMP")
+    @Column(name = "TIMEMARK")
     private LocalDateTime timestamp;
 
 }
