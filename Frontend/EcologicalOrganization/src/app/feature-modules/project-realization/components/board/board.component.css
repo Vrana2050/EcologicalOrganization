@@ -1,0 +1,353 @@
+/* Toolbar */
+.board-toolbar {
+  display: flex;
+  justify-content: flex-start;
+  padding: 0px 0 12px;
+}
+.btn-primary {
+  background: #6d4aff;
+  color: #fff;
+  border: 0;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  filter: brightness(0.95);
+}
+
+/* ====================== LAYOUT (jedina verzija) ====================== */
+/* Kolone idu vodoravno, sve iste širine, sa horizontalnim scrollom */
+.board {
+  display: grid;
+  grid-auto-flow: column; /* kolone u nizu (desno) */
+  grid-auto-columns: 340px; /* *** širina svake kolone *** */
+  gap: 18px; /* razmak između kolona */
+  align-items: start;
+  overflow-x: auto; /* horizontalni scroll */
+  overflow-y: visible; /* ne seci dropdown-e */
+  padding-bottom: 8px; /* prostor za scrollbar */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Kolona prati gabarit iz .board (gap i širinu) */
+.column {
+  box-sizing: border-box;
+  width: 340px; /* match grid-auto-columns */
+  min-width: 340px;
+  max-width: 340px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* *** razmak između kartica u koloni *** */
+  position: relative; /* zbog dropdown-a */
+  overflow: visible; /* pusti dropdown da “iskoči” */
+}
+
+/* (opciono) diskretan scrollbar za board */
+.board::-webkit-scrollbar {
+  height: 10px;
+}
+.board::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 8px;
+}
+.board::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 8px;
+}
+.board::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* ====================== Kolona header ====================== */
+.col-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 4px;
+  border-bottom: 1px solid #f3f4f6;
+}
+.col-title {
+  font-weight: 500;
+  color: #111827;
+}
+
+.icon-btn {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.icon-btn:hover {
+  background: #f9fafb;
+}
+
+/* ====================== Kartice ====================== */
+.card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px;
+  background: #fff;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+}
+.card:hover {
+  background: #fafafa;
+}
+.card-title {
+  font-weight: 600;
+  margin-bottom: 12px; /* more room below the title */
+  line-height: 1.25;
+}
+
+.chip.assignee {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 6px 8px;
+  margin-bottom: 8px;
+}
+.avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: #ede9fe;
+  color: #4f46e5;
+  font-weight: 700;
+}
+.avatar.sm {
+  width: 22px;
+  height: 22px;
+  font-size: 12px;
+}
+.assignee-name {
+  font-weight: 600;
+  line-height: 1.1;
+}
+.assignee-role {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.due {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #374151;
+}
+.due .ic {
+  color: #6b7280;
+}
+
+.card-foot {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+.muted {
+  color: #6b7280;
+}
+.small {
+  font-size: 12px;
+}
+
+/* ====================== Editor kartica (Add task) ====================== */
+.card.editor {
+  cursor: default;
+  background: #faf5ff;
+  border-color: #ede9fe;
+  position: relative;
+  z-index: 1;
+  overflow: visible; /* dozvoli dropdown da “iskoči” */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.card.editor .task-input,
+.card.editor .date-input,
+.card.editor .select {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  display: block;
+}
+
+.task-input,
+.date-input {
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font: inherit;
+}
+.task-input:focus,
+.date-input:focus {
+  outline: none;
+  border-color: #c7d2fe;
+  box-shadow: 0 0 0 3px rgba(199, 210, 254, 0.45);
+}
+
+.assignee-field {
+  position: relative;
+  margin: 8px 0;
+  z-index: 1;
+  font: inherit;
+}
+.select {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  border-radius: 10px;
+  padding: 8px 10px;
+  text-align: left;
+  cursor: pointer;
+}
+.caret {
+  margin-left: auto;
+  color: #6b7280;
+}
+.date-field {
+  margin-top: 8px;
+}
+
+/* Dropdown: lebdi iznad svega; skrol samo unutar njega */
+.assignee-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  max-height: 280px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+}
+.assignee-item {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.assignee-item:hover {
+  background: #f9fafb;
+}
+
+/* CTA */
+.add-task {
+  width: 100%;
+  border: 1px dashed #e5e7eb;
+  background: #fff;
+  border-radius: 10px;
+  padding: 8px 10px;
+  color: #4f46e5;
+  cursor: pointer;
+}
+.add-task:hover {
+  background: #f9fafb;
+}
+.status-editor {
+  gap: 12px;
+}
+.status-input {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font: inherit;
+}
+.status-input:focus {
+  outline: none;
+  border-color: #c7d2fe;
+  box-shadow: 0 0 0 3px rgba(199, 210, 254, 0.45);
+}
+/* Assignee badge – kompaktan, uredan */
+.assignee-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+  margin-bottom: 8px;
+}
+
+.assignee-badge .av {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  background: #eef2ff; /* blaga ljubičasta pozadina */
+  color: #4f46e5; /* ljubičasti tekst */
+  flex: 0 0 28px;
+}
+
+.assignee-badge .meta {
+  line-height: 1.15;
+  min-width: 0; /* da ellipsis radi */
+}
+
+.assignee-badge .name {
+  font-weight: 400;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.assignee-badge .role {
+  font-size: 12px;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* “No assignee” varijanta – neutralnija */
+.assignee-badge.ghost {
+  background: #fff;
+}
+.assignee-badge .av.av-ghost {
+  background: #f3f4f6;
+  color: #9ca3af;
+}
+.assignee-badge,
+.chip.assignee {
+  margin: 10px 0 12px; /* space around the assignee chip */
+}
+
+.due {
+  margin-top: 8px; /* space above due date row */
+  gap: 8px; /* a little more icon↔text gap */
+}
+
+.card-foot {
+  margin-top: 12px; /* push footer away from due date */
+}

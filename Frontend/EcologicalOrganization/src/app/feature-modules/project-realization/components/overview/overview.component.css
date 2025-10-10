@@ -1,0 +1,153 @@
+:host {
+  display: block;
+  color: #111827; /* slate-900 */
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+/* ── Header (meta + status) ─────────────────────────────────────────────── */
+.overview-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.meta {
+  display: grid;
+  gap: 8px;
+}
+
+.meta-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #111827;
+}
+
+.icon {
+  display: inline-flex;
+  color: #6b7280; /* slate-500 */
+}
+
+.meta-text {
+  font-size: 14px;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(16, 185, 129, 0.25); /* emerald-500 */
+  background: rgba(16, 185, 129, 0.08);
+  color: #065f46; /* emerald-800 */
+  font-weight: 600;
+  font-size: 13px;
+  cursor: default;
+}
+
+.status-pill .caret {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid currentColor;
+  opacity: 0.9;
+}
+
+.divider {
+  border: 0;
+  border-bottom: 1px solid #e5e7eb; /* gray-200 */
+  margin: 14px 0 18px;
+}
+
+/* ── Sections ───────────────────────────────────────────────────────────── */
+.section {
+  margin-bottom: 28px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 14px;
+}
+
+.muted {
+  color: #6b7280; /* slate-500 */
+}
+
+.small {
+  font-size: 13px;
+  margin: 0 0 10px;
+}
+
+.body {
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Roles list ─────────────────────────────────────────────────────────── */
+.roles {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.icon-btn {
+  width: 28px;
+  height: 28px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px dashed #9ca3af; /* gray-400 */
+  background: transparent;
+  color: #374151; /* gray-700 */
+  cursor: pointer;
+}
+
+.role-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 32px;
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: #a78bfa; /* violet-400 */
+  color: white;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+}
+
+.role-texts .name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  line-height: 1.2;
+}
+
+.role-texts .role-muted {
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.2;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .overview-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

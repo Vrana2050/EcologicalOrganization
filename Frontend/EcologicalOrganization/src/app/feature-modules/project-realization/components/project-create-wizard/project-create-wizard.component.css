@@ -1,0 +1,546 @@
+:host {
+  display: block;
+  color: #111827;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* page spacing */
+  --page-x: 40px;
+  --page-y: 32px;
+  /* card geometry */
+  --card-w: 230px; /* card width */
+  --card-gap: 56px; /* space between cards */
+  overflow-x: hidden; /* prevent horiz scroll */
+  margin-top: -50px;
+}
+
+/* page container */
+.wizard-page {
+  width: 100%;
+  margin: 0;
+  padding: var(--page-y) var(--page-x);
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* centered stage */
+.wizard-stage {
+  max-width: 1440px;
+  margin: 0 auto;
+  min-height: calc(100vh - 96px);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  row-gap: 0px; /* tighter so title sits closer */
+}
+
+/* title just above options */
+.stage-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 800;
+  margin-top: 140px;
+}
+/* choices row */
+.options {
+  display: grid;
+  grid-auto-flow: column;
+  justify-content: center;
+  gap: var(--card-gap);
+  align-content: center;
+  margin-top: 12px; /* <— brings cards up under the title */
+}
+
+/* CARD —— height = 2 × width via aspect-ratio */
+.option-card {
+  width: var(--card-w);
+  aspect-ratio: 1 / 1.1; /* <-- magic line */
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  background: #fff;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  place-items: center;
+  padding: 32px 24px;
+  cursor: pointer;
+  transition: box-shadow 0.16s ease, border-color 0.16s ease,
+    transform 0.08s ease;
+}
+.option-card:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border-color: #d1d5db;
+}
+.option-card:active {
+  transform: translateY(1px);
+}
+.option-card.selected {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.18);
+}
+
+/* big crisp icons (no gray tile) */
+.option-icon {
+  width: 120px; /* bigger */
+  height: 120px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 12px;
+}
+.option-label {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* footer buttons */
+.stage-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+}
+.btn {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  cursor: pointer;
+}
+.btn.primary {
+  background: #6d4aff;
+  color: #fff;
+  border: none;
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* responsive */
+@media (max-width: 900px) {
+  :host {
+    --card-w: 240px;
+    --card-gap: 32px;
+  }
+  .wizard-stage {
+    max-width: 100%;
+  }
+}
+@media (max-width: 640px) {
+  :host {
+    --card-w: 220px;
+    --card-gap: 20px;
+  }
+  .options {
+    grid-auto-flow: row;
+  }
+}
+
+/* simple form layout (step 2) */
+.form {
+  margin-top: 6px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 18px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.span-2 {
+  grid-column: span 2;
+}
+label {
+  font-size: 12px;
+  color: #374151;
+}
+.input {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font: inherit;
+  background: #fff;
+}
+.input:focus {
+  outline: none;
+  border-color: #c7d2fe;
+  box-shadow: 0 0 0 3px rgba(199, 210, 254, 0.45);
+}
+.textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+/* member chips */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: #fff;
+  cursor: pointer;
+}
+.chip.selected {
+  border-color: #6d4aff;
+  box-shadow: 0 0 0 2px rgba(109, 74, 255, 0.18);
+}
+.avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: #ede9fe;
+  color: #4f46e5;
+  font-weight: 700;
+}
+
+/* panels */
+.panel {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-top: 8px;
+}
+.panel-head {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+.panel-head h3 {
+  margin: 0;
+  font-size: 16px;
+}
+.hint {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+/* statuses row */
+.status-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.status-pill {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  background: #fff;
+}
+.status-input {
+  border: 0;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: #f5f3ff;
+  outline: none;
+}
+.status-input:focus {
+  box-shadow: inset 0 0 0 2px #e9d5ff;
+}
+.terminal {
+  font-size: 12px;
+  color: #6b7280;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+.icon-btn {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: #6b7280;
+}
+.btn.add {
+  border-radius: 10px;
+  border: 1px dashed #e5e7eb;
+  background: #fff;
+}
+
+/* transitions matrix */
+.matrix {
+  display: grid;
+  margin-top: 14px;
+  grid-template-columns: 180px repeat(auto-fit, minmax(120px, 1fr));
+  gap: 6px;
+}
+.matrix-head,
+.matrix-rowhead {
+  font-weight: 600;
+  color: #374151;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+.matrix-cell {
+  display: grid;
+  place-items: center;
+  padding: 8px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+.matrix-cell.diag {
+  background: #fafafa;
+  color: #9ca3af;
+}
+.matrix-cell.locked {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .span-2 {
+    grid-column: auto;
+  }
+  .matrix {
+    grid-template-columns: 140px repeat(auto-fit, minmax(100px, 1fr));
+  }
+}
+/* Pills */
+.pill-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  background: #fff;
+}
+.pill-av {
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: #ede9fe;
+  color: #4f46e5;
+  font-weight: 700;
+  font-size: 12px;
+}
+.pill-text {
+  line-height: 1;
+}
+.pill-role {
+  color: #6b7280;
+  font-size: 12px;
+  margin-left: 6px;
+}
+.pill-x {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: #6b7280;
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* Combobox */
+.combo {
+  position: relative;
+}
+.combo-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  padding: 8px 10px;
+}
+.combo-input {
+  border: 0;
+  outline: none;
+  flex: 1 1 auto;
+  font: inherit;
+  color: inherit;
+}
+.combo-caret {
+  color: #6b7280;
+}
+.combo-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 80;
+  max-height: 280px;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+}
+.combo-item {
+  border-radius: 8px;
+}
+.combo-item:hover {
+  background: #f9fafb;
+}
+.combo-check {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 18px 24px 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 8px;
+}
+.item-av {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: #f3f4f6;
+  color: #4f46e5;
+  font-weight: 700;
+  font-size: 12px;
+}
+.item-texts {
+  display: grid;
+  line-height: 1.1;
+}
+.item-name {
+  font-weight: 600;
+}
+.item-role {
+  color: #6b7280;
+  font-size: 12px;
+}
+.combo-empty {
+  padding: 8px;
+}
+/* Scroll container for the grid */
+.matrix-wrap {
+  position: relative;
+  overflow: auto; /* enable scroll if needed */
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  margin-top: 15px;
+}
+
+/* Grid:
+   - first column is the row labels
+   - repeat(var(--cols)) for dynamic columns
+   - minmax on data cells ensures all statuses fit; scrolls when too many
+*/
+.matrix {
+  --rowH: 44px;
+  --leftColW: 200px; /* row header width */
+  --cellMinW: 110px; /* min width per status column */
+
+  display: grid;
+  grid-template-columns: var(--leftColW) repeat(
+      var(--cols),
+      minmax(var(--cellMinW), 1fr)
+    );
+  grid-auto-rows: var(--rowH);
+
+  /* If the grid would be narrower than the sum of columns, keep it wide
+     enough to avoid squishing last columns off-screen */
+  min-width: max(100%, calc(var(--leftColW) + var(--cols) * var(--cellMinW)));
+}
+
+/* Corner (top-left) */
+.matrix .corner {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* Column headers (top row) */
+.matrix .col-head {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  display: grid;
+  place-items: center;
+  padding: 0 8px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* Row headers (first column) */
+.matrix .row-head {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: #f9fafb;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* Cells */
+.matrix .cell {
+  display: grid;
+  place-items: center;
+  border-bottom: 1px solid #f3f4f6;
+  border-right: 1px solid #f3f4f6;
+}
+
+/* Make diagonal look disabled (can’t transition to itself) */
+.matrix .cell.diag {
+  background: #fafafa;
+  color: #9ca3af;
+}
+
+/* Checkbox centering and hover affordance */
+.matrix .cell input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+.matrix .cell:not(.diag):hover {
+  background: #f9fafb;
+}
+
+/* Optional: thin grid lines for better full-screen alignment */
+.matrix .col-head + .col-head,
+.matrix .row-head + .cell,
+.matrix .cell + .cell {
+  /* already have right/bottom borders above; this keeps the rhythm tight */
+}

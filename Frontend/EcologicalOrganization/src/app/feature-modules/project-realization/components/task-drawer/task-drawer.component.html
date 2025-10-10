@@ -1,0 +1,315 @@
+<!-- Backdrop -->
+<div class="drawer-backdrop" (click)="onClose()" *ngIf="task"></div>
+
+<!-- Drawer -->
+<aside
+  #drawerRoot
+  class="drawer"
+  [@slideInOut]
+  (click)="onDrawerSurfaceClick($event)"
+>
+  <header class="drawer-header">
+    <div class="drawer-title">{{ task.name || "Task" }}</div>
+    <button class="icon-btn" aria-label="Close" (click)="onClose()">✕</button>
+  </header>
+
+  <div class="drawer-body" (scroll)="onDrawerScroll()">
+    <!-- DESCRIPTION -->
+    <section class="row">
+      <div class="label">Description</div>
+      <div class="value">
+        <p class="muted" *ngIf="!task.description">No description</p>
+        <p class="desc" *ngIf="task?.description">{{ task.description }}</p>
+      </div>
+    </section>
+
+    <!-- STATUS -->
+    <!-- STATUS -->
+    <!-- STATUS -->
+    <section class="row">
+      <div class="label">Status</div>
+      <div class="value">
+        <!-- loading -->
+        <div class="muted" *ngIf="statusLoading">Loading…</div>
+
+        <!-- done loading -->
+        <ng-container *ngIf="!statusLoading">
+          <!-- read-only when archived OR terminal -->
+          <div *ngIf="!canChangeStatus" class="muted">
+            {{ currentStatus?.name || "—" }}
+          </div>
+
+          <!-- editable when allowed -->
+          <!-- Selected value is the current statusId, options are allowedStatuses (+ current) -->
+          <div class="select" *ngIf="allowedStatuses?.length">
+            <select
+              [ngModel]="selectedStatusId"
+              (ngModelChange)="onStatusPick($event)"
+              [disabled]="isArchived"
+            >
+              <option *ngFor="let s of allowedStatuses" [ngValue]="s.id">
+                {{ s.name }}
+              </option>
+            </select>
+          </div>
+        </ng-container>
+      </div>
+    </section>
+
+    <!-- ASSIGNEE -->
+    <section class="row">
+      <div class="label">Assignee</div>
+      <div class="value">
+        <div
+          class="assignee-chip"
+          *ngIf="task?.assignedMemberId; else noAssignee"
+        >
+          <span class="avatar">A</span>
+          <div class="assignee-meta">
+            <div class="assignee-name">Member #{{ task.assignedMemberId }}</div>
+            <div class="assignee-role">Main coordinator</div>
+          </div>
+          <button class="chip-x" aria-label="Clear assignee">×</button>
+        </div>
+        <ng-template #noAssignee><span class="muted">None</span></ng-template>
+      </div>
+    </section>
+
+    <!-- DUE DATE -->
+    <section class="row">
+      <div class="label">Due date</div>
+      <div class="value">
+        <div class="date-display">
+          <!-- neutral calendar svg -->
+          <span class="calendar-ic" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <rect
+                x="3"
+                y="5"
+                width="18"
+                height="16"
+                rx="2"
+                stroke="currentColor"
+                stroke-width="1.6"
+              />
+              <path d="M3 9h18" stroke="currentColor" stroke-width="1.6" />
+              <path
+                d="M8 3v4M16 3v4"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+            </svg>
+          </span>
+          <span>{{
+            task.deadline ? (task.deadline | date : "d-MMM-y") : "None"
+          }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESOURCES -->
+    <section class="row">
+      <div class="label">Resources</div>
+
+      <div class="value">
+        <div *ngIf="resLoading" class="muted">Loading…</div>
+        <div *ngIf="!resLoading && resError" class="muted">{{ resError }}</div>
+
+        <ng-container *ngIf="!resLoading && !resError">
+          <div *ngIf="resources.length === 0" class="muted">None</div>
+
+          <div class="res-chip-list" *ngIf="resources.length">
+            <div
+              class="res-chip"
+              *ngFor="let r of resources; trackBy: trackByResId"
+              [class.provided]="r.provided"
+            >
+              <span class="lead" *ngIf="r.provided" aria-hidden="true">✓✓</span>
+              <span class="name">{{ r.resourceName }}</span>
+              <span class="dot">·</span>
+              <span class="qty">{{ r.quantity }}</span>
+              <span class="unit">{{ r.unitCode }}</span>
+
+              <div class="spacer"></div>
+
+              <button
+                *ngIf="!r.provided"
+                class="icon-xs check"
+                (click)="toggleProvided(r, $event)"
+              >
+                ✓
+              </button>
+              <button class="icon-xs close" (click)="removeResource(r, $event)">
+                ×
+              </button>
+
+              <!-- lep tooltip -->
+              <div class="res-tip" [innerText]="resTitle(r)"></div>
+            </div>
+          </div>
+
+          <!-- + Add resource trigger -->
+          <div class="add-res-wrap" *ngIf="!isArchived" #addResRef>
+            <button
+              type="button"
+              class="link-btn"
+              (click)="toggleAddResDropdown($event)"
+            >
+              + Add resource
+            </button>
+
+            <div
+              class="add-res-menu"
+              *ngIf="addResOpen"
+              (click)="$event.stopPropagation()"
+            >
+              <div class="menu-scroll">
+                <button
+                  class="menu-item"
+                  *ngFor="
+                    let item of resourcesCatalog;
+                    trackBy: trackByCatalogId
+                  "
+                  (click)="pickCatalogResource(item)"
+                >
+                  {{ item.name }}
+                </button>
+              </div>
+
+              <div class="menu-footer">
+                <button class="menu-item strong" (click)="openEmptyCustom()">
+                  + Add a custom resource
+                </button>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </section>
+
+    <!-- COMMENTS (stacked + gray panel) -->
+    <!-- COMMENTS -->
+    <section class="row row--stack">
+      <div class="label">Comments</div>
+      <div class="value">
+        <div class="comments-panel">
+          <div *ngIf="commentsLoading" class="muted">Loading…</div>
+          <div *ngIf="!commentsLoading && commentsError" class="muted">
+            {{ commentsError }}
+          </div>
+          <div
+            *ngIf="!commentsLoading && !commentsError && comments.length === 0"
+            class="muted"
+          >
+            No comments yet.
+          </div>
+
+          <ng-container
+            *ngIf="!commentsLoading && !commentsError && comments.length"
+          >
+            <div
+              class="comment"
+              *ngFor="let c of comments; trackBy: trackByCommentId"
+            >
+              <!-- <div class="avatar">
+              {{ (c.memberId).slice(0, 1).toUpperCase() }}
+              </div> -->
+              <div class="c-body">
+                <div class="c-head">
+                  <strong>{{ c.memberId }}</strong>
+                  <span class="muted">{{ c.createdAt | date : "short" }}</span>
+                </div>
+                <div class="c-text">{{ c.text }}</div>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- editor (ostaje isto, ili ga po želji ukloni dok ne vežemo POST) -->
+          <!-- editor -->
+          <div class="comment-editor">
+            <div class="avatar">A</div>
+            <div class="editor-col">
+              <textarea
+                placeholder="Add a comment"
+                [(ngModel)]="commentDraft"
+                [disabled]="posting"
+              ></textarea>
+              <div class="editor-actions">
+                <button
+                  type="button"
+                  class="btn-primary"
+                  (click)="postComment()"
+                  [disabled]="posting || !commentDraft.trim()"
+                >
+                  {{ posting ? "Posting…" : "Post" }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</aside>
+
+<!-- MODAL: Create custom resource -->
+<div class="modal-backdrop" *ngIf="customOpen" (click)="cancelCustom()"></div>
+<div class="modal" *ngIf="customOpen" (click)="$event.stopPropagation()">
+  <header class="modal-head">
+    <div class="modal-title">Create a custom resource</div>
+  </header>
+
+  <div class="modal-body">
+    <div class="form-row two">
+      <div class="form-col">
+        <label class="form-label">Resource amount</label>
+        <input
+          class="input"
+          type="number"
+          min="0"
+          [(ngModel)]="custom.amount"
+          placeholder="Type the amount"
+        />
+      </div>
+      <div class="form-col">
+        <label class="form-label">Resource unit</label>
+        <div class="select">
+          <select [(ngModel)]="custom.unitId">
+            <option [ngValue]="null" disabled>Select unit</option>
+            <option *ngFor="let u of units" [ngValue]="u.id">
+              {{ u.code }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Resource name</label>
+      <input
+        class="input"
+        [(ngModel)]="custom.name"
+        placeholder="Name the custom resource"
+      />
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Resource description</label>
+      <textarea
+        class="textarea"
+        [(ngModel)]="custom.description"
+        placeholder="Enter the resource description"
+      ></textarea>
+    </div>
+  </div>
+
+  <footer class="modal-foot">
+    <button class="btn ghost" type="button" (click)="cancelCustom()">
+      Cancel
+    </button>
+    <button class="btn primary" type="button" (click)="createCustom()">
+      Create
+    </button>
+  </footer>
+</div>

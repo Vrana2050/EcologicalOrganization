@@ -1,0 +1,140 @@
+<div *ngIf="loading" class="muted" style="margin-top: 8px">
+  Loading analytics…
+</div>
+<div *ngIf="error" class="error">{{ error }}</div>
+<div class="toolbar">
+  <div class="grow"></div>
+  <button class="btn" (click)="exportPdf()">Export PDF</button>
+</div>
+
+<div #analyticsRoot class="analytics-root">
+  <ng-container *ngIf="!loading && !error" class="analytics">
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <section class="kpi-card">
+        <div class="kpi-title">Total tasks</div>
+        <div class="kpi-value">{{ snapshot?.totalTasks || 0 }}</div>
+        <div class="kpi-sub" *ngIf="snapshot">
+          Average {{ snapshot.avgTasksPerMember | number : "1.0-1" }} tasks per
+          member
+        </div>
+      </section>
+
+      <section class="kpi-card">
+        <div class="kpi-title">Team comments</div>
+        <div class="kpi-value">{{ snapshot?.totalComments || 0 }}</div>
+        <div class="kpi-sub" *ngIf="snapshot">
+          Average {{ snapshot.avgCommentsPerTask | number : "1.0-1" }} per task
+        </div>
+      </section>
+
+      <section class="kpi-card">
+        <div class="kpi-title">Team members</div>
+        <div class="kpi-value">{{ snapshot?.membersCount || 0 }}</div>
+        <div class="kpi-sub" *ngIf="snapshot">
+          {{ snapshot.totalTasks || 0 }} tasks total
+        </div>
+      </section>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-grid">
+      <!-- Average time in status -->
+      <section class="panel">
+        <header class="panel-head">
+          <h3>Average time in status</h3>
+        </header>
+
+        <!-- Bottleneck pill under the title -->
+        <div *ngIf="bottleneck" class="pill">
+          Bottleneck: <strong>{{ bottleneck.statusName }}</strong>
+        </div>
+
+        <!-- Chart: Y-axis + bars area -->
+        <div
+          class="status-chart"
+          *ngIf="statusDurations?.length; else noStatusDurations"
+        >
+          <!-- Y axis (top/max & bottom/0) -->
+          <div class="y-axis">
+            <div class="y-label">{{ maxAvgDays | number : "1.0-0" }}d</div>
+            <!-- vertical axis line -->
+            <div class="axis-line"></div>
+          </div>
+
+          <!-- Bars area (with x baseline & light grid) -->
+          <div class="bars-area">
+            <div class="h-grid" style="top: 25%"></div>
+            <div class="h-grid" style="top: 50%"></div>
+            <div class="h-grid" style="top: 75%"></div>
+            <div class="x-baseline"></div>
+
+            <div class="bars-wrap">
+              <div class="bar" *ngFor="let s of statusDurations">
+                <div class="bar-col">
+                  <div
+                    class="bar-fill"
+                    [class.bottleneck]="bottleneck?.statusId === s.statusId"
+                    [style.height]="barHeight(secsToDays(s.avgSeconds))"
+                  ></div>
+                </div>
+                <div class="bar-meta">
+                  <div class="bar-label" [title]="s.statusName">
+                    {{ s.statusName }}
+                  </div>
+                  <div class="bar-value">
+                    {{ secsToDays(s.avgSeconds) | number : "1.0-1" }}d
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #noStatusDurations>
+          <div class="muted small">No data.</div>
+        </ng-template>
+      </section>
+
+      <!-- Task timelines (On time vs Overdue) -->
+      <section class="panel">
+        <header class="panel-head">
+          <h3>Task timelines</h3>
+          <div class="hint">
+            Breakdown of tasks completed on time versus those finished past
+            their due date
+          </div>
+        </header>
+
+        <div class="pie-wrap" *ngIf="snapshot; else noPie">
+          <div
+            class="pie"
+            [style.--onTimePct]="onTimePct"
+            [style.--overduePct]="overduePct"
+            aria-label="On-time vs overdue pie"
+            role="img"
+          ></div>
+
+          <div class="legend">
+            <div class="legend-item">
+              <span class="dot ontime"></span>
+              On Time
+              <strong>{{ snapshot.tasksOnTime || 0 }}</strong>
+              <span class="muted small"> ({{ onTimePct }}%)</span>
+            </div>
+            <div class="legend-item">
+              <span class="dot overdue"></span>
+              Overdue
+              <strong>{{ snapshot.tasksLate || 0 }}</strong>
+              <span class="muted small"> ({{ overduePct }}%)</span>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #noPie
+          ><div class="muted small">No data.</div></ng-template
+        >
+      </section>
+    </div>
+  </ng-container>
+</div>
