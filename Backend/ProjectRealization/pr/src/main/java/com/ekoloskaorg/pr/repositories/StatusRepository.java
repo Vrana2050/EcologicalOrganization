@@ -10,23 +10,26 @@ import java.util.List;
 public interface StatusRepository extends JpaRepository<Status,Long> {
 
     @Query(value = """
+      WITH cur AS (
+        SELECT t.status_id
+        FROM   Tasks t
+        WHERE  t.id = :taskId
+          AND  t.project_id = :projectId
+      )
       SELECT s.*
-        FROM Statuses s
-       WHERE s.project_id = :projectId
-         AND fn_is_transition_allowed(
-               :projectId,
-               :taskId,
-               (SELECT t.status_id
-                  FROM Tasks t
-                 WHERE t.id = :taskId
-                   AND t.project_id = :projectId),
-               s.id
+      FROM   Statuses s
+      CROSS  JOIN cur
+      WHERE  s.project_id = :projectId
+        AND  s.id <> cur.status_id 
+        AND  fn_is_transition_allowed(
+               :projectId, :taskId, cur.status_id, s.id
              ) = 1
-       ORDER BY s.order_num
+      ORDER  BY s.order_num
     """, nativeQuery = true)
-    List<Status> findAllowedNextEntities(
+    List<Status> findAllowedNextStatuses(
             @Param("projectId") long projectId,
             @Param("taskId") long taskId
     );
 
+    List<Status> findAllByProjectIdOrderByOrderNum(long projectId);
 }

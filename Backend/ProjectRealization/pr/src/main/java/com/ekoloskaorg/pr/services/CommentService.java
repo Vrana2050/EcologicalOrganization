@@ -15,8 +15,13 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +38,22 @@ public class CommentService extends AbstractCrudService<Comment, Long, CommentDt
 
     @Override protected void beforeCreate(CommentDto dto, Comment e) { validate(dto); wire(dto, e); }
     @Override protected void beforeUpdate(CommentDto dto, Comment e) { validate(dto); wire(dto, e); }
+
+    public List<CommentDto> getCommentsForTask(Long taskId) {
+        return repo.findByTaskIdOrderByCreatedAtAsc(taskId).stream().map(mapper::toDto).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Map<Long, Long> getCountsForTaskIds(List<Long> taskIds) {
+        if (taskIds == null || taskIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        var rows = repo.countByTaskIds(taskIds);
+        return rows.stream().collect(Collectors.toMap(
+                CommentRepository.CommentCount::getTaskId,
+                CommentRepository.CommentCount::getCnt
+        ));
+    }
 
     private void validate(CommentDto dto) {
         if (dto.projectId() == null) throw new IllegalArgumentException("projectId is required");

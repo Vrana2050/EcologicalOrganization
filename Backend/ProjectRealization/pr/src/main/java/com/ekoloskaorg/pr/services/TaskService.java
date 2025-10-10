@@ -1,6 +1,7 @@
 // src/main/java/com/ekoloskaorg/pr/services/TaskService.java
 package com.ekoloskaorg.pr.services;
 
+import com.ekoloskaorg.pr.repositories.*;
 import com.ekoloskaorg.pr.services.AbstractCrudService;
 import com.ekoloskaorg.pr.mappers.BaseMapper;
 import com.ekoloskaorg.pr.dtos.TaskDto;
@@ -9,20 +10,20 @@ import com.ekoloskaorg.pr.models.Member;
 import com.ekoloskaorg.pr.models.Project;
 import com.ekoloskaorg.pr.models.Status;
 import com.ekoloskaorg.pr.models.Task;
-import com.ekoloskaorg.pr.repositories.MemberRepository;
-import com.ekoloskaorg.pr.repositories.ProjectRepository;
-import com.ekoloskaorg.pr.repositories.StatusRepository;
-import com.ekoloskaorg.pr.repositories.TaskRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class TaskService extends AbstractCrudService<Task, Long, TaskDto> {
 
     private final TaskRepository repo;
+    private final TaskRepositoryCustom repoCustom;
     private final TaskMapper mapper;
     private final ProjectRepository projects;
     private final StatusRepository statuses;
@@ -33,6 +34,17 @@ public class TaskService extends AbstractCrudService<Task, Long, TaskDto> {
 
     @Override protected void beforeCreate(TaskDto dto, Task e) { validate(dto); wire(dto, e); }
     @Override protected void beforeUpdate(TaskDto dto, Task e) { validate(dto); wire(dto, e); }
+
+
+    @Transactional(readOnly = true)
+    public List<TaskDto> findAllByProjectId(Long projectId) {
+        return repo.findAllByProjectId(projectId).stream().map(mapper::toDto).toList();
+    }
+
+    @Transactional
+    public void changeStatus(long projectId, long taskId, long toStatusId, long changedByMemberId) {
+        repoCustom.changeStatus(projectId, taskId, toStatusId, changedByMemberId);
+    }
 
     private void validate(TaskDto dto) {
         if (dto.projectId() == null) throw new IllegalArgumentException("projectId is required");
@@ -69,4 +81,5 @@ public class TaskService extends AbstractCrudService<Task, Long, TaskDto> {
             e.setAssignedMember(null);
         }
     }
+
 }

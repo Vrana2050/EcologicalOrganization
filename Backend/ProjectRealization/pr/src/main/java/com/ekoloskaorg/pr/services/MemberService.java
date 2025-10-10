@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class MemberService extends AbstractCrudService<Member, Long, MemberDto> {
@@ -26,6 +28,10 @@ public class MemberService extends AbstractCrudService<Member, Long, MemberDto> 
 
     @Override protected void beforeCreate(MemberDto dto, Member e) { validate(dto); wire(dto, e); }
     @Override protected void beforeUpdate(MemberDto dto, Member e) { validate(dto); wire(dto, e); }
+
+    public List<MemberDto> findAllByProjectId(Long projectId) {
+        return repo.findAllByProjectId(projectId).stream().map(mapper::toDto).toList();
+    }
 
     private void validate(MemberDto dto) {
         if (dto.projectId() == null) throw new IllegalArgumentException("projectId is required");

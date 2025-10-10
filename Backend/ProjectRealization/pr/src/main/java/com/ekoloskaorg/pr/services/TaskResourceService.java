@@ -1,5 +1,6 @@
 package com.ekoloskaorg.pr.services;
 
+import com.ekoloskaorg.pr.dtos.TaskResourceView;
 import com.ekoloskaorg.pr.mappers.BaseMapper;
 import com.ekoloskaorg.pr.dtos.TaskResourceDto;
 import com.ekoloskaorg.pr.mappers.TaskResourceMapper;
@@ -15,6 +16,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +32,11 @@ public class TaskResourceService extends AbstractCrudService<TaskResource, Long,
 
     @Override protected void beforeCreate(TaskResourceDto dto, TaskResource e) { validate(dto, true);  wire(dto, e); }
     @Override protected void beforeUpdate(TaskResourceDto dto, TaskResource e) { validate(dto, false); wire(dto, e); }
+
+    public List<TaskResourceView> getResourcesForTask(Long taskId) {
+        return repo.findForByTaskId(taskId);
+    }
+
 
     private void validate(TaskResourceDto dto, boolean creating) {
         if (dto.taskId() == null)     throw new IllegalArgumentException("taskId is required");

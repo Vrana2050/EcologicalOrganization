@@ -9,5 +9,6 @@ public record ProjectDto(Long id,
                          LocalDateTime startDate,
                          LocalDateTime endDate,
                          Boolean archived,
+                         Long createdId,
                          Long templateId) {
 }

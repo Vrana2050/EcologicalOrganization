@@ -1,4 +1,10 @@
 package com.ekoloskaorg.pr.dtos;
 
-public record StatusDurationDto() {
-}
+import java.math.BigDecimal;
+
+public record StatusDurationDto(
+        Long statusId,
+        String statusName,
+        BigDecimal avgSeconds,
+        Long samples
+) {}
