@@ -1,0 +1,94 @@
+<!-- Loader / error -->
+<div *ngIf="loading" class="muted" style="margin-top: 8px">Loading…</div>
+<div
+  *ngIf="!loading && errorMsg"
+  class="muted"
+  style="margin-top: 8px; color: #b91c1c"
+>
+  {{ errorMsg }}
+</div>
+
+<!-- Tabela -->
+<div class="table-wrap" *ngIf="!loading && !errorMsg">
+  <table class="logs">
+    <thead>
+      <tr>
+        <th class="col-date">
+          <button class="th-btn" type="button">
+            Date <span class="sort sort-desc" aria-hidden="true"></span>
+          </button>
+        </th>
+        <th class="col-event">Event</th>
+        <th class="col-user">User</th>
+      </tr>
+    </thead>
+
+    <!-- audit-log.component.html (tbody row snippet) -->
+    <tbody>
+      <tr *ngFor="let l of logs">
+        <td class="date">
+          {{ l.timestamp | date : "d-MMM-y @ H:mm" }}
+          <span class="tz">CET</span>
+        </td>
+
+        <td class="event">
+          <div class="event-title">{{ formatAction(l) }}</div>
+          <div class="event-sub">
+            Action: <span class="muted">{{ l.action }}</span> · Task:
+            <span class="muted">#{{ l.taskId }}</span>
+          </div>
+        </td>
+
+        <td class="user">
+          <ng-container *ngIf="membersById.get(l.memberId) as mm; else system">
+            <div class="user-block">
+              <div class="user-name">{{ memberName(mm) }}</div>
+              <div class="user-email muted">
+                {{ roleLabel(mm.roleInProject) }}
+              </div>
+            </div>
+          </ng-container>
+          <ng-template #system>
+            <div class="user-name">System action</div>
+          </ng-template>
+        </td>
+      </tr>
+
+      <tr *ngIf="logs.length === 0">
+        <td colspan="3" class="empty">No log entries.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Paginacija -->
+<div class="pagerbar" *ngIf="!loading && totalPages > 1">
+  <button class="pager ghost" [disabled]="page === 1" (click)="prevPage()">
+    ‹ Previous
+  </button>
+
+  <div class="pages">
+    <ng-container *ngFor="let p of visiblePages">
+      <button
+        *ngIf="p !== '…'; else ellipsis"
+        class="page"
+        [class.active]="p === page"
+        (click)="goToPage(p)"
+        [attr.aria-current]="p === page ? 'page' : null"
+      >
+        {{ p }}
+      </button>
+      <ng-template #ellipsis>
+        <span class="ellipsis">…</span>
+      </ng-template>
+    </ng-container>
+  </div>
+
+  <button
+    class="pager ghost"
+    [disabled]="page === totalPages"
+    (click)="nextPage()"
+  >
+    Next ›
+  </button>
+</div>

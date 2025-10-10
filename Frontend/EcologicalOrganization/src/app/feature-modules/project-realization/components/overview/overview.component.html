@@ -1,0 +1,101 @@
+<ng-container *ngIf="project() as p">
+  <!-- Top meta row (location + dates) -->
+  <div class="overview-header">
+    <div class="meta">
+      <div class="meta-row" *ngIf="p.location">
+        <span class="icon" aria-hidden="true">
+          <!-- pin -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 22s7-5.33 7-12A7 7 0 1 0 5 10c0 6.67 7 12 7 12Z"
+              stroke="currentColor"
+              stroke-width="1.6"
+            />
+            <circle
+              cx="12"
+              cy="10"
+              r="2.5"
+              stroke="currentColor"
+              stroke-width="1.6"
+            />
+          </svg>
+        </span>
+        <span class="meta-text">{{ p.location }}</span>
+      </div>
+
+      <div class="meta-row">
+        <span class="icon" aria-hidden="true">
+          <!-- calendar -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <rect
+              x="3"
+              y="5"
+              width="18"
+              height="16"
+              rx="2"
+              stroke="currentColor"
+              stroke-width="1.6"
+            />
+            <path d="M3 9h18" stroke="currentColor" stroke-width="1.6" />
+            <path
+              d="M8 3v4M16 3v4"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+            />
+          </svg>
+        </span>
+        <span class="meta-text">
+          {{ p.startDate | date : "d-MMM-y" }}
+          <ng-container *ngIf="p.endDate">
+            – {{ p.endDate | date : "d-MMM-y" }}</ng-container
+          >
+          <span class="muted small">
+            ({{ durationDays(p) }} days{{ p.endDate ? "" : " so far" }})</span
+          >
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <section class="section">
+    <h3 class="section-title">Project description</h3>
+    <p class="body">
+      {{ p.description || "—" }}
+    </p>
+  </section>
+
+  <section class="section">
+    <h3 class="section-title">Roles</h3>
+
+    <ng-container *ngIf="membersLoading">
+      <p class="muted small">Loading members…</p>
+    </ng-container>
+    <ng-container *ngIf="!membersLoading && membersError">
+      <p class="muted small">{{ membersError }}</p>
+    </ng-container>
+
+    <div class="roles" *ngIf="!membersLoading && !membersError">
+      <button class="icon-btn" type="button" aria-label="Add role">＋</button>
+
+      <ng-container *ngIf="members.length; else noMembers">
+        <div class="role-item" *ngFor="let m of members">
+          <div class="avatar">{{ avatarLetter(m) }}</div>
+          <div class="role-texts">
+            <div class="name">{{ displayName(m) }}</div>
+            <div class="role-muted">{{ roleLabel(m.roleInProject) }}</div>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #noMembers>
+        <span class="muted small">No active members.</span>
+      </ng-template>
+    </div>
+  </section>
+</ng-container>
+
+<!-- fallback dok se učitava ili ako nema podataka -->
+<div *ngIf="!project()" class="muted small">Loading…</div>

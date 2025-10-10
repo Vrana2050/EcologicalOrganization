@@ -1,0 +1,287 @@
+<div class="list-toolbar" *ngIf="!isArchived">
+  <button class="btn-primary" type="button" (click)="startAddStatus($event)">
+    + Add status
+  </button>
+</div>
+
+<div class="lists" #listsRef>
+  <section
+    class="status-list"
+    *ngFor="let v of lists; trackBy: trackByStatusId"
+    [class.adding]="v.ui.adding"
+  >
+    <!-- Header kolona + naslov statusa -->
+    <div class="row head">
+      <div class="col col-status">
+        <span class="drag" aria-hidden="true">⋮⋮</span>
+        <span class="status-title">{{ v.status.name }}</span>
+      </div>
+      <div class="col col-assignee">Assignee</div>
+      <div class="col col-due">Due date</div>
+
+      <div class="col col-actions"></div>
+    </div>
+
+    <!-- Postojeći taskovi (view-only) -->
+    <div
+      class="row item"
+      *ngFor="let t of v.tasks; trackBy: trackByTaskId"
+      (click)="openDrawer(v.status.id!, t)"
+    >
+      <div class="col col-status">
+        <span class="drag" aria-hidden="true">⋮⋮</span>
+        <span class="task-name">{{ t.name }}</span>
+      </div>
+
+      <!-- Assignee -->
+      <div class="col col-assignee">
+        <ng-container *ngIf="t.assignedMemberId as mid; else noAssignee">
+          <ng-container *ngIf="memberById(mid) as mv; else noAssignee">
+            <div class="assignee-chip">
+              <span class="avatar">{{ mv.initials }}</span>
+              <div class="assignee-meta">
+                <div class="assignee-name">{{ mv.name }}</div>
+                <div class="assignee-role">{{ mv.role }}</div>
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+        <ng-template #noAssignee><span class="muted">—</span></ng-template>
+      </div>
+
+      <!-- Due date -->
+      <div class="col col-due">
+        <div class="due-text">
+          {{ t.deadline ? (t.deadline | date : "d-MMM-y") : "—" }}
+        </div>
+      </div>
+
+      <!-- Comments count -->
+      <div class="col col-comments">
+        <span class="comments-inline" title="Comments">
+          <svg
+            class="chat-rect"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <rect
+              x="3"
+              y="5"
+              width="18"
+              height="12"
+              rx="3"
+              stroke="currentColor"
+              stroke-width="1.6"
+            ></rect>
+            <path
+              d="M9 21l4-4"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+            ></path>
+          </svg>
+          {{ commentCounts.get(t.id) ?? 0 }}
+        </span>
+      </div>
+
+      <!-- Actions -->
+      <div
+        class="col col-actions actions-col"
+        (click)="$event.stopPropagation()"
+        *ngIf="!isArchived"
+      >
+        <button
+          class="icon-btn"
+          aria-label="Task menu"
+          (click)="openTaskMenu(v.status.id!, t.id, $event)"
+        >
+          ⋯
+        </button>
+
+        <div
+          class="task-menu"
+          *ngIf="isMenuOpen(v.status.id!, t.id)"
+          (click)="$event.stopPropagation()"
+        >
+          <button
+            class="menu-item"
+            type="button"
+            (click)="closeTaskMenu(); openDrawer(v.status.id!, t)"
+          >
+            Edit
+          </button>
+          <button
+            class="menu-item danger"
+            type="button"
+            (click)="onDeleteTask(v.status.id!, t)"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add task CTA (vidljiv kad NISMO u adding modu) -->
+    <div
+      class="row add"
+      *ngIf="!v.ui.adding && !isArchived && !v.status.terminal"
+    >
+      <div class="col col-status">
+        <button
+          class="link-btn"
+          type="button"
+          (click)="onAddTaskClick(v.status.id!, $event)"
+        >
+          + Add task
+        </button>
+      </div>
+      <div class="col col-assignee"></div>
+      <div class="col col-due"></div>
+      <div class="col col-comments"></div>
+      <div class="col col-actions"></div>
+    </div>
+
+    <!-- Editor red (bez Save/Cancel) -->
+    <div
+      class="row editor"
+      *ngIf="v.ui.adding && !isArchived"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Task name -->
+      <div class="col col-status">
+        <span class="drag" aria-hidden="true">⋮⋮</span>
+        <input
+          class="task-input"
+          placeholder="Enter task name"
+          [(ngModel)]="v.ui.draftName"
+        />
+      </div>
+
+      <!-- Assignee -->
+      <div class="col col-assignee assignee-col">
+        <button
+          class="assignee-field"
+          type="button"
+          (click)="toggleAssignee(v.status.id!, $event)"
+        >
+          <ng-container *ngIf="v.ui.draftAssignee; else assigneePlaceholder">
+            <span class="avatar">{{ v.ui.draftAssignee!.initials }}</span>
+            <div class="assignee-meta">
+              <div class="assignee-name">{{ v.ui.draftAssignee!.name }}</div>
+              <div class="assignee-role">{{ v.ui.draftAssignee!.role }}</div>
+            </div>
+          </ng-container>
+          <ng-template #assigneePlaceholder>
+            <span class="placeholder">Assign user to this task</span>
+          </ng-template>
+          <span class="caret" aria-hidden="true">▾</span>
+        </button>
+
+        <div
+          class="assignee-dropdown"
+          *ngIf="v.ui.assigneeOpen"
+          (click)="$event.stopPropagation()"
+        >
+          <div
+            class="assignee-item"
+            *ngFor="let m of membersVm"
+            (click)="pickAssignee(v.status.id!, m)"
+          >
+            <span class="avatar">{{ m.initials }}</span>
+            <div>
+              <div class="assignee-name">{{ m.name }}</div>
+              <div class="assignee-role">{{ m.role }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Due date -->
+      <div class="col col-due due-col">
+        <div class="date-group">
+          <span class="calendar-ic" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <rect
+                x="3"
+                y="5"
+                width="18"
+                height="16"
+                rx="2"
+                stroke="currentColor"
+                stroke-width="1.6"
+              />
+              <path d="M3 9h18" stroke="currentColor" stroke-width="1.6" />
+              <path
+                d="M8 3v4M16 3v4"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+            </svg>
+          </span>
+          <input
+            #dueRef
+            type="date"
+            class="due-input"
+            [value]="v.ui.draftDue ?? ''"
+            (change)="onDueChange(v.status.id!, dueRef.value)"
+            (click)="openDate(v.status.id!, dueRef)"
+          />
+        </div>
+      </div>
+
+      <!-- Comments kolona u editoru ostaje prazna (nema smisla) -->
+      <div class="col col-comments"></div>
+
+      <!-- prazna poslednja kolona radi poravnanja -->
+      <div class="col col-actions"></div>
+    </div>
+  </section>
+  <section
+    class="status-list status-editor"
+    *ngIf="addingStatus && !isArchived"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="row head">
+      <div class="col col-status">
+        <span class="status-title">New status</span>
+      </div>
+      <div class="col col-assignee"></div>
+      <div class="col col-due"></div>
+      <div class="col col-actions"></div>
+    </div>
+
+    <div class="row editor">
+      <div class="col col-status">
+        <div class="status-inline">
+          <input
+            #newStatusInput
+            class="status-input task-input"
+            placeholder="Status name"
+            [(ngModel)]="draftStatusName"
+            (keydown.enter)="commitAddStatus()"
+          />
+          <span class="hint muted small"
+            >Enter to save · click outside to cancel</span
+          >
+        </div>
+      </div>
+      <div class="col col-assignee"></div>
+      <div class="col col-due"></div>
+      <div class="col col-actions"></div>
+    </div>
+  </section>
+</div>
+
+<xp-task-drawer
+  *ngIf="drawerOpen && selectedTask"
+  [task]="selectedTask"
+  [members]="members"
+  (close)="closeDrawer()"
+  (updated)="onDrawerUpdated($event)"
+  (deleted)="onDrawerDeleted($event)"
+>
+</xp-task-drawer>

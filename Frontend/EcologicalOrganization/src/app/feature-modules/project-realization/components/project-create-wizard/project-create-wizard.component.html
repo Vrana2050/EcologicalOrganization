@@ -1,0 +1,353 @@
+<div class="wizard-page">
+  <div class="wizard-stage">
+    <ng-container *ngIf="step === 1">
+      <h1 class="stage-title">Create a new project</h1>
+
+      <div class="options">
+        <button
+          type="button"
+          class="option-card"
+          [class.selected]="selection === 'blank'"
+          (click)="choose('blank')"
+        >
+          <div class="option-icon">
+            <!-- crisp "blank" doc icon -->
+            <svg
+              width="120"
+              height="120"
+              viewBox="0 0 64 64"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M20 8h18a4 4 0 0 1 2.83 1.17L52.83 21.17A4 4 0 0 1 54 24v32a4 4 0 0 1-4 4H20a4 4 0 0 1-4-4V12a4 4 0 0 1 4-4Z"
+                stroke="#334155"
+                stroke-width="2.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M38 8v12a4 4 0 0 0 4 4h12"
+                stroke="#334155"
+                stroke-width="2.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+          <div class="option-label">Blank project</div>
+        </button>
+
+        <button
+          type="button"
+          class="option-card"
+          [class.selected]="selection === 'template'"
+          (click)="choose('template')"
+        >
+          <div class="option-icon">
+            <!-- crisp "template" sheet icon -->
+            <!-- Template (doc with lines) — 120x120, same stroke + corner as Blank -->
+            <svg
+              width="120"
+              height="120"
+              viewBox="0 0 64 64"
+              fill="none"
+              aria-hidden="true"
+            >
+              <!-- document shape with folded corner -->
+              <path
+                d="M20 8h18a4 4 0 0 1 2.83 1.17L52.83 21.17A4 4 0 0 1 54 24v32a4 4 0 0 1-4 4H20a4 4 0 0 1-4-4V12a4 4 0 0 1 4-4Z"
+                stroke="#334155"
+                stroke-width="2.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M38 8v12a4 4 0 0 0 4 4h12"
+                stroke="#334155"
+                stroke-width="2.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <!-- content lines -->
+              <path
+                d="M24 30h16M24 36h20M24 42h14"
+                stroke="#334155"
+                stroke-width="2.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+          <div class="option-label">Template</div>
+        </button>
+      </div>
+
+      <div class="stage-actions">
+        <button class="btn" type="button" (click)="cancel()">Cancel</button>
+        <button
+          class="btn primary"
+          type="button"
+          [disabled]="!selection"
+          (click)="next()"
+        >
+          Next
+        </button>
+      </div>
+    </ng-container>
+
+    <!-- ===== Step 2: Project details ===== -->
+    <ng-container *ngIf="step === 2">
+      <h1 class="stage-title">New project</h1>
+
+      <form class="form">
+        <div class="grid">
+          <div class="field span-2">
+            <label>Project name</label>
+            <input
+              class="input"
+              placeholder="Enter project name"
+              [(ngModel)]="form.name"
+              name="name"
+            />
+          </div>
+
+          <div class="field span-2">
+            <label>Project description</label>
+            <textarea
+              class="input textarea"
+              placeholder="Enter project description"
+              [(ngModel)]="form.description"
+              name="desc"
+            ></textarea>
+          </div>
+
+          <div class="field span-2">
+            <label>Project location</label>
+            <input
+              class="input"
+              placeholder="Enter project location"
+              [(ngModel)]="form.location"
+              name="loc"
+            />
+          </div>
+
+          <div class="field">
+            <label>Start date</label>
+            <input
+              type="date"
+              class="input"
+              [(ngModel)]="form.startDate"
+              name="startDate"
+            />
+          </div>
+          <div class="field">
+            <label>End date</label>
+            <input
+              type="date"
+              class="input"
+              [(ngModel)]="form.endDate"
+              name="endDate"
+            />
+          </div>
+
+          <!-- Members (multi-select combobox + pills) -->
+          <div class="field span-2">
+            <label>Members</label>
+
+            <!-- Pills for chosen members -->
+            <div class="pill-wrap" *ngIf="chosenMembers.length">
+              <span class="pill" *ngFor="let m of chosenMembers">
+                <span class="pill-av">{{ initials(m) }}</span>
+                <span class="pill-text">
+                  {{ displayName(m) }}
+                  <span class="pill-role">{{ roleToEn(m.roleInProject) }}</span>
+                </span>
+                <button
+                  class="pill-x"
+                  type="button"
+                  (click)="removeSelected(m.id)"
+                  aria-label="Remove member"
+                >
+                  ×
+                </button>
+              </span>
+            </div>
+
+            <!-- Combobox -->
+            <div class="combo" (click)="openMembers($event)">
+              <div class="combo-inner">
+                <input
+                  class="combo-input"
+                  type="text"
+                  placeholder="Select project members"
+                  [(ngModel)]="memberSearch"
+                  name="memberSearch"
+                  (focus)="openMembers($event)"
+                />
+                <span class="combo-caret">▾</span>
+              </div>
+
+              <div
+                class="combo-dropdown"
+                *ngIf="memberDropdownOpen"
+                (click)="$event.stopPropagation()"
+                (wheel)="$event.stopPropagation()"
+              >
+                <div
+                  class="combo-item"
+                  *ngFor="let m of filteredMembers"
+                  (click)="toggleMember(m)"
+                >
+                  <label class="combo-check">
+                    <input
+                      type="checkbox"
+                      [checked]="isSelected(m)"
+                      (click)="$event.stopPropagation()"
+                      (change)="toggleMember(m)"
+                    />
+                    <span class="item-av">{{ initials(m) }}</span>
+                    <span class="item-texts">
+                      <span class="item-name">{{ displayName(m) }}</span>
+                      <span class="item-role">{{
+                        roleToEn(m.roleInProject)
+                      }}</span>
+                    </span>
+                  </label>
+                </div>
+
+                <div
+                  class="combo-empty muted small"
+                  *ngIf="!filteredMembers.length"
+                >
+                  No matches.
+                </div>
+              </div>
+            </div>
+
+            <div class="muted small" style="margin-top: 6px">
+              Selected: {{ selectedMembers.length }}
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <div class="stage-actions">
+        <button class="btn" type="button" (click)="back()">Back</button>
+        <button
+          class="btn primary"
+          type="button"
+          [disabled]="!canContinueDetails"
+          (click)="next()"
+        >
+          Next
+        </button>
+      </div>
+    </ng-container>
+
+    <!-- ===== Step 3: Statuses & transitions ===== -->
+    <ng-container *ngIf="step === 3">
+      <h1 class="stage-title">Workflow</h1>
+
+      <section class="panel">
+        <header class="panel-head">
+          <h3>Statuses</h3>
+          <div class="hint">
+            Choose names, pick a terminal, and define allowed moves.
+          </div>
+        </header>
+
+        <!-- statuses row -->
+        <div class="status-row">
+          <div class="status-pill" *ngFor="let s of statuses; let i = index">
+            <input
+              class="status-input"
+              [(ngModel)]="s.name"
+              [name]="'status_' + i"
+            />
+            <label class="terminal">
+              <input
+                type="radio"
+                [checked]="terminalStatusId === (s.id ?? -1)"
+                (change)="s.id != null && setTerminal(s.id)"
+              />
+              Terminal
+            </label>
+            <button
+              type="button"
+              class="icon-btn"
+              (click)="removeStatus(s)"
+              [disabled]="statuses.length <= 1"
+            >
+              ✕
+            </button>
+          </div>
+
+          <button type="button" class="btn add" (click)="addStatus()">
+            + Add status
+          </button>
+        </div>
+
+        <!-- transitions matrix -->
+        <div class="matrix-wrap">
+          <div class="matrix" [style.--cols]="statuses.length">
+            <!-- gornji levi ugao -->
+            <div class="matrix-head corner"></div>
+
+            <!-- header kolone -->
+            <div class="matrix-head col-head" *ngFor="let c of statuses">
+              {{ c.name || "—" }}
+            </div>
+
+            <!-- redovi -->
+            <ng-container *ngFor="let r of statuses">
+              <!-- header reda -->
+              <div class="matrix-rowhead row-head">{{ r.name || "—" }}</div>
+
+              <!-- ćelije -->
+              <div
+                class="matrix-cell cell"
+                *ngFor="let c of statuses"
+                [class.diag]="(r.id ?? -1) === (c.id ?? -2)"
+                [class.locked]="(r.id ?? -1) === (terminalStatusId ?? -3)"
+                (click)="
+                  r.id != null && c.id != null && toggleTransition(r.id, c.id)
+                "
+              >
+                <ng-container *ngIf="(r.id ?? -1) !== (c.id ?? -2); else dash">
+                  <input
+                    type="checkbox"
+                    [checked]="
+                      r.id != null && c.id != null
+                        ? transitions.get(r.id)?.get(c.id) || false
+                        : false
+                    "
+                    (click)="
+                      $event.stopPropagation();
+                      r.id != null &&
+                        c.id != null &&
+                        toggleTransition(r.id, c.id)
+                    "
+                  />
+                </ng-container>
+                <ng-template #dash>—</ng-template>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </section>
+
+      <div class="stage-actions">
+        <button class="btn" type="button" (click)="back()">Back</button>
+        <button
+          class="btn primary"
+          type="button"
+          [disabled]="!canFinishWorkflow"
+          (click)="next()"
+        >
+          Create project
+        </button>
+      </div>
+    </ng-container>
+  </div>
+</div>

@@ -1,0 +1,73 @@
+<!-- Top status -->
+<div class="header">
+  <div class="status-tabs">
+    <a
+      class="status-tab"
+      [routerLink]="['/project-realization']"
+      [queryParams]="{ status: 'active', page: 1 }"
+      >Active</a
+    >
+    <a
+      class="status-tab"
+      [routerLink]="['/project-realization']"
+      [queryParams]="{ status: 'archived', page: 1 }"
+      >Archived</a
+    >
+  </div>
+
+  <button class="primary-btn" type="button" (click)="goNewProject()">
+    New project
+  </button>
+</div>
+
+<!-- Title row (dinamički naziv i status) -->
+<div class="title-row">
+  <h1 class="project-title">
+    {{ ctx.project()?.name || "..." }}
+  </h1>
+
+  <div class="title-actions">
+    <button
+      class="status-pill"
+      [class.success]="ctx.project() && !ctx.project()!.archived"
+      [class.muted]="ctx.project() && ctx.project()!.archived"
+      type="button"
+      [disabled]="ctx.loading()"
+    >
+      {{ ctx.project()?.archived ? "Archived" : "Active" }}
+      <span class="caret" aria-hidden="true"></span>
+    </button>
+  </div>
+</div>
+
+<!-- Secondary tabs -->
+<nav class="subtabs" role="tablist" aria-label="Project sections">
+  <a
+    class="subtab"
+    routerLink="overview"
+    routerLinkActive="active"
+    [routerLinkActiveOptions]="{ exact: true }"
+    >Overview</a
+  >
+  <a class="subtab" routerLink="list" routerLinkActive="active">List</a>
+  <a class="subtab" routerLink="board" routerLinkActive="active">Board</a>
+  <a class="subtab" routerLink="audit-log" routerLinkActive="active"
+    >Audit log</a
+  >
+  <a
+    *ngIf="ctx.project()?.archived"
+    class="subtab"
+    routerLink="analytics"
+    routerLinkActive="active"
+    >Analytics</a
+  >
+</nav>
+
+<!-- Loader / error (ne menja izgled, samo fallback) -->
+<div *ngIf="ctx.loading()" class="muted" style="margin-top: 8px">Loading…</div>
+<div *ngIf="ctx.error()" class="muted" style="margin-top: 8px; color: #b91c1c">
+  {{ ctx.error() }}
+</div>
+
+<!-- Child routes -->
+<router-outlet></router-outlet>

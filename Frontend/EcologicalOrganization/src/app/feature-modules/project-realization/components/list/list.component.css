@@ -1,0 +1,345 @@
+:host {
+  display: block;
+  color: #111827; /* slate-900 */
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+/* ───────── Toolbar ───────── */
+.list-toolbar {
+  padding: 0px 0 12px;
+}
+.btn-primary {
+  background: #6b5bff;
+  color: #fff;
+  border: 0;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ─────── Lists wrapper ─────── */
+.lists {
+  display: grid;
+  gap: 16px;
+}
+
+/* Jedan status box */
+.status-list {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  overflow: visible; /* da dropdown može “napolje” */
+}
+
+/* ───────── Redovi (sa comments kolonom) ───────── */
+/* status | assignee | due | comments | actions */
+.row {
+  display: grid;
+  grid-template-columns: 1fr 320px 220px 72px 48px;
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+  min-height: 44px;
+}
+.row:last-child {
+  border-bottom: 0;
+}
+.row .col {
+  padding: 10px 14px;
+}
+
+/* Header */
+.row.head {
+  background: #f3f4f6; /* gray-100 */
+  color: #374151; /* gray-700 */
+  font-weight: 600;
+  font-size: 13px;
+}
+.status-title {
+  font-weight: 600;
+}
+.drag {
+  color: #9ca3af;
+  margin-right: 8px;
+  cursor: grab;
+  user-select: none;
+}
+
+/* Task (view) */
+.row.item .task-name {
+  font-weight: 500;
+}
+
+.assignee-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: #ede9fe;
+  color: #6b21a8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+.assignee-meta {
+  line-height: 1.1;
+}
+.assignee-name {
+  font-weight: 600;
+}
+.assignee-role {
+  color: #6b7280;
+  font-size: 12px;
+}
+.due-text {
+  white-space: nowrap;
+}
+
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #374151;
+  cursor: pointer;
+}
+.icon-btn:hover {
+  background: #f9fafb;
+}
+
+/* Add task CTA */
+.row.add .link-btn {
+  border: 0;
+  background: transparent;
+  color: #6b5bff;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 0;
+}
+
+/* ───────── Editor red (bez Save/Cancel) ───────── */
+.row.editor {
+  background: #faf5ff;
+  grid-template-columns: 1fr 320px 220px 72px 48px;
+}
+.row.editor .col {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Task/Status input – ista širina i stil */
+.task-input {
+  width: 100%;
+  height: 38px;
+  border: 1px solid #ede9fe;
+  background: #f5f3ff;
+  padding: 0 12px;
+  border-radius: 8px;
+  font: inherit;
+  color: inherit;
+}
+.task-input:focus {
+  outline: none;
+  border-color: #c4b5fd;
+  box-shadow: 0 0 0 3px rgba(196, 181, 253, 0.35);
+}
+
+/* Status editor – input + hint u jednom redu */
+.status-inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.status-editor .status-inline .status-input.task-input {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
+}
+.status-editor .status-inline .hint {
+  white-space: nowrap;
+  flex: 0 0 auto;
+  line-height: 1.2;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+/* Assignee picker */
+.assignee-col {
+  position: relative;
+}
+.assignee-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  background: #f5f3ff;
+  border: 1px solid #ede9fe;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.assignee-field .placeholder {
+  color: #6b7280;
+}
+.assignee-field .caret {
+  margin-left: auto;
+  color: #6b7280;
+}
+
+/* Dropdown */
+.assignee-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 50;
+  width: 100%;
+  min-width: 260px;
+  max-width: 320px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+}
+.assignee-item {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.assignee-item:hover {
+  background: #f9fafb;
+}
+
+/* Date picker – input group sa ikonicom */
+.due-col {
+  position: relative;
+}
+.date-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 38px;
+  border: 1px solid #ede9fe;
+  background: #f5f3ff;
+  border-radius: 8px;
+  padding: 0 10px;
+}
+.date-group .calendar-ic {
+  display: inline-flex;
+}
+.due-input {
+  flex: 1 1 auto;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0 4px;
+  font: inherit;
+  color: inherit;
+}
+.due-input:focus {
+  outline: none;
+}
+
+/* Comments (ikonica + broj, bez okvira) */
+.col-comments {
+  text-align: right;
+  color: #6b7280;
+}
+.head-comments {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  color: #9ca3af;
+}
+.comments-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #6b7280;
+}
+.chat-rect {
+  display: inline-block;
+  vertical-align: -2px;
+}
+
+/* actions kolona kao anchor za popup */
+.actions-col {
+  position: relative;
+}
+
+/* task context menu */
+.task-menu {
+  position: absolute;
+  top: 36px; /* ispod ⋯ dugmeta */
+  right: 8px;
+  z-index: 60;
+  min-width: 140px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+}
+.menu-item {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+  color: #111827;
+}
+.menu-item:hover {
+  background: #f9fafb;
+}
+.menu-item.danger {
+  color: #b91c1c;
+}
+.menu-item.danger:hover {
+  background: #fef2f2;
+}
+
+/* ───────── Responsive ───────── */
+@media (max-width: 1100px) {
+  .row,
+  .row.editor {
+    grid-template-columns: 1fr 260px 200px 64px 40px; /* sužene kolone */
+  }
+}
+@media (max-width: 800px) {
+  .row,
+  .row.head,
+  .row.editor {
+    grid-template-columns: 1fr 1fr;
+  }
+  .col-due,
+  .col-comments,
+  .col-actions,
+  .row.head .col-due,
+  .row.head .col-comments,
+  .row.head .col-actions {
+    display: none;
+  }
+}
+
+/* Utility */
+.muted {
+  color: #6b7280;
+}
