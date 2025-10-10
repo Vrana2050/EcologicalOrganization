@@ -91,6 +91,12 @@ export class DocumentBase implements IDocumentBase {
   isInDraft(): boolean {
     return this.isDraft;
   }
+  canReview(): boolean {
+    return this.status.isReview();
+  }
+  isSubDocument(): boolean {
+    return this.parentDocumentId !== undefined;
+  }
 }
 export class DocumentExtended extends DocumentBase {
     dependsOn?: IDocumentBase[];
@@ -261,6 +267,9 @@ export class DocumentExtended extends DocumentBase {
     getFileNameById(activeFileId: number): string | undefined {
       const activeFile = this.activeFiles?.find(af => af.id === activeFileId);
       return activeFile ? activeFile.file.name : undefined;
+    }
+    canDeleteDocument(userId: number): boolean {
+      return this.isUserOwner(userId);
     }
   }
   export class DocumentActiveFile implements IDocumentActiveFile {

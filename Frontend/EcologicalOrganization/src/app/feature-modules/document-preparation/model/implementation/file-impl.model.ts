@@ -39,5 +39,8 @@ export class File implements IFile{
   isFirstVersion(): boolean {
     return this.version === 1;
   }
+  isNewVersionOf(other: IFile): boolean {
+    return this.name === other.name && this.extension === other.extension;
+  }
 
 }

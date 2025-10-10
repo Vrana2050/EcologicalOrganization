@@ -26,3 +26,41 @@ justify-content: space-between;
   align-items: center;
   gap: 10px;
 }
+.dp-positive {
+  background-color: #26A69A; /* Green */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.dp-positive:hover {
+  background-color: #1E8E8A;
+}
+.dp-negative {
+  background-color: #f44336; /* Red */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.dp-negative:hover {
+  background-color: #da190b;
+}
+.analysis-button {
+  background-color: #008CBA; /* Blue */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.analysis-button:hover {
+  background-color: #007bb5;
+}
+.document-status {
+  font-size: 16px;
+  color: #26A69A;
+}

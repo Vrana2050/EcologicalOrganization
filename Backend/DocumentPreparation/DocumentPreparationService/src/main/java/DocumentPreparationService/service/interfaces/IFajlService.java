@@ -19,4 +19,8 @@ public interface IFajlService extends ICrudService<Fajl,Long> {
     Set<Fajl> findAllFileVersions(Long aktivniFajlId, Long userId,int page, int size);
 
     Fajl restoreFajl(Long userId, Fajl fajl,Long dokumentAktivniFajlId);
+
+    boolean deleteAktivniFajl(Long aktivniFajlId, Long userId);
+
+    DokumentAktivniFajl getAktivniFajlByDokumentAndFajl(Long dokumentId, Long fajlId, Long userId);
 }

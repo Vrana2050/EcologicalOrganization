@@ -16,4 +16,6 @@ public interface IProjekatService extends ICrudService<Projekat,Long>{
     Optional<Projekat> findProjectBoardById(Long userId, Long id);
     Projekat findByIdEager(Long userId, Long projekatId);
     Projekat findByIdEager( Long projekatId);
+
+    Boolean abandonProject(Long userId, Long projectId);
 }

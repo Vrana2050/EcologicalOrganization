@@ -124,6 +124,18 @@ public class ProjekatService extends CrudService<Projekat,Long> implements IProj
     }
 
     @Override
+    public Boolean abandonProject(Long userId, Long projectId) {
+        KorisnikProjekat kp = korisnikProjekatService.findByUserAndProjekat(userId, projectId).orElseThrow(() -> new NotFoundException("User not found on project"));
+        Projekat projekat = iProjekatRepository.findByIdEager(projectId).orElseThrow(() -> new NotFoundException("Project not found"));
+        if(projekat.isMenadzer(userId)) {
+            projekat.abandon();
+            super.update(projekat);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public Projekat create(Projekat newProjekat, Long userId) {
         newProjekat.getKorisniciProjekta().add(new KorisnikProjekat(userId,newProjekat, Uloga.menadzer));
         return create(newProjekat);

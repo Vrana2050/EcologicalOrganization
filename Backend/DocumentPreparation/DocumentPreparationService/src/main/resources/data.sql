@@ -12,7 +12,7 @@ INSERT INTO status (id, naziv, potrebno_odobrenje_za_prelazak,dozvola_menjanja_z
 VALUES (1000, 'Draft', 0,1,1,1,1,0,0,0,0);
 
 INSERT INTO status (id, naziv, potrebno_odobrenje_za_prelazak,dozvola_menjanja_za_vlasnika, dozvola_dodavanja_za_vlasnika,dozvola_brisanja_za_vlasnika, dozvola_citanja_za_vlasnika,dozvola_menjanja_za_zaduzenog, dozvola_dodavanja_za_zaduzenog,dozvola_brisanja_za_zaduzenog, dozvola_citanja_za_zaduzenog)
-VALUES (1001, 'To do', 0,0,0,0,1,1,1,1,1);
+VALUES (1001, 'To do', 0,1,1,0,1,1,1,1,1);
 
 INSERT INTO status (id, naziv, potrebno_odobrenje_za_prelazak,dozvola_menjanja_za_vlasnika, dozvola_dodavanja_za_vlasnika,dozvola_brisanja_za_vlasnika, dozvola_citanja_za_vlasnika,dozvola_menjanja_za_zaduzenog, dozvola_dodavanja_za_zaduzenog,dozvola_brisanja_za_zaduzenog, dozvola_citanja_za_zaduzenog)
 VALUES (1002, 'In progress', 0,0,0,0,1,1,1,1,1);
@@ -622,6 +622,8 @@ INSERT INTO korisnik_dokument(korisnik_id, dokument_id)
 VALUES (1003, 1010);
 INSERT INTO korisnik_dokument(korisnik_id, dokument_id)
 VALUES (1004, 1011);
+INSERT INTO korisnik_dokument(korisnik_id, dokument_id)
+VALUES (1006, 1003);
 
 
 --DOKUMENT ZAVISNOST PROJEKAT 1002
@@ -828,79 +830,51 @@ VALUES (1006, 1004, 'Remove duplicate paragraph in all documents', 1,SYSTIMESTAM
 
 -- OBAVESTENJA
 
+-- Dodeljeni dokumenti (creatNewDokumentObavestenje)
+/*
 INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1000, 'Dokument zavrsen', 1, 0, 1004);
+VALUES (1000, 'Korisnik 1000 vam je dodelio rad na dokumentu Emission Sources Inventory', 1002, 0, 1000);
 INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1001, 'Dokument zavrsen', 1, 0, 1005);
+VALUES (1001, 'Korisnik 1000 vam je dodelio rad na dokumentu Air Quality Monitoring Plan', 1002, 0, 1001);
 INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1002, 'Dokument zavrsen', 7, 0, 1010);
+VALUES (1002, 'Korisnik 1000 vam je dodelio rad na dokumentu Impact Assessment Report', 1007, 0, 1002);
 INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1003, 'Dokument zavrsen', 7, 0, 1011);
+VALUES (1003, 'Korisnik 1000 vam je dodelio rad na dokumentu Mitigation Strategies Proposal', 1007, 0, 1003);
 INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1004, 'Dokument zahteva reviziju', 1, 1, 1004);
+VALUES (1004, 'Korisnik 1000 vam je dodelio rad na dokumentu Implementation Schedule', 1007, 0, 1004);
 INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1005, 'Dokument zahteva reviziju', 1, 1, 1005);
+VALUES (1005, 'Korisnik 1000 vam je dodelio rad na dokumentu Stakeholder Consultation Report', 1007, 0, 1005);
 INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1006, 'Dokument zahteva reviziju', 1, 1, 1004);
-INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1007, 'Dokument zahteva reviziju', 1, 1, 1005);
-INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1008, 'Dokument zahteva reviziju', 1, 0, 1003);
-INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1009, 'Dokument zahteva reviziju', 1, 0, 1007);
-INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1010, 'Dokument je odbijen', 7, 1, 1004);
-INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1011, 'Dokument je odbijen', 7, 1, 1005);
-INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1012, 'Dokument je odobren', 7, 1, 1004);
-INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1013, 'Dokument je odobren', 7, 1, 1005);
+VALUES (1006, 'Korisnik 1000 vam je dodelio rad na dokumentu Progress and Evaluation Reports', 1007, 0, 1006);
 
+-- Dokumenti čekaju na odobrenje (creatReviewObavestenje)
 INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1014, 'Dodeljen ti je novi dokument', 2, 0, 1000);
+VALUES (1007, 'Dokument Emission Sources Inventory ceka na odobrenje', 1001, 0, 1000);
+INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
+VALUES (1008, 'Dokument Air Quality Monitoring Plan ceka na odobrenje', 1001, 0, 1001);
+INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
+VALUES (1009, 'Dokument Impact Assessment Report ceka na odobrenje', 1001, 0, 1002);
 
+-- Završeni dokumenti (creatDoneObavestenje)
 INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1015, 'Dodeljen ti je novi dokument', 2, 0, 1001);
+VALUES (1010, 'Dokument Emission Sources Inventory je zavrsen!', 1001, 0, 1000);
+INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
+VALUES (1011, 'Dokument Air Quality Monitoring Plan je zavrsen!', 1001, 0, 1001);
+INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
+VALUES (1012, 'Dokument Impact Assessment Report je zavrsen!', 1001, 0, 1002);
+INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
+VALUES (1013, 'Dokument Mitigation Strategies Proposal je zavrsen!', 1001, 0, 1003);
 
+-- Rezultati revizije (creatReviewResultObavestenje)
 INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1016, 'Dodeljen ti je novi dokument', 2, 0, 1002);
-
+VALUES (1014, 'Dokument Emission Sources Inventory je dobio odobrenje za nastavak!', 1007, 0, 1000);
 INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1017, 'Dodeljen ti je novi dokument', 7, 0, 1002);
-
+VALUES (1015, 'Dokument Air Quality Monitoring Plan nije dobio odobrenje za nastavak!', 1007, 0, 1001);
 INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1018, 'Dodeljen ti je novi dokument', 2, 0, 1003);
-
+VALUES (1016, 'Dokument Impact Assessment Report je dobio odobrenje za nastavak!', 1007, 0, 1002);
 INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1019, 'Dodeljen ti je novi dokument', 7, 0, 1004);
-
-INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1020, 'Dodeljen ti je novi dokument', 7, 0, 1005);
-
-INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1021, 'Dodeljen ti je novi dokument', 7, 0, 1006);
-
-INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1022, 'Dodeljen ti je novi dokument', 7, 0, 1007);
-
-INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1023, 'Dodeljen ti je novi dokument', 3, 0, 1002);
-
-INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1024, 'Dodeljen ti je novi dokument', 6, 0, 1002);
-
-INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1025, 'Dodeljen ti je novi dokument', 4, 0, 1002);
-
-INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1026, 'Dodeljen ti je novi dokument', 5, 0, 1002);
-
-INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1027, 'Dodeljen ti je novi dokument', 6, 0, 1003);
-
-INSERT INTO obavestenje(id, poruka, korisnik_id, procitana, dokument_id)
-VALUES (1028, 'Dodeljen ti je novi dokument', 5, 0, 1003);
+VALUES (1017, 'Dokument Mitigation Strategies Proposal nije dobio odobrenje za nastavak!', 1007, 0, 1003);
+*/
 
 
 

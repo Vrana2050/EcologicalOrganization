@@ -1,5 +1,7 @@
 package DocumentPreparationService.service;
 
+import DocumentPreparationService.dto.StatusCreateLogDto;
+import DocumentPreparationService.dto.StatusLogDto;
 import DocumentPreparationService.exception.ForbiddenException;
 import DocumentPreparationService.exception.InvalidRequestDataException;
 import DocumentPreparationService.exception.NotFoundException;
@@ -9,10 +11,14 @@ import DocumentPreparationService.repository.IDokumentRepository;
 import DocumentPreparationService.service.interfaces.*;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,6 +42,8 @@ public class DokumentService extends CrudService<Dokument,Long> implements IDoku
     private IDokumentAktivniFajlService  dokumentAktivniFajlService;
     @Autowired
     private EntityManager entityManager;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
     protected DokumentService(IDokumentRepository repository) {
         super(repository);
     }
@@ -130,7 +138,22 @@ public class DokumentService extends CrudService<Dokument,Long> implements IDoku
     {
         entityManager.detach(newDokument);
         Dokument dokumentToUpdate = repository.findByIdEager(newDokument.getId()).orElseThrow(() -> new NotFoundException("Document not found"));
-        dokumentToUpdate.setStatus(tokStatusService.findById(newDokument.getStatus().getId()).orElseThrow(() -> new NotFoundException("Status not found")));
+        TokStatus oldStatus = dokumentToUpdate.getStatus();
+        KorisnikProjekat kp = korisnikProjekatService.findByUserAndProjekat(userId,dokumentToUpdate.getProjekat().getId()).orElseThrow(() -> new NotFoundException("User not found on project"));
+        TokStatus newStatus = tokStatusService.findById(newDokument.getStatus().getId()).orElseThrow(() -> new NotFoundException("Status not found"));
+        if(dokumentToUpdate.isSubDocument())
+        {
+            Dokument roditeljDokument = repository.findByIdEager(dokumentToUpdate.getRoditeljDokument().getId()).orElseThrow(() -> new NotFoundException("Parent document not found"));
+            if(!roditeljDokument.isKorisnikDodeljenik(kp))
+            {
+                throw new ForbiddenException("Only assignees on parent document can change status.");
+            }
+        }
+        else if(!dokumentToUpdate.canUserUpdateStatus(kp,newStatus))
+        {
+            throw new ForbiddenException("Not authorized to update status.");
+        }
+        dokumentToUpdate.setStatus(newStatus);
          Dokument updatedDokument = update(dokumentToUpdate,userId);
          if(updatedDokument.getStatus().isDone()) {
             obavestenjeService.creatDoneObavestenje(updatedDokument.getVlasnik(),updatedDokument);
@@ -141,7 +164,26 @@ public class DokumentService extends CrudService<Dokument,Long> implements IDoku
         if(updatedDokument.getStatus().isInReview()) {
             obavestenjeService.creatReviewObavestenje(updatedDokument.getVlasnik(),updatedDokument);
         }
+            eventPublisher.publishEvent(
+                    new StatusCreateLogDto(
+                            Instant.now(),
+                            updatedDokument.getId().toString(),
+                            updatedDokument.getProjekat().getId().toString(),
+                            oldStatus.getId(),
+                            updatedDokument.getStatus().getId()
+                    )
+            );
          return updatedDokument;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @EventListener
+    public void handleStatusUpdateFailure(StatusLogDto statusLog) {
+        Dokument doc = repository.findById(Long.parseLong(statusLog.getDokumentId())).orElse(null);
+        if (doc != null) {
+            doc.setStatus(tokStatusService.findById(statusLog.getPrethodnoStanjeId()).orElseThrow());
+            super.create(doc);
+        }
     }
 
     private void updateFajloveInParentDokument(Dokument roditeljDokument,Dokument dokumentNaslednik) {
@@ -229,6 +271,12 @@ public class DokumentService extends CrudService<Dokument,Long> implements IDoku
 
     @Override
     public boolean delete(Long id, Long userId) {
+        Dokument dokument = repository.findByIdEager(id).orElseThrow(() -> new NotFoundException("Document not found"));
+        KorisnikProjekat kp = korisnikProjekatService.findByUserAndProjekat(userId,dokument.getProjekat().getId()).orElseThrow(() -> new ForbiddenException("User not found on project"));
+        if(dokument.isKorisnikVlasnik(kp))
+        {
+            return super.delete(id);
+        }
         return false;
     }
 
@@ -352,16 +400,20 @@ public class DokumentService extends CrudService<Dokument,Long> implements IDoku
     }
 
     private boolean canEdit(Dokument oldDokument,KorisnikProjekat korisnikProjekat) {
-        if(!oldDokument.hasEditPermission(korisnikProjekat))
-            return false;
         if(oldDokument.isSubDocument()) {
             Dokument roditeljDokument = repository.findByIdEager(oldDokument.getRoditeljDokument().getId()).orElseThrow(() -> new NotFoundException("Document not found"));
+            if(!roditeljDokument.hasSubDocumentEditPermission(korisnikProjekat,oldDokument)) {
+                return false;
+            }
             if (roditeljDokument.isInReview())
             {
                 throw new ForbiddenException("Cannot edit document. Parent document is in review");
             }
+            return true;
         }
         else {
+            if(!oldDokument.hasEditPermission(korisnikProjekat))
+                return false;
             Projekat projekat = projekatService.findByIdEager(oldDokument.getProjekat().getId());
             if (projekat.isInProgress())
             {

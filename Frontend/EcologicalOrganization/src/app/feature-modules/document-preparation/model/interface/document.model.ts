@@ -23,6 +23,8 @@ export interface IDocumentBase{
   ownerId : number;
   isDone(): boolean;
   isInDraft(): boolean;
+  canReview(): boolean;
+  isSubDocument(): boolean;
 
 }
 
@@ -43,7 +45,8 @@ export interface IDocumentExtended extends IDocumentBase{
   getActiveDependencies(): IDocumentBase[];
 }
 export interface IDocumentDetails extends IDocumentExtended{
-getFileNameById(fileId: number): string | undefined;
+  canDeleteDocument(userId: number): boolean;
+  getFileNameById(fileId: number): string | undefined;
  canCorrectIssue(userId: number): boolean;
   getUnApprovedIssues(): IRevisionIssue[];
   hasUnApprovedIssues(): boolean;

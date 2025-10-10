@@ -26,3 +26,52 @@ justify-content: space-between;
   align-items: center;
   gap: 10px;
 }
+.project-status {
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: white;
+}
+.status-in-progress {
+  background-color: #FFA500; /* Orange */
+}
+.status-completed {
+  background-color: #4CAF50; /* Green */
+}
+.status-abandoned {
+  background-color: #F44336; /* Red */
+}
+.dp-positive {
+  background-color: #26A69A; /* Green */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.dp-positive:hover {
+  background-color: #1E8E8A;
+}
+.dp-negative {
+  background-color: #f44336; /* Red */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.dp-negative:hover {
+  background-color: #da190b;
+}
+.analysis-button {
+  background-color: #008CBA; /* Blue */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.analysis-button:hover {
+  background-color: #007bb5;
+}

@@ -169,9 +169,6 @@ export class DocumentPreparationCreateDocumentComponent implements OnInit {
        if(this.isUserOwner && status.canOwnerAdd()) {
         statuses.set(status, colors[index]);
       }
-      if(this.isUserAssignee && status.canAssigneeAdd()) {
-        statuses.set(status, colors[index]);
-      }
     });
     return statuses;
   }

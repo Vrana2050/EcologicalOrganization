@@ -66,6 +66,9 @@ export class BaseProject implements IBaseProject{
   canEdit(userId: number): boolean {
     return this.isUserOwner(userId) && this.isInProgress();
   }
+  canAbandon(userId: number): boolean {
+    return this.isUserOwner(userId) && this.isInProgress();
+  }
 
 }
 export class Project extends BaseProject implements IProject {

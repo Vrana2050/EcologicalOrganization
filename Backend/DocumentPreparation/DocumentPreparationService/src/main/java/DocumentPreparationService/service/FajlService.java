@@ -13,6 +13,7 @@ import DocumentPreparationService.service.interfaces.IKorisnikProjekatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
@@ -54,6 +55,9 @@ public class FajlService extends CrudService<Fajl,Long> implements IFajlService 
         for(DokumentAktivniFajl daf : dokumentAktivniFajlovi){
             if(daf.getFajl().isNewVerzija(newFajl)) {
                 savedFajl = createNewVerzija(dokument.getSviFajlovi(),newFajl);
+                if(dokument.isFajlGlavniFajl(daf.getFajl().getId())){
+                    dokument.setGlavniFajl(savedFajl);
+                }
                 daf.setFajl(savedFajl);
             }
         }
@@ -102,13 +106,44 @@ public class FajlService extends CrudService<Fajl,Long> implements IFajlService 
         Fajl fajlToRestore = fajlRepository.findById(fajl.getId()).orElseThrow(() -> new NotFoundException("File not found"));
         DokumentAktivniFajl daf = dokumentAktivniFajlService.findById(dokumentAktivniFajlId).orElseThrow(() -> new NotFoundException("Document active file not found"));
         Dokument dokumentToUpdate = dokumentService.findByIdEager(daf.getDokument().getId());
-        daf.setFajl(fajlToRestore);
-        dokumentAktivniFajlService.create(daf);
-        if(dokumentToUpdate.getGlavniFajl().getId().equals(daf.getFajl().getId())) {
+        if(dokumentToUpdate.isFajlGlavniFajl(daf.getFajl().getId())) {
             dokumentToUpdate.setGlavniFajl(fajlToRestore);
         }
+        daf.setFajl(fajlToRestore);
+        dokumentAktivniFajlService.create(daf);
         dokumentService.updateDokumentFiles(dokumentToUpdate,userId);
         return fajlToRestore;
+    }
+
+    @Override
+    @Transactional
+    public boolean deleteAktivniFajl(Long aktivniFajlId, Long userId) {
+        DokumentAktivniFajl daf = dokumentAktivniFajlService.findById(aktivniFajlId).orElseThrow(() -> new NotFoundException("Active file not found"));
+        Dokument dokument = dokumentService.findByIdWithAllFajlovi(daf.getDokument().getId());
+        Fajl aktivniFajl = fajlRepository.findById(daf.getFajl().getId()).orElseThrow(() -> new NotFoundException("File not found"));
+        Set<Fajl> fajloviToDelete = dokument.getSviFajlovi().stream().filter(fajl->aktivniFajl.isNewVerzija(fajl)).collect(Collectors.toSet());
+        dokument.setSviFajlovi(dokument.getSviFajlovi().stream().filter(fajl -> !fajloviToDelete.contains(fajl)).collect(Collectors.toSet()));
+        if(dokument.isFajlGlavniFajl(daf.getFajl().getId())) {
+            dokument.setGlavniFajl(null);
+        }
+        dokumentAktivniFajlService.delete(daf.getId());
+        for(Fajl fajl : fajloviToDelete){
+            if(!fileExistsInOtherDocuments(fajl,dokument)) {
+                fajlRepository.delete(fajl);
+            }
+        }
+        dokumentService.updateDokumentFiles(dokument,userId);
+        return true;
+    }
+
+    @Override
+    public DokumentAktivniFajl getAktivniFajlByDokumentAndFajl(Long dokumentId, Long fajlId, Long userId) {
+        Dokument dokument = dokumentService.findById(dokumentId).orElseThrow(() -> new NotFoundException("Document not found"));
+        korisnikProjekatService.findByUserAndProjekat(userId,dokument.getProjekat().getId()).orElseThrow(() -> new ForbiddenException("User not found on project"));
+        return dokumentAktivniFajlService.findByDokumentAndFajl(dokumentId,fajlId);
+    }
+    private boolean fileExistsInOtherDocuments(Fajl fajl,Dokument dokument) {
+        return fajlRepository.fileExistsInOtherDocument(fajl.getId(),dokument.getId());
     }
 
 }

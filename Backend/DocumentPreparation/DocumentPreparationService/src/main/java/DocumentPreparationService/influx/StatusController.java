@@ -45,7 +45,7 @@ public class StatusController {
         return "✅ Uspesno generisano 2000 slogova u InfluxDB (measurement: statuses)";
     }
     @PostMapping("/report")
-    public ResponseEntity<ReportDto> getAll(@RequestParam() String projekatId,@RequestParam String dokumentId, @RequestBody DateRangeDto dateRangeDto) {
-        return ResponseEntity.ok(statusService.getReport(projekatId,dokumentId,dateRangeDto));
+    public ResponseEntity<ReportDto> getAll(@RequestParam() String projekatId, @RequestBody DateRangeDto dateRangeDto) {
+        return ResponseEntity.ok(statusService.getReport(projekatId,dateRangeDto));
     }
 }

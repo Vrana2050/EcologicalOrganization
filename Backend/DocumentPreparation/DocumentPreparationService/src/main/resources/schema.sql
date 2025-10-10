@@ -163,27 +163,63 @@ ALTER TABLE tok_status ADD FOREIGN KEY (status_nakon_odbijanja) REFERENCES tok_s
 ALTER TABLE dokument ADD FOREIGN KEY (projekat_id) REFERENCES projekat (id);
 ALTER TABLE dokument ADD FOREIGN KEY (tok_izrade_dokumenta) REFERENCES tok (id);
 ALTER TABLE dokument ADD FOREIGN KEY (status) REFERENCES tok_status (id);
-ALTER TABLE dokument ADD FOREIGN KEY (roditelj_dokument_id) REFERENCES dokument (id);
+ALTER TABLE dokument ADD CONSTRAINT dokument_roditelj_dokument_id_fk
+    FOREIGN KEY (roditelj_dokument_id)
+        REFERENCES dokument (id)
+            ON DELETE CASCADE;
 ALTER TABLE dokument ADD FOREIGN KEY (vlasnik) REFERENCES korisnik_projekat (id);
-ALTER TABLE dokument ADD FOREIGN KEY (glavni_fajl_id) REFERENCES fajl (id);
+ALTER TABLE dokument ADD CONSTRAINT fk_dokument_glavni_fajl FOREIGN KEY (glavni_fajl_id) REFERENCES fajl(id) ON DELETE SET NULL;
 ALTER TABLE dokument ADD FOREIGN KEY (izmena_od) REFERENCES korisnik_projekat (id);
-ALTER TABLE dokument_revizija ADD FOREIGN KEY (dokument_id) REFERENCES dokument (id);
+ALTER TABLE dokument_revizija ADD CONSTRAINT dokument_revizija_dokument_id_fkey
+    FOREIGN KEY (dokument_id)
+        REFERENCES dokument (id)
+            ON DELETE CASCADE;
 ALTER TABLE dokument_revizija ADD FOREIGN KEY (trenutni_status) REFERENCES tok_status (id);
 ALTER TABLE dokument_revizija ADD FOREIGN KEY (pregledac_id) REFERENCES korisnik_projekat (id);
-ALTER TABLE dokument_zavisnost ADD FOREIGN KEY (dokument_id) REFERENCES dokument (id);
-ALTER TABLE dokument_zavisnost ADD FOREIGN KEY (zavisi_od) REFERENCES dokument (id);
+ALTER TABLE dokument_zavisnost ADD CONSTRAINT dokument_zavisnost_dokument_id_fkey
+    FOREIGN KEY (dokument_id)
+        REFERENCES dokument (id)
+            ON DELETE CASCADE ;
+ALTER TABLE dokument_zavisnost ADD CONSTRAINT dokument_zavisnost_zavisi_od_fkey FOREIGN KEY (zavisi_od) REFERENCES dokument(id) ON DELETE CASCADE ;
 ALTER TABLE korisnik_dokument ADD FOREIGN KEY (korisnik_id) REFERENCES korisnik_projekat (id);
-ALTER TABLE korisnik_dokument ADD FOREIGN KEY (dokument_id) REFERENCES dokument (id);
-ALTER TABLE revizija_izmena ADD FOREIGN KEY (revizija_id) REFERENCES dokument_revizija (id);
-ALTER TABLE revizija_izmena ADD FOREIGN KEY (aktivni_fajl_id) REFERENCES dokument_aktivni_fajl (id);
-ALTER TABLE revizija_izmena ADD FOREIGN KEY (fajl_id) REFERENCES fajl (id);
-ALTER TABLE dokument_fajl ADD FOREIGN KEY (dokument_id) REFERENCES dokument (id);
+ALTER TABLE korisnik_dokument ADD CONSTRAINT korisnik_dokument_dokument_id_fkey
+    FOREIGN KEY (dokument_id)
+        REFERENCES dokument (id)
+            ON DELETE CASCADE;
+ALTER TABLE revizija_izmena
+    ADD CONSTRAINT fk_revizija_izmena_revizija
+        FOREIGN KEY (revizija_id)
+            REFERENCES dokument_revizija (id)
+                ON DELETE CASCADE;
+ALTER TABLE revizija_izmena ADD CONSTRAINT fk_revizija_izmena_aktivni_fajl
+    FOREIGN KEY (aktivni_fajl_id)
+        REFERENCES dokument_aktivni_fajl(id)
+            ON DELETE SET NULL;
+ALTER TABLE revizija_izmena ADD CONSTRAINT fk_revizija_izmena_fajl
+    FOREIGN KEY (fajl_id)
+        REFERENCES fajl(id)
+            ON DELETE SET NULL;
+ALTER TABLE dokument_fajl ADD CONSTRAINT dokument_fajl_dokument_id_fkey
+    FOREIGN KEY (dokument_id)
+        REFERENCES dokument (id)
+            ON DELETE CASCADE;
 ALTER TABLE dokument_fajl ADD FOREIGN KEY (fajl_id) REFERENCES fajl (id);
-ALTER TABLE dokument_aktivni_fajl ADD FOREIGN KEY (dokument_id) REFERENCES dokument (id);
+ALTER TABLE dokument_aktivni_fajl ADD CONSTRAINT dokument_aktivni_fajl_dokument_id_fkey
+    FOREIGN KEY (dokument_id)
+        REFERENCES dokument (id)
+            ON DELETE CASCADE;
 ALTER TABLE dokument_aktivni_fajl ADD FOREIGN KEY (fajl_id) REFERENCES fajl (id);
-ALTER TABLE obavestenje ADD FOREIGN KEY (dokument_id) REFERENCES dokument (id);
+
+ALTER TABLE obavestenje ADD CONSTRAINT obavestenje_dokument_id_fkey
+    FOREIGN KEY (dokument_id)
+        REFERENCES dokument (id)
+            ON DELETE CASCADE;
 ALTER TABLE status_log ADD FOREIGN KEY (izvrsilac) REFERENCES korisnik_projekat (id);
-ALTER TABLE status_log ADD FOREIGN KEY (dokument) REFERENCES dokument (id);
+ALTER TABLE status_log ADD CONSTRAINT status_log_dokument_fkey
+    FOREIGN KEY (dokument)
+        REFERENCES dokument (id)
+            ON DELETE CASCADE;
 ALTER TABLE status_log ADD FOREIGN KEY (prethodno_stanje) REFERENCES tok_status (id);
 ALTER TABLE status_log ADD FOREIGN KEY (novo_stanje) REFERENCES tok_status (id);
 ALTER TABLE status_log ADD FOREIGN KEY (projekat_id) REFERENCES projekat (id);
+

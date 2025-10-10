@@ -101,7 +101,7 @@ public class Dokument {
     )
     private Set<Dokument> zavisiOd = new HashSet<>();
 
-    @ManyToMany(mappedBy = "zavisiOd", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "zavisiOd", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<Dokument> zavisnici = new HashSet<>();
     @ManyToMany
     @JoinTable(
@@ -163,6 +163,8 @@ public class Dokument {
             errors.add("Priority not selected");
         if (this.rokZavrsetka == null || this.rokZavrsetka.isBefore(LocalDate.now())
                 || this.rokZavrsetka.isAfter(this.projekat.getRokZavrsetka()))
+            errors.add("Invalid due date");
+        if(this.rokZavrsetka != null && this.roditeljDokument!=null && this.rokZavrsetka.isAfter(this.roditeljDokument.getRokZavrsetka()))
             errors.add("Invalid due date");
         if (this.getDodeljeniKorisnici().isEmpty())
             errors.add("Document assignees cannot be empty");
@@ -248,7 +250,7 @@ public class Dokument {
                 this.status = newStatus;
                 return true;
             } else {
-                return false;
+                throw new ForbiddenException("Selected status requires review");
             }
         } else {
             if (newStatus.getId().equals(status.getSledeceStanje().getId())) {
@@ -322,14 +324,6 @@ public class Dokument {
         }
         return false;
     }
-    private boolean canVlasnikAddDocumentInStatus(Long statusId) {
-        for(TokStatus ts : this.tokIzradeDokumenta.getStatusi()){
-            if(ts.getId().equals(statusId)){
-                return ts.canVlasnikAdd();
-            }
-        }
-        return false;
-    }
     public boolean isSubDocument() {
         return this.getRoditeljDokument() != null;
     }
@@ -356,5 +350,38 @@ public class Dokument {
 
     public boolean doesZavisiOd(Long id) {
         return this.getZavisiOd().stream().anyMatch(dokument -> dokument.getId().equals(id));
+    }
+
+    public boolean isFajlGlavniFajl(Long fajlId) {
+        return getGlavniFajl() != null && getGlavniFajl().getId().equals(fajlId);
+    }
+
+    public boolean canUserUpdateStatus(KorisnikProjekat kp,TokStatus newTokStatus) {
+        boolean isDodeljenik = isKorisnikDodeljenik(kp);
+        boolean isVlasnik = getVlasnik().getId().equals(kp.getId());
+
+        if(isVlasnik && canVlasnikUpdateDokumentStatus(newTokStatus)){
+            return true;
+        }
+        if(isDodeljenik && canDodeljenikUpdateDokumentStatus())
+        {
+            return true;
+        }
+        return false;
+    }
+    private boolean canVlasnikUpdateDokumentStatus(TokStatus newTokStatus) {
+        if(isInReview()) {
+            return true;
+        }
+        return newTokStatus.canVlasnikEdit();
+    }
+    private boolean canDodeljenikUpdateDokumentStatus(){
+        return this.canDodeljenikEdit();
+    }
+
+    public boolean hasSubDocumentEditPermission(KorisnikProjekat korisnikProjekat,Dokument subDocument) {
+        boolean isVlasnik = isKorisnikDodeljenik(korisnikProjekat);
+        boolean isDodeljenik = subDocument.isKorisnikDodeljenik(korisnikProjekat);
+        return isVlasnik && subDocument.getStatus().canVlasnikEdit() || isDodeljenik && subDocument.getStatus().canDodeljenikEdit();
     }
 }

@@ -132,4 +132,17 @@ public class Projekat {
         }
         return false;
     }
+
+    public void markAsDone() {
+        this.setStatus(ProjekatStatus.zavrsen);
+        this.datumZavrsetka = LocalDate.now();
+    }
+
+    public void abandon() {
+        if(status.equals(ProjekatStatus.u_toku))
+        {
+            this.setStatus(ProjekatStatus.obustavljen);
+            this.datumZavrsetka = LocalDate.now();
+        }
+    }
 }

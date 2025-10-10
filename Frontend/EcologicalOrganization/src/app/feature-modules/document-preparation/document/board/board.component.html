@@ -2,9 +2,10 @@
   <div class="document-header" *ngIf="parentDocument">
     <div class="document-header-left">
       <span class="document-name">{{ parentDocument.name }}</span>
-      <button class="dp-positive" (click)="openDocumentAnalysis(parentDocument)" *ngIf="canAnalyze()">Analyze</button>
+      <span class="document-status">{{parentDocument.status.currentStatus.name}}</span>
+      <button class="dp-positive" (click)="showMyTasks()" *ngIf="isUserAssignee() || isUserOwner()">{{showMyTasksFlag ? 'All Tasks' : 'My Tasks'}}</button>
+      <button class="analysis-button" (click)="openDocumentAnalysis(parentDocument)" *ngIf="canAnalyze()">Analyze</button>
     </div>
-    <button class="dp-positive" *ngIf="isUserAssignee()">My Tasks</button>
   </div>
   <document-preparation-board class="document-preparation-board" *ngIf="parentDocument && documents" (addDocument)="openAddDocument($event)" [sortedWorkflow]="parentDocument.workflow!" [documents]="documents" [isUserOwner]="isUserOwner()" [isUserAssignee]="isUserAssignee()" [canEdit]="canEdit"></document-preparation-board>
 </div>

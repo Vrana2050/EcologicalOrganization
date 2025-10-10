@@ -51,5 +51,9 @@ public class ProjekatController {
     public ResponseEntity<AnalizaDto> getProjectReport(@RequestHeader(name = "X-USER-ID") Long userId, @PathVariable Long projectId) {
         return ResponseEntity.ok(statistikaService.getProjectAnalysis(userId,projectId));
     }
+    @PatchMapping("/abandon/{projectId}")
+    public ResponseEntity<Boolean> abandonProject(@RequestHeader(name = "X-USER-ID") Long userId, @PathVariable Long projectId) {
+        return ResponseEntity.ok(projekatService.abandonProject(userId,projectId));
+    }
 
 }

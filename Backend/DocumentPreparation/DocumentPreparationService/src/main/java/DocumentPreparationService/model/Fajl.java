@@ -54,7 +54,6 @@ public class Fajl {
         if(naziv == null || naziv.isEmpty())  throw new IllegalArgumentException("Invalid file name");
         validateEkstenzija();
     }
-
     private void validateEkstenzija() {
         if(ekstenzija == null || ekstenzija.isEmpty()) throw new IllegalArgumentException("Invalid file extension");
         Set<String> allowedExtensions = Set.of(

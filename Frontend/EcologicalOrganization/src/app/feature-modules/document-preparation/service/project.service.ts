@@ -48,4 +48,8 @@ export class ProjectService {
   createProject(project: ProjectCreate): Observable<any> {
     return this.http.post<any>(this.apiUserUrl, project, { headers: this.headers });
   }
+  abandonProject(projectId: number): Observable<void> {
+    const url = `${this.apiUrl}/abandon/${projectId}`;
+    return this.http.patch<void>(url, {}, { headers: this.headers });
+  }
 }

@@ -1,1 +1,13 @@
-<p>news works!</p>
+<div class ="news-form-container">
+    <div class ="header">
+      <span class ="title">Notifications</span>
+    </div>
+    <div class ="content">
+      <div class="notification-container" *ngFor="let notification of notifications">
+          <span class="notification-message">{{ notification.message }}</span>
+          <button class="view-document-button" (click)="openDocument(notification)">
+            <img class ="view-document-icon" src="assets/next.png" alt="View Project">
+          </button>
+      </div>
+    </div>
+</div>

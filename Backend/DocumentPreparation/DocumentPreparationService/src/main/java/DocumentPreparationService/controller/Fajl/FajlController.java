@@ -3,6 +3,7 @@ package DocumentPreparationService.controller.Fajl;
 import DocumentPreparationService.annotation.RequireRole;
 import DocumentPreparationService.dto.DokumentAktivniFajlDto;
 import DocumentPreparationService.dto.FajlDto;
+import DocumentPreparationService.exception.InvalidRequestDataException;
 import DocumentPreparationService.mapper.interfaces.IDokumentAktivniFajlConverter;
 import DocumentPreparationService.mapper.interfaces.IDokumentConverter;
 import DocumentPreparationService.mapper.interfaces.IFajlConverter;
@@ -74,7 +75,9 @@ public class FajlController {
             @RequestParam("naziv") String naziv,
             @RequestParam("ekstenzija") String ekstenzija
     ) throws IOException {
-
+        if(file.getSize()>20*1024*1024){
+            throw new InvalidRequestDataException("File is too large.Max file size:" + 20 +" MB");
+        }
         FajlDto dto = new FajlDto();
         dto.setDokumentId(dokumentId);
         dto.setNaziv(naziv);
@@ -86,10 +89,15 @@ public class FajlController {
         return new ResponseEntity<>(mapper.ToDto(savedEntity), HttpStatus.CREATED);
     }
 
-    /*@DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> delete(@RequestHeader(name = "X-USER-ID") Long userId,@PathVariable Long id) {
-        boolean success = fajlService.delete(id,userId);
+    @DeleteMapping("/activeFile/{aktivniFajlId}")
+    public ResponseEntity<Boolean> delete(@RequestHeader(name = "X-USER-ID") Long userId,@PathVariable Long aktivniFajlId) {
+        boolean success = fajlService.deleteAktivniFajl(aktivniFajlId,userId);
         return success ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }*/
+    }
 
+    @GetMapping("/active/file/{dokumentId}/{fajlId}")
+    public ResponseEntity<DokumentAktivniFajlDto> getAktivniFajlByDokumentAndFajl(@RequestHeader(name = "X-USER-ID") Long userId, @PathVariable Long dokumentId, @PathVariable Long fajlId) {
+        DokumentAktivniFajl entity = fajlService.getAktivniFajlByDokumentAndFajl(dokumentId,fajlId,userId);
+        return ResponseEntity.ok(aktivniFajlConverter.ToDto(entity));
+    }
 }

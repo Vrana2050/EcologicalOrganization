@@ -2,12 +2,14 @@ import { Component } from '@angular/core';
 import { OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ProjectService } from '../../service/project.service';
-import { IProjectBoard } from '../../model/interface/project.model';
+import { IProjectBoard, ProjectStatus } from '../../model/interface/project.model';
 import { DocumentBoard } from '../../model/implementation/document-impl.model';
 import { DocumentService } from '../../service/document.service';
 import { AuthService } from 'src/app/infrastructure/auth/auth.service';
 import { Router } from '@angular/router';
 import { IStatus, IWorkflowStatus } from '../../model/interface/workflow.model';
+import { ViewChild } from '@angular/core';
+import { BoardComponent } from '../../shared/board/board.component';
 
 @Component({
   selector: 'document-preparation-board-project',
@@ -15,12 +17,15 @@ import { IStatus, IWorkflowStatus } from '../../model/interface/workflow.model';
   styleUrls: ['./project.component.css']
 })
 export class DocumentPreparationBoardProjectComponent implements OnInit {
+  @ViewChild(BoardComponent)
+  boardComponent!: BoardComponent;
   projectId!: number;
   project!: IProjectBoard;
   documents!: DocumentBoard[];
   canEdit: boolean;
   showCreateDocumentModal: boolean = false;
   statusToCreateDocumentIn: IWorkflowStatus;
+  showMyTasksFlag: boolean = false;
   constructor(private route: ActivatedRoute, private projectService: ProjectService, private documentService: DocumentService,public authService: AuthService,private router: Router) {}
 
   ngOnInit(): void {
@@ -60,5 +65,22 @@ export class DocumentPreparationBoardProjectComponent implements OnInit {
     this.showCreateDocumentModal = true;
     this.statusToCreateDocumentIn = status;
   }
-
+  showMyTasks(): void {
+    this.showMyTasksFlag =!this.showMyTasksFlag;
+    if(!this.showMyTasksFlag){
+      this.boardComponent.refreshBoard(this.documents);
+      return;
+    }
+    else{
+      this.boardComponent.refreshBoard(this.documents.filter(doc => doc.isUserAssignee(this.authService.user$.value.id)));
+    }
+  }
+  canAbandon(): boolean {
+    return this.project.canAbandon(this.authService.user$.value.id);
+  }
+  abandonProject(): void {
+    this.projectService.abandonProject(this.project.id).subscribe(() => {
+      location.reload();
+    });
+  }
 }

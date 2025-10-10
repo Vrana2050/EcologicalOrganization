@@ -41,4 +41,12 @@ public interface IFajlRepository extends ICrudRepository<Fajl, Long> {
             @Param("offset") int offset,
             @Param("limit") int limit
     );
+
+    @Query("""
+    SELECT CASE WHEN COUNT(d) > 0 THEN true ELSE false END
+    FROM Fajl f
+    JOIN f.dokumenti d
+    WHERE f.id = :id and d.id != :dokumentId
+""")
+    boolean fileExistsInOtherDocument(@Param("id") Long id,@Param("dokumentId") Long dokumentId);
 }

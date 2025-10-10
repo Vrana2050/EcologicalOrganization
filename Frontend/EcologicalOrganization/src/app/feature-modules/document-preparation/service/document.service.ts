@@ -86,4 +86,8 @@ export class DocumentService {
     const url = `${this.apiUrl}/${documentId}/parentDocuments`;
     return this.http.get<any[]>(url, { headers: this.headers }).pipe(map(documents => documents.map(d => new DocumentBase(d))));
   }
+  deleteDocument(documentId: number): Observable<void> {
+    const url = `${this.apiUrl}/${documentId}`;
+    return this.http.delete<void>(url, { headers: this.headers });
+  }
 }

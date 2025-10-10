@@ -69,7 +69,20 @@ public class DokumentRevizijaService  extends CrudService<DokumentRevizija,Long>
     @Override
     @Transactional
     public Set<DokumentRevizija> create(Set<DokumentRevizija> dokumentRevizije, Long userId) {
-        KorisnikProjekat korisnikProjekat = korisnikProjekatService.findByUserAndProjekat(userId,dokumentRevizije.stream().findFirst().get().getDokument().getProjekat().getId()).orElseThrow(() -> new NotFoundException("User not found on document project"));
+        Long projekatId = null;
+        for(DokumentRevizija dr : dokumentRevizije)
+        {
+            if(dr.getDokument()!=null && dr.getDokument().getProjekat()!=null)
+            {
+                projekatId = dr.getDokument().getProjekat().getId();
+                break;
+            }
+        }
+        if(projekatId==null)
+        {
+            throw new InvalidRequestDataException("Project not found");
+        }
+        KorisnikProjekat korisnikProjekat = korisnikProjekatService.findByUserAndProjekat(userId,projekatId).orElseThrow(() -> new NotFoundException("User not found on document project"));
         //MORA SE POSLATI DOKUMENTID AKO IMAM VREMENA DA NAMESTIM
         /*DokumentRevizija dR = repository.findByIdWithDokument(
                 dokumentRevizije.stream()
@@ -96,15 +109,21 @@ public class DokumentRevizijaService  extends CrudService<DokumentRevizija,Long>
                 throw new ForbiddenException("Cannot reject document review. All issues were resolved");
             }
         }
+        //MORA PRVO DA SE UPDATUJU JER CREATE UPDATUJE DOKUMENT!!!
+        DokumentRevizija revizijaToCreate = null;
         for(DokumentRevizija dokumentRevizija : dokumentRevizije)
         {
             if(dokumentRevizija.getId()==null){
                 dokumentRevizija.setPregledac(korisnikProjekat);
-                create(dokumentRevizija);
+                revizijaToCreate = dokumentRevizija;
             }
             else {
                 update(dokumentRevizija);
             }
+        }
+        if(revizijaToCreate != null)
+        {
+            create(revizijaToCreate);
         }
         return dokumentRevizije;
     }

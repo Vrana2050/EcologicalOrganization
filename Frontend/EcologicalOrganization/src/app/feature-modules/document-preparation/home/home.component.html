@@ -2,7 +2,7 @@
 <div class ="home-container">
   <div class="header">
     <h1>Projects</h1>
-    <button class="dp-positive" *ngIf="canAddProjectFlag"><img class="add-project-img" src="assets/plus.png" alt="Add Project" (click)="addProject()"></button>
+    <button *ngIf="canAddProject" class="dp-positive" (click)="addProject()"><span class="add-project-text">Add Project</span></button>
   </div>
   <div class="project-items">
     <div *ngFor="let project of projects" class="project-item">

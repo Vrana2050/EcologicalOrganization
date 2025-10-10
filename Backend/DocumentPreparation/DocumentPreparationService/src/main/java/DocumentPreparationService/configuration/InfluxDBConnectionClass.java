@@ -18,6 +18,7 @@ import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -160,7 +161,7 @@ public class InfluxDBConnectionClass {
         return flag;
     }
 
-    public List<StatusAvg> getReport(InfluxDBClient influxDBClient, String projekatId, String dokumentId, DateRangeDto dateRangeDto) {
+    public List<StatusAvg> getReport(InfluxDBClient influxDBClient, String projekatId, DateRangeDto dateRangeDto,List<Long> finishedDokumentIds) {
         String start = dateRangeDto != null && dateRangeDto.getStart() != null
                 ? dateRangeDto.getStart().toInstant().toString()
                 : "-30d";
@@ -170,25 +171,31 @@ public class InfluxDBConnectionClass {
                 : "now()";
 
         // 🧱 Dinamički filter — koristi projekatId ili dokumentId ako postoji
-        String idFilter = dokumentId != null && !dokumentId.isBlank()
-                ? "r.dokumentId == \"" + dokumentId + "\""
-                : "r.projekatId == \"" + projekatId + "\"";
+        StringBuilder idFilter = new StringBuilder("r.projekatId == \"" + projekatId + "\"");
 
-        // 🔥 Flux query string
+        if (finishedDokumentIds != null && !finishedDokumentIds.isEmpty()) {
+            String docsCondition = finishedDokumentIds.stream()
+                    .map(id -> "r.dokumentId == \"" + id + "\"")
+                    .collect(Collectors.joining(" or "));
+            idFilter.append(" and (").append(docsCondition).append(")");
+        }
+
+        // 🔹 Flux upit
         String flux = String.format("""
-                from(bucket: "iis_bucket")
-                  |> range(start: %s, stop: %s)
-                  |> filter(fn: (r) => r._measurement == "statuses")
-                  |> filter(fn: (r) => r._field == "novoStanjeId")
-                  |> filter(fn: (r) => %s)
-                  |> sort(columns: ["_time"])
-                  |> elapsed(unit: 1s)
-                  |> filter(fn: (r) => exists r.elapsed)
-                  |> group(columns: ["_value"], mode: "by")
-                  |> mean(column: "elapsed")
-                  |> rename(columns: {_value: "statusId", elapsed: "avg_duration_seconds"})
-                  |> yield(name: "avg_duration_per_status")
-                """, start, stop, idFilter);
+            from(bucket: "iis_bucket")
+              |> range(start: %s, stop: %s)
+              |> filter(fn: (r) => r._measurement == "statuses")
+              |> filter(fn: (r) => r._field == "novoStanjeId")
+              |> filter(fn: (r) => %s)
+              |> filter(fn: (r) => r._value != -1)
+              |> sort(columns: ["_time"])
+              |> elapsed(unit: 1s)
+              |> filter(fn: (r) => exists r.elapsed)
+              |> group(columns: ["_value"], mode: "by")
+              |> mean(column: "elapsed")
+              |> rename(columns: {_value: "statusId", elapsed: "avg_duration_seconds"})
+              |> yield(name: "avg_duration_per_status")
+            """, start, stop, idFilter);
 
         // 🧩 Query execution
         QueryApi queryApi = influxDBClient.getQueryApi();
@@ -210,7 +217,7 @@ public class InfluxDBConnectionClass {
     }
 
 
-    public MaxStatusTime getTimeSpentForStatus(InfluxDBClient influxDBClient,Long statusId, String projekatId, String dokumentId, DateRangeDto dateRangeDto) {
+    public MaxStatusTime getTimeSpentForStatus(InfluxDBClient influxDBClient,Long statusId, String projekatId, DateRangeDto dateRangeDto, List<Long> finishedDokumentIds) {
 
         // 📅 Dinamički opseg (ili poslednjih 30 dana ako nije zadat)
         String start = (dateRangeDto != null && dateRangeDto.getStart() != null)
@@ -221,9 +228,16 @@ public class InfluxDBConnectionClass {
                 : "now()";
 
         // 🧩 Dinamički deo filtera
-        String idFilter = (projekatId != null)
-                ? String.format("r.projekatId == \"%s\"", projekatId)
-                : String.format("r.dokumentId == \"%s\"", dokumentId);
+        StringBuilder filterBuilder = new StringBuilder(
+                String.format("r.projekatId == \"%s\"", projekatId));
+
+        // 🧩 Lista dokumenata (ako postoji)
+        if (finishedDokumentIds != null && !finishedDokumentIds.isEmpty()) {
+            String docConditions = finishedDokumentIds.stream()
+                    .map(id -> String.format("r.dokumentId == \"%s\"", id))
+                    .collect(Collectors.joining(" or "));
+            filterBuilder.append(" and (").append(docConditions).append(")");
+        }
 
         // 🧮 Flux upit
         String flux = String.format("""
@@ -231,7 +245,7 @@ public class InfluxDBConnectionClass {
               |> range(start: %s, stop: %s)
               |> filter(fn: (r) => r._measurement == "statuses")
               |> filter(fn: (r) => r._field == "novoStanjeId")
-              |> filter(fn: (r) => r._value == %d)
+              |> filter(fn: (r) => r._value == %d and r._value != -1)
               |> filter(fn: (r) => %s)
               |> sort(columns: ["_time"])
               |> elapsed(unit: 1s)
@@ -240,7 +254,7 @@ public class InfluxDBConnectionClass {
               |> sum(column: "elapsed")
               |> rename(columns: {elapsed: "total_duration_seconds"})
               |> yield(name: "total_duration_for_status")
-            """, start, stop, statusId, idFilter);
+            """, start, stop, statusId, filterBuilder);
 
         QueryApi queryApi = influxDBClient.getQueryApi();
         List<FluxTable> tables = queryApi.query(flux);
@@ -255,5 +269,75 @@ public class InfluxDBConnectionClass {
                 : 0.0;
 
         return new MaxStatusTime(statusId, totalDuration);
+    }
+
+    public List<Long> getDokumentsOnProject(InfluxDBClient influxDBClient, String projekatId) {
+
+        String flux = String.format("""
+        from(bucket: "iis_bucket")
+          |> range(start: 0)
+          |> filter(fn: (r) => r._measurement == "statuses")
+          |> filter(fn: (r) => r.projekatId == "%s")
+          |> keep(columns: ["dokumentId"])
+          |> distinct(column: "dokumentId")
+    """, projekatId);
+
+        QueryApi queryApi = influxDBClient.getQueryApi();
+
+        List<FluxTable> tables = queryApi.query(flux);
+
+        return tables.stream()
+                .flatMap(table -> table.getRecords().stream())
+                .map(record -> {
+                    try {
+                        return Long.parseLong(record.getValueByKey("dokumentId").toString());
+                    } catch (NumberFormatException e) {
+                        return null;
+                    }
+                })
+                .filter(java.util.Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    public List<Long> getAllFinishedDocuments(InfluxDBClient influxDBClient,String projekatId, List<Long> dokumentIds) {
+        if (dokumentIds == null || dokumentIds.isEmpty()) {
+            return List.of();
+        }
+
+        // Formatiraj listu ID-jeva u Influx-ov format ["1","2","3"]
+        String idSet = dokumentIds.stream()
+                .map(Object::toString)
+                .map(id -> "\"" + id + "\"")
+                .collect(Collectors.joining(", "));
+
+        String flux = String.format("""
+        from(bucket: "iis_bucket")
+          |> range(start: 0)
+          |> filter(fn: (r) => r._measurement == "statuses")
+          |> filter(fn: (r) => contains(value: r.dokumentId, set: [%s]))
+          |> filter(fn: (r) => r.projekatId == "%s")
+          |> filter(fn: (r) => r._field == "novoStanjeId")
+          |> filter(fn: (r) => r._value == -1)
+          |> keep(columns: ["dokumentId"])
+          |> distinct(column: "dokumentId")
+        """, idSet, projekatId);
+
+        QueryApi queryApi = influxDBClient.getQueryApi();
+
+        List<FluxTable> tables = queryApi.query(flux);
+
+        return tables.stream()
+                .flatMap(table -> table.getRecords().stream())
+                .map(record -> {
+                    try {
+                        return Long.parseLong(record.getValueByKey("dokumentId").toString());
+                    } catch (NumberFormatException e) {
+                        return null;
+                    }
+                })
+                .filter(java.util.Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
     }
 }

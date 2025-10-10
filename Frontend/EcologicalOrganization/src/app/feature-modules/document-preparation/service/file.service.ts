@@ -44,12 +44,16 @@ export class FileService {
     const url = `${this.apiUrl}/upload`;
     return this.http.post(url, formData, { headers: this.headers });
   }
-  getActiveFileByDocumentAndFile(documentId: number, activeFileId: number): Observable<IDocumentActiveFile> {
+  getActiveFileByDocumentAndFile(documentId: number, activeFileId: number): Observable<any> {
     const url = `${this.apiUrl}/active/file/${documentId}/${activeFileId}`;
-    return this.http.get<any>(url, { headers: this.headers }).pipe(map(f => new DocumentActiveFile(f)));
+    return this.http.get<any>(url, { headers: this.headers });
   }
   restoreFile(fileId:number, documentActiveFileId:number): Observable<any> {
     const url = `${this.apiUrl}/restore/${documentActiveFileId}`;
     return this.http.put(url,{id:fileId}, { headers: this.headers });
+  }
+  deleteFile(activeFileId:number): Observable<any> {
+    const url = `${this.apiUrl}/activeFile/${activeFileId}`;
+    return this.http.delete(url, { headers: this.headers });
   }
 }

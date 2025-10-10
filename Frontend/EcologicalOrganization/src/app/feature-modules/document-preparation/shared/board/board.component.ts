@@ -47,18 +47,23 @@ ngOnInit(): void {
   this.addStatusColors();
   this.connectDocumentsToStatuses();
 }
+refreshBoard(documents: DocumentBoard[]): void {
+  this.documents = documents;
+  this.connectDocumentsToStatuses();
+}
 addStatusColors() {
   const colors = this.generateStatusColors(this.boardWorkflow.statuses.length);
 
   this.boardWorkflow.statuses.forEach((s, i) => {
     this.statusColors[s.status.currentStatus.id] = colors[i];
   });
+  console.log(this.statusColors);
 }
 connectDocumentsToStatuses() {
+  this.boardWorkflow.statuses.forEach(status => status.documents = []);
   this.boardWorkflow.statuses.forEach(status => {
     status.documents = this.documents.filter(doc => doc.status.id === status.status.id);
   });
-  console.log(this.boardWorkflow);
 }
 getDocumentCountByStatus(status: IBoardWorkflowStatus): number {
   return status.documents ? status.documents.length : 0;

@@ -38,17 +38,31 @@ public class StatusRepository {
         return isSuccess;
     }
 
-    public List<StatusAvg> getStatusAvgs(String projekatId, String dokumentId, DateRangeDto dateRangeDto) {
+    public List<StatusAvg> getStatusAvgs(String projekatId, DateRangeDto dateRangeDto,List<Long>  finishedDokumentIds) {
         InfluxDBClient influxDBClient = inConn.buildConnection();
-        List<StatusAvg> statuses= inConn.getReport(influxDBClient,projekatId,dokumentId,dateRangeDto);
+        List<StatusAvg> statuses= inConn.getReport(influxDBClient,projekatId,dateRangeDto,finishedDokumentIds);
         influxDBClient.close();
         return statuses;
     }
 
-    public MaxStatusTime getTimeSpentForStatus(Long statusId, String projekatId, String dokumentId, DateRangeDto dateRangeDto) {
+    public MaxStatusTime getTimeSpentForStatus(Long statusId, String dokumentId, DateRangeDto dateRangeDto, List<Long> finishedDokumentIds) {
         InfluxDBClient influxDBClient = inConn.buildConnection();
-        MaxStatusTime maxStatus= inConn.getTimeSpentForStatus(influxDBClient,statusId,projekatId,dokumentId,dateRangeDto);
+        MaxStatusTime maxStatus= inConn.getTimeSpentForStatus(influxDBClient,statusId,dokumentId,dateRangeDto,finishedDokumentIds);
         influxDBClient.close();
         return maxStatus;
+    }
+
+    public List<Long> getDokumentsOnProject(String projekatId) {
+        InfluxDBClient influxDBClient = inConn.buildConnection();
+        List<Long> dokumentIds = inConn.getDokumentsOnProject(influxDBClient,projekatId);
+        influxDBClient.close();
+        return dokumentIds;
+    }
+
+    public List<Long> getAllFinishedDocuments(String projekatId,List<Long> dokumentIds) {
+        InfluxDBClient influxDBClient = inConn.buildConnection();
+        List<Long> finishedDocumentIds = inConn.getAllFinishedDocuments(influxDBClient,projekatId,dokumentIds);
+        influxDBClient.close();
+        return finishedDocumentIds;
     }
 }

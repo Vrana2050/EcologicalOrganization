@@ -70,9 +70,9 @@ export class StatusDuration implements IStatusDuration {
     if (data.naziv == null) {
       throw new Error('StatusDuration: "naziv" is required.');
     }
-    if (data.trajanjeDani == null) {
+    /*if (data.trajanjeDani == null) {
       throw new Error('StatusDuration: "trajanjeDani" is required.');
-    }
+    }*/
 
     this.status = data.stanje;
     this.name = data.naziv;

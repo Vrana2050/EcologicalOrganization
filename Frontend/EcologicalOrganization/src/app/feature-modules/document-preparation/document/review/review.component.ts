@@ -11,6 +11,7 @@ import { RevisionIssue, RevisionIssueUpdate, RevisionUpdate } from '../../model/
 import { FileViewerService } from '../../service/Util/file-viewer.service';
 import { IFile } from '../../model/interface/file.model';
 import { NotificationService } from '../../service/Util/toast-notification.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -41,13 +42,22 @@ export class DocumentPreparationReviewComponent implements OnInit {
 
   reviewsToUpdate: RevisionUpdate[] = [];
 
-  constructor(private toastNotificationService: NotificationService, private fileViewerService: FileViewerService, private reviewService : ReviewService, private route: ActivatedRoute,private documentService: DocumentService,private fileService: FileService) { }
+  constructor(private router:Router, private toastNotificationService: NotificationService, private fileViewerService: FileViewerService, private reviewService : ReviewService, private route: ActivatedRoute,private documentService: DocumentService,private fileService: FileService) { }
 
   ngOnInit(): void {
         this.route.paramMap.subscribe(params => {
           this.dokumentId = Number(params.get('id'));
           this.documentService.getDocumentById(this.dokumentId).subscribe(document => {
             this.document = document;
+            if(!document.canReview()){
+              if(document.isSubDocument())
+              {
+                this.router.navigate(['document-preparation/board/document', document.parentDocumentId]);
+                return;
+              }
+              this.router.navigate(['document-preparation/board/project', this.document.projectId]);
+              return;
+            }
             this.hasUnResolvedReview= document.hasUnResolvedReview();
             this.fileService.getActiveFilesByDocumentId(this.dokumentId).subscribe(activeFiles => {
               this.document.activeFiles=activeFiles;
@@ -120,6 +130,7 @@ export class DocumentPreparationReviewComponent implements OnInit {
     this.reviewsToUpdate.push(new RevisionUpdate(this.document.projectId,true,this.document.status.id,this.document.id,undefined,undefined));
     this.reviewService.submitReview(this.reviewsToUpdate).subscribe(() => {
       this.toastNotificationService.success("Document review submitted successfully.");
+      this.router.navigate(['/document-preparation/document', this.document.id]);
     });
     return;
   }
@@ -141,6 +152,7 @@ export class DocumentPreparationReviewComponent implements OnInit {
     }
     this.reviewService.submitReview(this.reviewsToUpdate).subscribe(() => {
       this.toastNotificationService.success("Document review submitted successfully.");
+      this.router.navigate(['/document-preparation/document', this.document.id]);
     });
   return;
   }

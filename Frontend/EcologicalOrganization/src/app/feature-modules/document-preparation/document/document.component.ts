@@ -19,6 +19,8 @@ import { DocumentMainFileUpdate } from '../model/implementation/document-impl.mo
 import { IRevisionIssue } from '../model/interface/revision.model';
 import { ReviewService } from '../service/review.service';
 import { RevisionUpdate } from '../model/implementation/revision-impl.model';
+import { ChangeDetectorRef } from '@angular/core';
+import {File} from '../model/implementation/file-impl.model';
 
 @Component({
   selector: 'document-preparation-document',
@@ -67,7 +69,13 @@ export class DocumentPreparationDocumentComponent implements OnInit {
   dependencySearchTerm: string = '';
   availableDependencies: IDocumentBase[] = [];
   filteredDependencies: IDocumentBase[] = [];
-  constructor(private reviewService: ReviewService,private workflowService: WorkflowService,private route: ActivatedRoute, private documentService: DocumentService,private router : Router,private authService: AuthService,private fileService: FileService,private fileViewerService: FileViewerService,private projectService: ProjectService,private toastNotificationService: NotificationService) { }
+  hasLoadedDependencies: boolean;
+  showDeletePopup: boolean = false;
+  fileToDelete: IDocumentActiveFile | undefined;
+  deleteTitle:string;
+  deleteMessage:string;
+  isDeletingDocument: boolean = false;
+  constructor(private cd: ChangeDetectorRef,private reviewService: ReviewService,private workflowService: WorkflowService,private route: ActivatedRoute, private documentService: DocumentService,private router : Router,private authService: AuthService,private fileService: FileService,private fileViewerService: FileViewerService,private projectService: ProjectService,private toastNotificationService: NotificationService) { }
 
   ngOnInit(): void {
         this.route.paramMap.subscribe(params => {
@@ -257,19 +265,48 @@ onFileSelected(event: Event) {
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
       if (!file) return;
+      const maxSizeMB = 20;
+      const maxSizeBytes = maxSizeMB * 1024 * 1024;
+      console.log(file.size, maxSizeBytes);
+
+      if (file.size > maxSizeBytes) {
+        this.toastNotificationService.error(`File size exceeds the maximum limit of ${maxSizeMB} MB.`, "Error");
+        return; // prekini dalje izvršavanje
+      }
       const formData = new FormData();
 
       formData.append('file', file);
 
       formData.append('dokumentId', this.document.id.toString());
-      formData.append('naziv', file.name);
+      const fullName = file.name;
+      const nameWithoutExt = fullName.split('.').slice(0, -1).join('.');
+      formData.append('naziv', nameWithoutExt);
       const ext = file.name.split('.').pop();
       formData.append('ekstenzija', ext || '');
+      console.log(formData.get('naziv'));
       this.fileService.uploadFile(formData).subscribe({
         next: res => {
           this.toastNotificationService.success("File uploaded successfully.","Success");
           this.fileService.getActiveFileByDocumentAndFile(this.document.id, (res as any).id).subscribe(f => {
-            this.document.activeFiles?.push(f);
+            const activeFile :any ={
+              id: f.id,
+              file: new File(res),
+              documentId: f.dokumentId,
+            }
+            let isNewVersion = false;
+            for(const doc of this.document.activeFiles || []){
+              if(activeFile.file.isNewVersionOf(doc.file)){
+                if(this.document.mainFileId === doc.file.id){
+                  this.document.mainFileId = activeFile.file.id;
+                }
+                doc.file= activeFile.file;
+                isNewVersion = true;
+              }
+            }
+            if(!isNewVersion){
+              this.document.activeFiles?.push(activeFile);
+            }
+            this.cd.detectChanges();
           });
         }
       });
@@ -393,13 +430,15 @@ onFileSelected(event: Event) {
     this.fileService.restoreFile(file.id, this.activeVersion.id).subscribe(() => {
         this.document.activeFiles!.forEach(af => {
           if(this.document.mainFileId === af.file.id){
+            console.log("Bio je main file")
             this.document.mainFileId = file.id;
           }
-          if(af.file.id === file.id){
+          if(af.file.id === this.activeVersion.file.id){
+            console.log("Restoring file:", af.file);
             af.file = file;
           }
         });
-
+      this.cd.detectChanges();
       this.toastNotificationService.success("File successfully restored.","Success");
       this.closeRestoreOptions();
     });
@@ -488,9 +527,12 @@ saveDependencies() {
   });
 }
 loadAvailableDependencies() {
+  if(!this.hasLoadedDependencies){
   this.documentService.getDocumentsWithSameParent(this.document.id).subscribe(docs => {
-    this.availableDependencies = docs.filter(d => d.id !== this.document.id);
+    this.availableDependencies = docs.filter(d => d.id !== this.document.id && !d.isDone());
+    this.hasLoadedDependencies = true;
   });
+}
 }
 searchDependencies() {
   if(this.dependencySearchTerm.trim() === ''){
@@ -505,5 +547,51 @@ showAllAvailableDependencies() {
     return;
   }
   this.filteredDependencies = this.availableDependencies.filter(d => !this.document.dependsOn?.find(dep => dep.id === d.id));
+}
+deleteFile(activeFile: IDocumentActiveFile) {
+  this.fileService.deleteFile(activeFile.id).subscribe(() => {
+    this.document.activeFiles = this.document.activeFiles?.filter(af => af.id !== activeFile.id);
+    if(this.document.mainFileId === activeFile.file.id){
+      this.document.mainFileId = undefined;
+    }
+    this.cd.detectChanges();
+    this.toastNotificationService.success("File successfully deleted.","Success");
+  });
+}
+openDeletePopup(event: any, activeFile: IDocumentActiveFile) {
+  event.stopPropagation();
+  this.fileToDelete = activeFile;
+  this.showDeletePopup = true;
+  this.deleteTitle = "Delete " + (this.fileToDelete?.file!.name || '');
+  this.deleteMessage = "Are you sure you want to delete this file and its versions?";
+}
+onDeleteConfirmed() {
+  if(this.isDeletingDocument){
+    this.deleteDocument();
+    return;
+  }
+  this.deleteFile(this.fileToDelete!);
+  this.showDeletePopup = false;
+  this.fileToDelete = undefined;
+}
+onDeleteCanceled() {
+  this.showDeletePopup = false;
+  this.isDeletingDocument = false;
+  this.fileToDelete = undefined;
+}
+deleteDocument() {
+  this.documentService.deleteDocument(this.document.id).subscribe(() => {
+    this.toastNotificationService.success("Document successfully deleted.","Success");
+    this.router.navigate(['document-preparation/board/project', this.document.projectId]);
+  });
+}
+canDeleteDocument(): boolean {
+  return this.document.canDeleteDocument(this.userId!);
+}
+openDeleteDocumentPopup() {
+  this.showDeletePopup = true;
+  this.isDeletingDocument = true;
+  this.deleteTitle = "Delete " + this.document.name;
+  this.deleteMessage = "Are you sure you want to delete this document and its sub-documents? This action cannot be undone.";
 }
 }

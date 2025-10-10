@@ -27,6 +27,7 @@ import { DocumentPreparationWorkflowGraphComponent } from './shared/workflow-gra
 
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ProjectNotificationInterceptor } from './interceptor/notification-interceptor';
+import { DeletePopupComponent } from './shared/delete-popup/delete-popup.component';
 
 
 
@@ -56,6 +57,7 @@ import { ProjectNotificationInterceptor } from './interceptor/notification-inter
     DocumentPreparationProjectCreateComponent,
     DocumentPreparationExistingWorkflowWindowComponent,
     DocumentPreparationWorkflowGraphComponent,
+    DeletePopupComponent,
   ],
   imports: [
     CommonModule,

@@ -7,6 +7,8 @@ import { DocumentBoard, DocumentDetails } from '../../model/implementation/docum
 import { IDocumentBoard } from '../../model/interface/document.model';
 import { AuthService } from 'src/app/infrastructure/auth/auth.service';
 import { IStatus, IWorkflowStatus } from '../../model/interface/workflow.model';
+import { ViewChild } from '@angular/core';
+import { BoardComponent } from '../../shared/board/board.component';
 
 @Component({
   selector: 'document-preparation-document-board',
@@ -14,12 +16,16 @@ import { IStatus, IWorkflowStatus } from '../../model/interface/workflow.model';
   styleUrls: ['./board.component.css']
 })
 export class DocumentPreparationBoardDocumentComponent {
+  @ViewChild(BoardComponent)
+  boardComponent!: BoardComponent;
+
   documentId!: number;
   parentDocument!: IDocumentDetails;
   documents!: IDocumentBoard[];
   canEdit: boolean;
   showCreateDocumentModal: boolean = false;
   statusToCreateDocumentIn: IWorkflowStatus;
+  showMyTasksFlag: boolean = false;
   constructor(private route: ActivatedRoute,private router: Router,private authService: AuthService,private documentService: DocumentService) {}
 
    ngOnInit(): void {
@@ -61,5 +67,15 @@ export class DocumentPreparationBoardDocumentComponent {
   openAddDocument(status: IWorkflowStatus): void {
     this.showCreateDocumentModal = true;
     this.statusToCreateDocumentIn = status;
+  }
+  showMyTasks(): void {
+    this.showMyTasksFlag =!this.showMyTasksFlag;
+    if(!this.showMyTasksFlag){
+      this.boardComponent.refreshBoard(this.documents);
+      return;
+    }
+    else{
+      this.boardComponent.refreshBoard(this.documents.filter(doc => doc.isUserAssignee(this.authService.user$.value.id)));
+    }
   }
 }

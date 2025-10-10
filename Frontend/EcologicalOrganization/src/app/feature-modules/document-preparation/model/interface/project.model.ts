@@ -26,6 +26,7 @@ export interface IBaseProject{
   isInProgress(): boolean;
   isUserOwner(userId: number): boolean;
   isUserAssignee(userId: number): boolean;
+  canAbandon(userId: number): boolean;
 }
 export interface IProjectBoard extends IProject {
 

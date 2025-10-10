@@ -3,6 +3,7 @@
         <div class ="document-title-container">
             <span class="document-title">{{document.name}}</span>
             <img src="assets/edit.png" alt="edit icon" class="edit-icon" *ngIf="canEditDocument()" (click)="openEditDocument()">
+            <img src="assets/bin.png" alt="bin icon" class="edit-icon" *ngIf="canDeleteDocument()" (click)="openDeleteDocumentPopup()">
         </div>
         <span *ngIf="!document.isDraft" class="time-left">Time left: <span class="time-left" [style.color] = "getTimeLeftColor()">{{getTimeLeftFormatted()}}</span></span>
         <span *ngIf="document.isDraft" class="time-left">Version: <span class="time-left" [style.color] = "'#FF0000'">Draft</span></span>
@@ -145,12 +146,11 @@
               <img src="assets/warning.png" *ngIf="document.doesActiveFileHaveUnApprovedCorrections(activeFile.id)" alt="warning icon" class="exclamation-icon">
               <img src="assets/{{activeFile.file.extension}}.png" alt="file icon" class="file-icon">
               <span class="file-name">{{activeFile.file.name}}</span>
-              <span class="file-version">Version: {{activeFile.file.version}}</span>
-              <span class="file-modification">{{activeFile.file.dateUploaded | date:'dd MMM yyyy':'':'en-GB'}}</span>
+              <span class="file-modification">{{activeFile.file.dateUploaded | date:'d MMM yyyy, HH:mm':'':'en-GB'}}</span>
               <div class="file-actions" *ngIf="this.userId && document.canManageFile(this.userId)">
                 <img src="assets/sync.png" alt="restore options icon" class="file-action-icon" (click)="openRestoreOptions($event, activeFile)">
                 <button *ngIf="!document.isFileMain(activeFile.file.id)" class="mark-as-main-button" (click)="markAsMain($event,activeFile)"><span class="mark-as-main">Mark as main</span></button>
-                <img src="assets/bin.png" alt="delete icon" class="file-action-icon">
+                <img src="assets/bin.png" alt="delete icon" class="file-action-icon" (click)="openDeletePopup($event,activeFile)">
               </div>
             </div>
           </div>
@@ -165,8 +165,7 @@
             <div class="file-item-container active-version" (click)="openFile(activeVersion.file)">
               <img src="assets/{{activeVersion.file.extension}}.png" alt="file icon" class="file-icon">
               <span class="file-name">{{activeVersion.file.name}}</span>
-              <span class="file-modification">{{activeVersion.file.dateUploaded | date:'dd MMM yyyy':'':'en-GB'}}</span>
-              <span class="file-version">Version: {{activeVersion.file.version}}</span>
+              <span class="file-modification">{{activeVersion.file.dateUploaded | date:'d MMM yyyy, HH:mm':'':'en-GB'}}</span>
               <div class="file-actions">
                 <span class="current-version">Current Version</span>
               </div>
@@ -174,8 +173,7 @@
             <div *ngFor="let file of fileVersions" class="file-item-container" (click)="openFile(file)">
               <img src="assets/{{file.extension}}.png" alt="file icon" class="file-icon">
               <span class="file-name">{{file.name}}</span>
-              <span class="file-modification">{{file.dateUploaded | date:'dd MMM yyyy':'':'en-GB'}}</span>
-              <span class="file-version">Version: {{file.version}}</span>
+              <span class="file-modification">{{file.dateUploaded | date:'d MMM yyyy, HH:mm':'':'en-GB'}}</span>
               <div class="file-actions">
                 <button class="restore-button" (click)="restoreFile($event,file)"><span class="restore">Restore</span></button>
               </div>
@@ -203,6 +201,14 @@
       </div>
     </div>
 </div>
+
+<document-preparation-delete-popup
+  *ngIf="showDeletePopup"
+  [title]="deleteTitle"
+  [message]="deleteMessage"
+  (confirm)="onDeleteConfirmed()"
+  (cancel)="onDeleteCanceled()">
+</document-preparation-delete-popup>
 
 <document-preparation-document-create  [sortedWorkflow]="document.workflow!" [parentDocument]="document" [isUserOwner]="isUserAssignee" [isUserAssignee]="isUserSubAssignee" *ngIf="showCreateDocument"></document-preparation-document-create>
 <document-preparation-document-create [workflowStatus]="document.status" [document]="document" [sortedWorkflow]="parentSortedWorkflow!" [project]="project" [parentDocument]="parentDocument" [isUserOwner]="document.isUserOwner(this.userId)" [isUserAssignee]="document.isUserAssignee(this.userId)" *ngIf="showEditDocument"></document-preparation-document-create>
