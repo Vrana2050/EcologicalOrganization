@@ -13,7 +13,6 @@ import rs.ac.uns.acs.nais.TimeseriesDatabaseService.model.PlantMetric;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Repository
@@ -177,7 +176,6 @@ public class PlantMetricRepositoryImpl implements PlantMetricRepository {
             long spanMs = java.time.Duration.between(start, end).toMillis();
 
             for (int i = 0; i < count; i++) {
-                // nasumičan timestamp u [start, end)
                 long offset = (spanMs <= 0) ? 0 : (Math.abs(rnd.nextLong()) % spanMs);
                 java.time.Instant t = start.plusMillis(offset);
 
@@ -187,7 +185,8 @@ public class PlantMetricRepositoryImpl implements PlantMetricRepository {
                 double soil = clamp(40 + rnd.nextGaussian() * 15, 5, 90);
                 double temp = 20 + rnd.nextGaussian() * 3;
                 double lux  = Math.max(0, 300 + rnd.nextGaussian() * 200);
-                double water = (rnd.nextInt(600) == 0) ? (200 + rnd.nextInt(200)) : 0;
+                double water = (rnd.nextInt(24) == 0) ? (200 + rnd.nextInt(200)) : 0;
+
 
                 Point p = Point.measurement("plant_metrics")
                         .addTag("plant_id", plant)
@@ -233,26 +232,17 @@ public class PlantMetricRepositoryImpl implements PlantMetricRepository {
     @Override
     public List<Map<String, Object>> dailyAvgTempMoistureByRoom(int days) {
         String flux = String.format("""
-        t = from(bucket: "%2$s")
+        from(bucket: "%2$s")
           |> range(start: -%1$dd)
-          |> filter(fn: (r) => r._measurement == "plant_metrics" and r._field == "temp_c")
-          |> group(columns: ["room"])
-          |> mean()
-          |> rename(columns: {_value: "temp_c"})
-          |> keep(columns: ["room","temp_c"])
-
-
-        m = from(bucket: "%2$s")
-          |> range(start: -%1$dd)
-          |> filter(fn: (r) => r._measurement == "plant_metrics" and r._field == "soil_moisture_pct")
-          |> group(columns: ["room"])
-          |> mean()
-          |> rename(columns: {_value: "soil_moisture_pct"})
-          |> keep(columns: ["room","soil_moisture_pct"])
-
-        join(tables: {t: t, m: m}, on: ["room"])
-          |> sort(columns: ["room"])
+          |> filter(fn: (r) => r._measurement == "plant_metrics" and
+                               (r._field == "temp_c" or r._field == "soil_moisture_pct"))
+          |> group(columns: ["room","_field"])
+          |> aggregateWindow(every: 1d, fn: mean, createEmpty: false)
+          |> pivot(rowKey: ["_time","room"], columnKey: ["_field"], valueColumn: "_value")
+          |> keep(columns: ["_time","room","temp_c","soil_moisture_pct"])
+          |> sort(columns: ["room","_time"])
         """, days, bucket);
+
 
         return queryToMaps(flux);
     }
