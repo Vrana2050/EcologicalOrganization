@@ -1,0 +1,103 @@
+<div class="page-container">
+  <!-- Header sekcija: 5% visine -->
+
+  <div class="top-bar">
+    <div class="section-item add-meta" (click)="openModal()">
+      <span class="icon">➕</span>
+      <!-- ili neki emoji po izboru -->
+      <span class="label">Add Member</span>
+    </div>
+    <xp-search-bar
+      (searchChange)="onSearch($event)"
+      class="search-bar"
+    ></xp-search-bar>
+  </div>
+
+  <!-- Glavni sadržaj: ostatak -->
+  <div class="main-content">
+    <div
+      style="
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 30px;
+        margin-left: 15px;
+      "
+    >
+      <span
+        style="color: #2563eb; cursor: pointer; font-size: 16px"
+        onmouseover="this.style.textDecoration='underline'"
+        onmouseout="this.style.textDecoration='none'"
+        [routerLink]="['/document-management/groups']"
+      >
+        User Groups
+      </span>
+      <span style="font-size: 16px">&gt;</span>
+      <h3 style="margin: 0; font-size: 16px; font-weight: 600">
+        {{ group.name }}
+      </h3>
+    </div>
+    <h2 style="margin-top: 20px; margin-left: 15px">
+      User Group "{{ group.name }}"
+    </h2>
+    <table class="metadata-table">
+      <thead>
+        <tr>
+          <th>Member Email</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let member of filteredMembers; let i = index"
+          [class.odd]="i % 2 === 1"
+          [class.even]="i % 2 === 0"
+        >
+          <td style="cursor: pointer">
+            {{ member.email }}
+          </td>
+          <td class="actions-cell">
+            <div class="menu-container" (click)="toggleMenu(member.id)">
+              <mat-icon>settings</mat-icon>
+              <div class="menu-dropdown" *ngIf="openModalId === member.id">
+                <button (click)="openModalRemove()">Remove member</button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="isModalOpen" (click)="closeModal()"></div>
+
+<div class="modal" *ngIf="isModalOpen">
+  <div class="modal-header">
+    <h3 *ngIf="isAdding">New Group Member</h3>
+    <h3 *ngIf="isRemoving">
+      Are you sure you want to remove member from group?
+    </h3>
+    <span class="close-btn" (click)="closeModal()">×</span>
+  </div>
+  <div class="modal-body" *ngIf="isAdding">
+    <input
+      type="text"
+      [(ngModel)]="newMemberEmail"
+      placeholder="Member Email"
+    />
+    <p style="color: red; margin-left: 5px; margin-top: 5px">{{ error }}</p>
+  </div>
+  <h4 style="margin-left: 20px; margin-top: 10px" *ngIf="isRemoving">
+    "{{ newMemberEmail }}"
+  </h4>
+
+  <div class="modal-footer">
+    <button class="create-btn" *ngIf="isAdding" (click)="AddMember()">
+      ADD
+    </button>
+    <button class="create-btn" *ngIf="isRemoving" (click)="RemoveMember()">
+      REMOVE
+    </button>
+  </div>
+</div>

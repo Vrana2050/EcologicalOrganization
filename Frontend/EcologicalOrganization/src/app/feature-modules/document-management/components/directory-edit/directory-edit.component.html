@@ -1,0 +1,194 @@
+<div class="page-container">
+  <div class="top-bar">
+    <xp-search-bar class="search-bar"></xp-search-bar>
+  </div>
+  <div class="main-content">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-container">
+      <div class="breadcrumb" style="margin-top: 20px; margin-left: 10px">
+        <ng-container *ngFor="let item of path; let last = last">
+          <a
+            *ngIf="!last"
+            [routerLink]="['/document-management/directory', item.id]"
+            class="breadcrumb-link"
+            style="font-size: larger"
+          >
+            {{ item.name }}
+          </a>
+          <span
+            *ngIf="last"
+            class="breadcrumb-current"
+            style="font-size: larger"
+          >
+            {{ item.name }}
+          </span>
+          <span *ngIf="!last" style="font-size: larger"> > </span>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+  <div class="document-preview-section">
+    <div class="document-left">
+      <div class="document-thumbnail">📁</div>
+
+      <div class="document-info">
+        <p style="margin-left: 5px; font-weight: 700; font-size: 18px">
+          Directory Name:
+        </p>
+        <div class="document-info-header editable-name">
+          <!-- Input za menjanje imena -->
+
+          <input
+            placeholder="Enter directory name"
+            type="text"
+            [(ngModel)]="updateName"
+            class="name-input"
+          />
+        </div>
+        <p style="color: red; margin-top: 10px">{{ updateError }}</p>
+      </div>
+    </div>
+
+    <!-- Tagovi ispod -->
+
+    <h2 style="margin-top: 20px; margin-bottom: 0px; color: green">Tags</h2>
+    <div class="tags-input-container">
+      <!-- Već postojeći tagovi -->
+      <div class="tag" *ngFor="let tag of updateTags; let i = index">
+        {{ tag.name }}
+        <span class="remove-tag" (click)="removeTag(i)">×</span>
+      </div>
+
+      <!-- Input za unos -->
+      <input
+        type="text"
+        [(ngModel)]="tagInput"
+        (keydown.enter)="addTagFromInput($event)"
+        (keydown.backspace)="handleBackspace($event)"
+        (input)="filterTags()"
+        [placeholder]="updateTags.length === 0 ? 'Add tags...' : ''"
+      />
+
+      <!-- Dropdown preporuka -->
+      <ul class="suggestions" *ngIf="filteredTags.length > 0">
+        <li
+          *ngFor="let suggestion of filteredTags"
+          (mousedown)="selectSuggestion(suggestion)"
+        >
+          {{ suggestion.name }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- Ostali meta podaci -->
+    <div class="document-meta">
+      <div *ngIf="directory" class="document-meta-grid">
+        <div style="width: 30em; display: flex; flex-direction: column">
+          <span><strong>Creator:</strong> {{ directory.creator }}</span>
+          <span style="margin-top: 10px"
+            ><strong>Created At:</strong>
+            {{ directory.created_at | date : "short" }}</span
+          >
+        </div>
+        <div style="width: 30em; display: flex; flex-direction: column">
+          <span
+            ><strong>Last modified:</strong>
+            {{ directory.last_modified | date : "short" }}</span
+          >
+        </div>
+      </div>
+      <h2 class="custom-metadata-title">Custom Metadata</h2>
+
+      <div
+        class="metadata-item"
+        *ngFor="let meta of updateMetadata; let i = index"
+      >
+        <label>{{ meta.custom_metadata.name }}:</label>
+
+        <!-- String -->
+        <input
+          *ngIf="meta.custom_metadata.metadata_type === 'String'"
+          type="text"
+          [(ngModel)]="meta.value"
+        />
+
+        <!-- Boolean -->
+        <input
+          *ngIf="meta.custom_metadata.metadata_type === 'Boolean'"
+          type="checkbox"
+          [(ngModel)]="meta.value"
+        />
+
+        <!-- Date -->
+        <input
+          *ngIf="meta.custom_metadata.metadata_type === 'Date'"
+          type="date"
+          [(ngModel)]="meta.value"
+        />
+
+        <!-- Datetime -->
+        <input
+          *ngIf="meta.custom_metadata.metadata_type === 'Datetime'"
+          type="datetime-local"
+          [(ngModel)]="meta.value"
+        />
+
+        <!-- Time -->
+        <input
+          *ngIf="meta.custom_metadata.metadata_type === 'Time'"
+          type="time"
+          [(ngModel)]="meta.value"
+          step="1"
+        />
+
+        <!-- Integer -->
+        <input
+          *ngIf="meta.custom_metadata.metadata_type === 'Integer'"
+          type="number"
+          step="1"
+          [(ngModel)]="meta.value"
+        />
+
+        <!-- Decimal -->
+        <input
+          *ngIf="meta.custom_metadata.metadata_type === 'Decimal'"
+          type="number"
+          step="0.01"
+          [(ngModel)]="meta.value"
+        />
+
+        <!-- Dugme za uklanjanje -->
+        <button class="remove-btn" (click)="removeMetadata(i)">×</button>
+      </div>
+
+      <!-- Dodavanje novih metadata -->
+      <div class="metadata-add">
+        <select [(ngModel)]="selectedMetadataId">
+          <option [ngValue]="null">-- Add metadata --</option>
+          <option
+            *ngFor="let meta of allMetadata"
+            [ngValue]="meta.id"
+            [disabled]="isMetadataDisabled(meta.id)"
+          >
+            {{ meta.name }}
+          </option>
+        </select>
+        <button
+          [disabled]="!selectedMetadataId"
+          class="metadata-add-button"
+          (click)="addMetadata()"
+        >
+          Add
+        </button>
+        <div style="margin-left: 630px">
+          <button (click)="cancelUpdate()" class="cancel-update-button">
+            CANCEL
+          </button>
+          <button (click)="saveUpdate()" class="save-update-button">
+            SAVE
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

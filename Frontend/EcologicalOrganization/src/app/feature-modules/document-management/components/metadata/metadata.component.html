@@ -1,0 +1,103 @@
+<div class="page-container">
+  <!-- Header sekcija: 5% visine -->
+
+  <div class="top-bar">
+    <div class="section-item add-meta" (click)="openModal()">
+      <span class="icon">➕</span>
+      <!-- ili neki emoji po izboru -->
+      <span class="label">Add Meta</span>
+    </div>
+    <xp-search-bar
+      (searchChange)="onSearch($event)"
+      class="search-bar"
+    ></xp-search-bar>
+  </div>
+
+  <!-- Glavni sadržaj: ostatak -->
+  <div class="main-content">
+    <h2 style="margin-top: 30px; margin-left: 10px">
+      Manage custom metadata fields
+    </h2>
+    <table class="metadata-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let meta of filteredMetadata; let i = index"
+          [class.odd]="i % 2 === 1"
+          [class.even]="i % 2 === 0"
+        >
+          <td>{{ meta.name }}</td>
+          <td>{{ meta.metadata_type }}</td>
+          <td>{{ meta.description }}</td>
+          <td class="actions-cell">
+            <div class="menu-container" (click)="toggleMenu(meta.id)">
+              <mat-icon>settings</mat-icon>
+              <div class="menu-dropdown" *ngIf="openModalId === meta.id">
+                <button (click)="openModalDelete()">Delete</button>
+                <button (click)="openModalUpdate()">Edit</button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="isModalOpen" (click)="closeModal()"></div>
+
+<div class="modal" *ngIf="isModalOpen">
+  <div class="modal-header">
+    <h3 *ngIf="isCreating">New Metadata Field</h3>
+    <h3 *ngIf="isUpdating">Edit Metadata Field</h3>
+    <h3 *ngIf="isDeleting">Are you sure you want to delete this meta?</h3>
+    <span class="close-btn" (click)="closeModal()">×</span>
+  </div>
+  <div class="modal-body" *ngIf="isUpdating || isCreating">
+    <input type="text" [(ngModel)]="newMetadataName" placeholder="Field Name" />
+  </div>
+  <h4 style="margin-left: 20px; margin-top: 10px" *ngIf="isDeleting">
+    "{{ newMetadataName }}"
+  </h4>
+  <p style="margin-left: 20px" *ngIf="isDeleting">
+    If deleted, the meta will also be deleted from all files and folders.
+  </p>
+  <div class="modal-body" *ngIf="isUpdating || isCreating">
+    <input
+      type="text"
+      [(ngModel)]="newMetadataDescription"
+      placeholder="Field Description"
+    />
+  </div>
+  <div class="type-option" *ngIf="isUpdating || isCreating">
+    <label for="metadataType" class="type-label">Metadata Type</label>
+    <select id="metadataType" [(ngModel)]="newMetadataType" class="type-select">
+      <option value="String">String</option>
+      <option value="Boolean">Boolean</option>
+      <option value="Date">Date</option>
+      <option value="Datetime">Datetime</option>
+      <option value="Time">Time</option>
+      <option value="Integer">Integer</option>
+      <option value="Decimal">Decimal</option>
+    </select>
+  </div>
+
+  <div class="modal-footer">
+    <button class="create-btn" *ngIf="isCreating" (click)="createMetadata()">
+      CREATE
+    </button>
+    <button class="create-btn" *ngIf="isUpdating" (click)="updateMetadata()">
+      UPDATE
+    </button>
+    <button class="create-btn" *ngIf="isDeleting" (click)="deleteMetadata()">
+      DELETE
+    </button>
+  </div>
+</div>

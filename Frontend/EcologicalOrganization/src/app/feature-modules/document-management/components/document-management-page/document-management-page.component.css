@@ -1,0 +1,18 @@
+.container {
+  display: flex;
+  width: 100%;
+  height: 90%;
+}
+
+.sidebar {
+  flex: 0 0 20%; /* zauzima tačno 30% */
+  max-width: 20%;
+  background-color: #ffffff; /* samo primer da vidiš gde je sidebar */
+  border-right: 2px solid #16518c;
+}
+
+.content {
+  flex: 1; /* zauzima ostatak */
+  max-width: 80%;
+  padding: 1rem;
+}

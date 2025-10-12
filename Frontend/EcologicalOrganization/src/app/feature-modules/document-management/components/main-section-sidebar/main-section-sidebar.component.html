@@ -1,0 +1,104 @@
+<h2 style="margin-left: 30px; margin-top: 30px">Main Sections</h2>
+
+<div class="section-list">
+  <div class="section-item" *ngFor="let section of sections">
+    <span
+      [routerLink]="['/document-management/directory', section.directory_id]"
+      >{{ section.directory_name }}</span
+    >
+
+    <!-- tri tačkice -->
+    <div
+      class="menu-container"
+      (click)="toggleMenu(section.directory_id)"
+      *ngIf="
+        section.access_type === 'EDITOR' || section.access_type === 'VIEWER'
+      "
+    >
+      <mat-icon>settings</mat-icon>
+      <div class="menu-dropdown" *ngIf="openMenuId === section.directory_id">
+        <button *ngIf="section.principal_type === 'OWNER'">Delete</button>
+        <button
+          *ngIf="
+            section.principal_type === 'OWNER' ||
+            section.access_type === 'EDITOR'
+          "
+        >
+          Modify
+        </button>
+        <button
+          *ngIf="
+            section.access_type === 'EDITOR' || section.access_type === 'VIEWER'
+          "
+        >
+          Download
+        </button>
+        <button *ngIf="section.access_type === 'EDITOR'">Share</button>
+      </div>
+    </div>
+  </div>
+  <div
+    style="margin-top: 20px"
+    class="section-item create-new"
+    (click)="openModal()"
+    *ngIf="user.role == 'MANAGER'"
+  >
+    <span>➕ Create New Section</span>
+  </div>
+  <div class="modal-backdrop" *ngIf="isModalOpen" (click)="closeModal()"></div>
+
+  <div class="modal" *ngIf="isModalOpen">
+    <div class="modal-header">
+      <h3>Create New Section</h3>
+      <span class="close-btn" (click)="closeModal()">×</span>
+    </div>
+    <div class="modal-body">
+      <input
+        type="text"
+        [(ngModel)]="newSectionName"
+        placeholder="Section name"
+      />
+    </div>
+    <div class="modal-footer">
+      <button class="create-btn" (click)="createSection()">CREATE</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Tools -->
+<div *ngIf="user.role == 'MANAGER'">
+  <h2 style="margin-left: 30px; margin-top: 50px">Admin Tools</h2>
+
+  <div class="section-list">
+    <div class="section-item" [routerLink]="['/document-management/metadata']">
+      <span>📦 Metadata</span>
+    </div>
+
+    <div class="section-item" [routerLink]="['/document-management/tags']">
+      <span>🏷️ Tags</span>
+    </div>
+
+    <div class="section-item" [routerLink]="['/document-management/groups']">
+      <span>👥 User Groups</span>
+    </div>
+
+    <div
+      class="section-item"
+      [routerLink]="['/document-management/audit-logs']"
+    >
+      <span>📝 Audit Log</span>
+    </div>
+
+    <div class="section-item">
+      <span>📂 Archive</span>
+    </div>
+
+    <div class="section-item">
+      <span>🗑️ Recycle Bin</span>
+    </div>
+
+    <div class="section-item" (click)="openActivityReports()">
+      <span>📊 Activity Reports</span>
+    </div>
+  </div>
+</div>

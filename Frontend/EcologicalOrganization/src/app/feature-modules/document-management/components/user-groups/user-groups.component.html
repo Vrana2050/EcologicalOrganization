@@ -1,0 +1,101 @@
+<div class="page-container">
+  <!-- Header sekcija: 5% visine -->
+
+  <div class="top-bar">
+    <div class="section-item add-meta" (click)="openModal()">
+      <span class="icon">➕</span>
+      <!-- ili neki emoji po izboru -->
+      <span class="label">Add Group</span>
+    </div>
+    <xp-search-bar
+      (searchChange)="onSearch($event)"
+      class="search-bar"
+    ></xp-search-bar>
+  </div>
+
+  <!-- Glavni sadržaj: ostatak -->
+  <div class="main-content">
+    <h2 style="margin-top: 30px; margin-left: 10px">User Groups</h2>
+    <table class="metadata-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Number of members</th>
+          <th>Description</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let group of filteredGroups; let i = index"
+          [class.odd]="i % 2 === 1"
+          [class.even]="i % 2 === 0"
+        >
+          <td
+            style="cursor: pointer"
+            [routerLink]="['/document-management/group/' + group.id]"
+          >
+            {{ group.name }}
+          </td>
+          <td
+            style="cursor: pointer"
+            [routerLink]="['/document-management/group/' + group.id]"
+          >
+            {{ group.members.length }}
+          </td>
+          <td
+            style="cursor: pointer"
+            [routerLink]="['/document-management/group/' + group.id]"
+          >
+            {{ group.description }}
+          </td>
+          <td class="actions-cell">
+            <div class="menu-container" (click)="toggleMenu(group.id)">
+              <mat-icon>settings</mat-icon>
+              <div class="menu-dropdown" *ngIf="openModalId === group.id">
+                <button (click)="openModalDelete()">Delete</button>
+                <button (click)="openModalUpdate()">Edit</button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="isModalOpen" (click)="closeModal()"></div>
+
+<div class="modal" *ngIf="isModalOpen">
+  <div class="modal-header">
+    <h3 *ngIf="isCreating">New User Group</h3>
+    <h3 *ngIf="isUpdating">Edit User Group</h3>
+    <h3 *ngIf="isDeleting">Are you sure you want to delete this group?</h3>
+    <span class="close-btn" (click)="closeModal()">×</span>
+  </div>
+  <div class="modal-body" *ngIf="isUpdating || isCreating">
+    <input type="text" [(ngModel)]="newGroupName" placeholder="Group Name" />
+  </div>
+  <h4 style="margin-left: 20px; margin-top: 10px" *ngIf="isDeleting">
+    "{{ newGroupName }}"
+  </h4>
+  <div class="modal-body" *ngIf="isUpdating || isCreating">
+    <input
+      type="text"
+      [(ngModel)]="newGroupDescription"
+      placeholder="Group Description"
+    />
+  </div>
+
+  <div class="modal-footer">
+    <button class="create-btn" *ngIf="isCreating" (click)="createGroup()">
+      CREATE
+    </button>
+    <button class="create-btn" *ngIf="isUpdating" (click)="updateGroup()">
+      UPDATE
+    </button>
+    <button class="create-btn" *ngIf="isDeleting" (click)="deleteGroup()">
+      DELETE
+    </button>
+  </div>
+</div>

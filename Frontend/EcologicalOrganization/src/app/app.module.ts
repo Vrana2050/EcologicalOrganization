@@ -13,6 +13,7 @@ import { DocumentManagementModule } from './feature-modules/document-management/
 import { DocumentPreparationModule } from './feature-modules/document-preparation/document-preparation.module';
 import { WrittingAssistantModule } from './feature-modules/writting-assistant/writting-assistant.module';
 import { ProjectRealizationModule } from './feature-modules/project-realization/project-realization.module';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [AppComponent],
@@ -22,6 +23,7 @@ import { ProjectRealizationModule } from './feature-modules/project-realization/
     LayoutModule,
     BrowserAnimationsModule,
     MaterialModule,
+    MatIconModule,
     AuthModule,
     HttpClientModule,
     DocumentManagementModule,

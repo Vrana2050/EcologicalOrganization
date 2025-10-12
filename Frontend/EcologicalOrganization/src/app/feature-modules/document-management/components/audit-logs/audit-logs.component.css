@@ -1,0 +1,439 @@
+/*
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 25px 35px;
+  position: relative;
+  width: 360px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.25);
+  animation: fadeIn 0.25s ease-in-out;
+}
+*/
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 24px;
+  border-radius: 16px;
+  width: 360px;
+  position: relative;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.close-btn {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  border: none;
+  background: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.picker-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.generate-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.generate-btn:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 3px solid #fff;
+  border-top-color: #007bff;
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.button-row {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.view-btn {
+  background-color: #28a745;
+  color: white;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.close-btn-secondary {
+  background-color: #dc3545;
+  color: white;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  text-align: center;
+}
+
+/* Close button (X) */
+.close-btn {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* Pickers */
+.picker-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.picker-section label {
+  font-weight: 500;
+  margin-top: 5px;
+}
+
+/* Generate button */
+.generate-btn {
+  margin-top: 20px;
+  width: 100%;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+.generate-btn:hover {
+  background-color: #0056b3;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* cela visina ekrana */
+}
+
+.top-bar {
+  height: 10%; /* zauzima 5% visine */
+  background-color: #e6e6e6; /* primer boje */
+  display: flex;
+  align-items: center;
+  padding-left: 20px;
+  margin: -16px;
+}
+
+.search-bar {
+  margin-left: auto;
+  margin-right: 20px;
+}
+
+.main-content {
+  height: 95%; /* ostatak prostora */
+  overflow: auto; /* ako sadržaj pređe visinu */
+}
+
+.section-item.add-meta {
+  display: flex;
+  flex-direction: column; /* stavlja label ispod ikone */
+  align-items: center; /* centriranje horizontalno */
+  cursor: pointer;
+  padding: 10px;
+  transition: background 0.2s;
+}
+
+.section-item.add-meta:hover {
+  background-color: #f0f0f0; /* hover efekat */
+}
+
+.section-item.add-meta .icon {
+  font-size: 24px; /* veličina ikone */
+}
+
+.section-item.add-meta .label {
+  margin-top: 4px; /* razmak između ikone i teksta */
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* backdrop */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+}
+
+/* modal box */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #f9f9f9;
+  width: 400px;
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+}
+
+/* header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1ea1e9;
+  color: white;
+  padding: 10px 15px;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+
+.modal-header h3 {
+  margin: 0;
+}
+
+/* body */
+.modal-body {
+  padding: 20px;
+}
+
+.modal-body input {
+  width: 95%;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* footer */
+.modal-footer {
+  padding: 10px 15px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.create-btn {
+  background: #1ea1e9;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.create-btn:hover {
+  background: #147cb3;
+}
+
+.type-option {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+  margin-left: 20px;
+}
+
+.type-label {
+  margin-bottom: 4px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.type-select {
+  width: 95%;
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.metadata-table {
+  width: 95%;
+  border-collapse: separate; /* bitno za border-radius */
+  border-spacing: 0; /* uklanja razmak između ćelija */
+  margin: 20px 10px;
+  font-size: 14px;
+}
+
+/* Header (prvi red) */
+.metadata-table thead tr th:first-child {
+  border-top-left-radius: 8px;
+}
+
+.metadata-table thead tr th:last-child {
+  border-top-right-radius: 8px;
+}
+
+/* Poslednji red u tbody */
+.metadata-table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 8px;
+}
+
+.metadata-table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 8px;
+}
+
+/* Stil za header i redove */
+.metadata-table th,
+.metadata-table td {
+  text-align: left;
+  padding: 10px;
+}
+
+.metadata-table th {
+  background-color: #d4f0d4; /* svetlo zelena pozadina za header */
+  font-weight: 600;
+}
+
+.metadata-table th:nth-child(1),
+.metadata-table td:nth-child(1) {
+  width: 15%;
+}
+
+.metadata-table th:nth-child(2),
+.metadata-table td:nth-child(2) {
+  width: 20%;
+}
+
+.metadata-table th:nth-child(3),
+.metadata-table td:nth-child(3) {
+  width: 10%;
+}
+
+.metadata-table th:nth-child(4),
+.metadata-table td:nth-child(4) {
+  width: 20%;
+}
+
+.metadata-table th:nth-child(5),
+.metadata-table td:nth-child(5) {
+  width: 30%;
+}
+
+.metadata-table tr.even {
+  background-color: #ffffff;
+}
+
+.metadata-table tr.odd {
+  background-color: #f0fff0;
+}
+
+/* uklanjanje border-a */
+.metadata-table,
+.metadata-table th,
+.metadata-table td {
+  border: none;
+}
+
+.metadata-table thead,
+.metadata-table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.metadata-table tbody {
+  display: block;
+  max-height: 500px; /* koliko visoko hoćeš da tabela bude */
+  overflow-x: auto;
+  min-width: 100%;
+}
+
+.menu-container {
+  position: relative;
+  cursor: pointer;
+}
+
+.menu-dropdown {
+  position: absolute;
+  left: 25px;
+  top: 0px;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 5px;
+  z-index: 10;
+}
+
+.menu-dropdown button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  padding: 3px 5px;
+}
+
+.menu-dropdown button:hover {
+  background-color: #668eb1;
+}

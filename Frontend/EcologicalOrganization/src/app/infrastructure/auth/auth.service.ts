@@ -21,7 +21,14 @@ export interface TokenResponse {
   providedIn: 'root',
 })
 export class AuthService {
-  user$ = new BehaviorSubject<User>({ email: '', id: 0, role: '' });
+  user$ = new BehaviorSubject<User>({
+    email: 'admin@admin.com',
+    id: 3,
+    role: 'MANAGER',
+  });
+
+  // MANAGER   3   admin@admin.com
+  // EMPLOYEE  6   ivan@ivan.com
 
   constructor(
     private http: HttpClient,

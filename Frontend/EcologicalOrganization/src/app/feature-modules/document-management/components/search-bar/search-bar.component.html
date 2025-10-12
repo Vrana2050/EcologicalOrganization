@@ -1,0 +1,17 @@
+<!-- search-bar.component.html -->
+<div style="display: flex; flex-direction: row">
+  <!-- <button class="global-button" title="Global Search">🌍</button> -->
+  <div class="search-bar">
+    <input
+      (input)="onInput($event)"
+      type="text"
+      placeholder="Search docs, tags, etc"
+    />
+    <mat-icon>search</mat-icon>
+  </div>
+  <a
+    class="advanced-search"
+    [routerLink]="['/document-management/advanced-search']"
+    >Advanced Search</a
+  >
+</div>

@@ -1,0 +1,94 @@
+<div class="page-container">
+  <!-- Header sekcija: 5% visine -->
+
+  <div class="top-bar">
+    <div class="section-item add-meta" (click)="openModal()">
+      <span class="icon">📊</span>
+      <!-- ili neki emoji po izboru -->
+      <span class="label">Generate Report</span>
+    </div>
+    <xp-search-bar class="search-bar"></xp-search-bar>
+  </div>
+
+  <!-- Glavni sadržaj: ostatak -->
+  <div class="main-content">
+    <h2 style="margin-top: 30px; margin-left: 10px">Audit Logs</h2>
+    <table class="metadata-table">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>User</th>
+          <th>Object Type</th>
+          <th>Object</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let log of auditLogs; let i = index"
+          [class.odd]="i % 2 === 1"
+          [class.even]="i % 2 === 0"
+        >
+          <td>{{ log.created_at }}</td>
+          <td>{{ log.user_email }}</td>
+          <td>{{ log.object_type }}</td>
+          <td>{{ log.object_name }}</td>
+          <td>{{ log.action }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal($event)">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="closeModal()">×</button>
+    <h3>Generate Monthly Report</h3>
+
+    <div class="picker-section">
+      <label for="year">Year:</label>
+      <input
+        type="number"
+        id="year"
+        [(ngModel)]="selectedYear"
+        min="2000"
+        max="2100"
+      />
+
+      <label for="month">Month:</label>
+      <select id="month" [(ngModel)]="selectedMonth">
+        <option *ngFor="let m of months" [value]="m.value">
+          {{ m.label }}
+        </option>
+      </select>
+    </div>
+
+    <button
+      class="generate-btn"
+      (click)="generateReport()"
+      [disabled]="isLoading"
+    >
+      <span *ngIf="!isLoading">Generate</span>
+      <span *ngIf="isLoading" class="spinner"></span>
+    </button>
+  </div>
+</div>
+
+<div
+  class="modal-overlay"
+  *ngIf="showSuccessModal"
+  (click)="showSuccessModal = false"
+>
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="showSuccessModal = false">×</button>
+    <h3>✅ Report Generated Successfully!</h3>
+    <p>Your monthly report has been generated.</p>
+
+    <div class="button-row">
+      <button class="view-btn" (click)="viewGeneratedReport()">View</button>
+      <button class="close-btn-secondary" (click)="showSuccessModal = false">
+        Close
+      </button>
+    </div>
+  </div>
+</div>

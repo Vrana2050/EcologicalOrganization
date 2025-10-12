@@ -1,0 +1,192 @@
+<div class="page-container">
+  <!-- Header sekcija: 5% visine -->
+
+  <div class="top-bar">
+    <div class="section-item add-meta" (click)="openModal()">
+      <span class="icon">➕</span>
+      <!-- ili neki emoji po izboru -->
+      <span class="label">Add Directory</span>
+    </div>
+    <div
+      class="section-item add-meta"
+      [routerLink]="[
+        '/document-management/directory-edit',
+        directoryData?.current_permission?.directory_id
+      ]"
+    >
+      <span class="icon">⚙️</span>
+      <!-- ili neki emoji po izboru -->
+      <span class="label">Modify</span>
+    </div>
+    <div class="section-item add-meta" (click)="openModal()">
+      <span class="icon">⌛</span>
+      <!-- ili neki emoji po izboru -->
+      <span class="label">Retention</span>
+    </div>
+    <div class="section-item add-meta" (click)="openModal()">
+      <span class="icon">🏷️</span>
+      <!-- ili neki emoji po izboru -->
+      <span class="label">Meta</span>
+    </div>
+    <div class="section-item add-meta" (click)="deleteDirectory()">
+      <span class="icon">🗑️</span>
+      <!-- ili neki emoji po izboru -->
+      <span class="label">Delete</span>
+    </div>
+    <button class="upload-button" (click)="toggleUpload()">
+      Upload
+      <span class="arrow">
+        {{ isUploadOpen ? "▲" : "▼" }}
+      </span>
+    </button>
+    <xp-search-bar
+      (searchChange)="onSearch($event)"
+      class="search-bar"
+    ></xp-search-bar>
+  </div>
+
+  <div class="main-content">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-container">
+      <div class="breadcrumb" style="margin-top: 20px; margin-left: 10px">
+        <ng-container *ngFor="let item of directoryData?.path; let last = last">
+          <a
+            *ngIf="!last"
+            [routerLink]="['/document-management/directory', item.id]"
+            class="breadcrumb-link"
+            style="font-size: larger"
+          >
+            {{ item.name }}
+          </a>
+          <span
+            *ngIf="last"
+            class="breadcrumb-current"
+            style="font-size: larger"
+          >
+            {{ item.name }}
+          </span>
+          <span *ngIf="!last" style="font-size: larger"> > </span>
+        </ng-container>
+      </div>
+    </div>
+    <div
+      class="upload-panel-1"
+      *ngIf="isUploadOpen && !isUploading"
+      (click)="fileInput.click()"
+      (dragover)="onDragOver($event)"
+      (drop)="onDrop($event)"
+    >
+      <p>Click or drag document here</p>
+      <input type="file" #fileInput hidden (change)="onFileSelected($event)" />
+    </div>
+    <div class="upload-section" *ngIf="isUploadOpen && isUploading">
+      <!-- Upload panel levo -->
+      <div
+        class="upload-panel"
+        (click)="fileInput.click()"
+        (dragover)="onDragOver($event)"
+        (drop)="onDrop($event)"
+      >
+        <p>Click or drag document here</p>
+        <input
+          type="file"
+          #fileInput
+          hidden
+          (change)="onFileSelected($event)"
+        />
+      </div>
+
+      <!-- Lista fajlova desno -->
+      <div class="upload-list">
+        <div class="upload-item" *ngFor="let upload of uploads">
+          <div class="upload-name">{{ upload.file.name }}</div>
+          <div class="upload-status">
+            <ng-container *ngIf="upload.status === 'Uploading...'">
+              <div class="progress-bar">
+                <div
+                  class="progress-fill"
+                  [style.width.%]="upload.progress"
+                ></div>
+              </div>
+              <span>{{ upload.progress }}%</span>
+            </ng-container>
+            <ng-container *ngIf="upload.status === 'Done'">
+              ✅ Done
+            </ng-container>
+            <ng-container *ngIf="upload.status !== 'Done'">
+              <span style="color: rgb(211, 117, 117)">
+                ❌ {{ upload.status }}
+              </span>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <table class="metadata-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Date Created</th>
+          <th>Last Modified</th>
+          <th>Tags</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let item of filteredItems; let i = index"
+          [class.odd]="i % 2 === 1"
+          [class.even]="i % 2 === 0"
+        >
+          <td
+            style="cursor: pointer"
+            [routerLink]="
+              item.directory_id
+                ? ['/document-management/directory', item.directory_id]
+                : ['/document-management/document', item.document_id]
+            "
+          >
+            {{ item.directory_id ? "📁" : "📄" }} {{ item.name }}
+          </td>
+          <td>{{ item.created_at | date : "short" }}</td>
+          <td>{{ item.last_modified | date : "short" }}</td>
+          <td>
+            <div class="tags">
+              <span *ngFor="let tag of item.tags" class="tag">{{ tag }}</span>
+            </div>
+          </td>
+          <td class="actions-cell">
+            <mat-icon>settings</mat-icon>
+            <mat-icon>share</mat-icon>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="isModalOpen" (click)="closeModal()"></div>
+
+<div class="modal" *ngIf="isModalOpen">
+  <div class="modal-header">
+    <h3>New Directory</h3>
+    <span class="close-btn" (click)="closeModal()">×</span>
+  </div>
+  <div class="modal-body">
+    <input
+      type="text"
+      [(ngModel)]="newDirectoryName"
+      placeholder="Directory Name"
+    />
+    <p
+      style="position: absolute; color: red; margin-left: 5px; margin-top: 2px"
+    >
+      {{ errorMessage }}
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button class="create-btn" (click)="createDirectory()">CREATE</button>
+  </div>
+</div>

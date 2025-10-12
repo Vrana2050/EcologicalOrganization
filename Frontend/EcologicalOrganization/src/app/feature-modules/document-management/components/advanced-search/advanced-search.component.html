@@ -1,0 +1,373 @@
+<div #scrollContainer style="overflow-y: auto; max-height: 100%; height: 100%">
+  <div class="advanced-search-container">
+    <div style="display: flex; flex-direction: row; width: 100%">
+      <div class="sub-containers1">
+        <!-- SEARCH TERM -->
+        <h2>Advanced Search</h2>
+        <div class="section">
+          <label class="section-label">Search Term:</label>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            placeholder="Enter search term..."
+            class="input-field"
+          />
+
+          <div class="radio-group">
+            <label *ngFor="let option of searchTermOptions">
+              <input
+                type="radio"
+                name="searchTermType"
+                [value]="option"
+                [(ngModel)]="selectedSearchTermType"
+              />
+              {{ option }}
+            </label>
+          </div>
+        </div>
+
+        <!-- FOLDER NAME -->
+        <div class="section">
+          <label class="section-label">Folder Name:</label>
+          <input
+            type="text"
+            [(ngModel)]="folderName"
+            placeholder="Enter folder name..."
+            class="input-field"
+          />
+        </div>
+
+        <!-- CREATED DATE RANGE -->
+        <div class="section date-range">
+          <label class="section-label">Created:</label>
+
+          <div class="date-inputs">
+            <label>From:</label>
+            <input type="datetime-local" [(ngModel)]="createdFrom" />
+
+            <label>To:</label>
+            <input type="datetime-local" [(ngModel)]="createdTo" />
+          </div>
+        </div>
+
+        <!-- CREATOR -->
+        <div class="section">
+          <label class="section-label">Creator (email):</label>
+          <input
+            type="email"
+            [(ngModel)]="creatorEmail"
+            placeholder="Enter creator email..."
+            class="input-field"
+          />
+        </div>
+
+        <!-- TAGS -->
+        <div class="section">
+          <label class="section-label">Tags:</label>
+
+          <div class="tags-input">
+            <div class="tags-container" (click)="tagInputField.focus()">
+              <span class="tag" *ngFor="let tag of selectedTags">
+                <span
+                  class="tag-text"
+                  [attr.data-description]="tag.description"
+                >
+                  {{ tag.name }}
+                </span>
+                <button style="color: white" (click)="removeTag(tag)">×</button>
+              </span>
+
+              <input
+                #tagInputField
+                type="text"
+                [(ngModel)]="tagInput"
+                (keydown)="handleKeyDown($event)"
+                (keydown.backspace)="handleBackspace($event)"
+                (input)="filterTags()"
+                [placeholder]="selectedTags.length === 0 ? 'Add tags...' : ''"
+              />
+            </div>
+
+            <ul class="suggestions" [class.visible]="filteredTags.length > 0">
+              <li
+                #suggestionItem
+                *ngFor="let suggestion of filteredTags; let i = index"
+                [class.selected]="i === selectedSuggestionIndex"
+                (mousedown)="selectSuggestion(suggestion)"
+              >
+                {{ suggestion.name }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-containers">
+        <!-- CUSTOM METADATA -->
+        <h2 class="custom-metadata-title">Custom Metadata</h2>
+
+        <div
+          class="metadata-item"
+          *ngFor="let meta of selectedMetadata; let i = index"
+        >
+          <span
+            class="tag-text"
+            [attr.data-description]="meta.custom_metadata.description"
+          >
+            {{ meta.custom_metadata.name }}
+          </span>
+
+          <!-- dropdown operator -->
+          <select [(ngModel)]="meta.operator" class="operator-select">
+            <option
+              *ngFor="
+                let op of getOperators(meta.custom_metadata.metadata_type)
+              "
+              [value]="op"
+            >
+              {{ op }}
+            </option>
+          </select>
+
+          <!-- vrednost (skriva se ako je exists / does not exist) -->
+          <ng-container
+            *ngIf="!['exists', 'does not exist'].includes(meta.operator)"
+          >
+            <input
+              *ngIf="meta.custom_metadata.metadata_type === 'String'"
+              type="text"
+              [(ngModel)]="meta.value"
+            />
+
+            <input
+              *ngIf="meta.custom_metadata.metadata_type === 'Boolean'"
+              type="checkbox"
+              [(ngModel)]="meta.value"
+            />
+
+            <input
+              *ngIf="meta.custom_metadata.metadata_type === 'Date'"
+              type="date"
+              [(ngModel)]="meta.value"
+            />
+
+            <input
+              *ngIf="meta.custom_metadata.metadata_type === 'Datetime'"
+              type="datetime-local"
+              [(ngModel)]="meta.value"
+            />
+
+            <input
+              *ngIf="meta.custom_metadata.metadata_type === 'Time'"
+              type="time"
+              step="1"
+              [(ngModel)]="meta.value"
+            />
+
+            <input
+              *ngIf="meta.custom_metadata.metadata_type === 'Integer'"
+              type="number"
+              step="1"
+              [(ngModel)]="meta.value"
+            />
+
+            <input
+              *ngIf="meta.custom_metadata.metadata_type === 'Decimal'"
+              type="number"
+              step="0.01"
+              [(ngModel)]="meta.value"
+            />
+          </ng-container>
+
+          <mat-icon style="cursor: pointer" (click)="removeMetadata(i)"
+            >delete</mat-icon
+          >
+        </div>
+
+        <!-- DODAVANJE NOVIH METADATA -->
+        <div class="metadata-add">
+          <select [(ngModel)]="selectedMetadataId">
+            <option [ngValue]="null">-- Add metadata --</option>
+            <option
+              *ngFor="let meta of allMetadata"
+              [ngValue]="meta.id"
+              [disabled]="isMetadataDisabled(meta.id)"
+            >
+              {{ meta.name }}
+            </option>
+          </select>
+          <button
+            [disabled]="!selectedMetadataId"
+            class="metadata-add-button"
+            (click)="addMetadata()"
+          >
+            Add
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- SEARCH BUTTON -->
+    <div class="search-btn-container">
+      <div
+        class="btn-left"
+        *ngIf="hasSearched && allItems && allItems.length > 0"
+      >
+        <button class="generate-button" (click)="openModal()">
+          Generate PDF
+        </button>
+      </div>
+      <div class="btn-right">
+        <button class="search-button" (click)="performSearch()">Search</button>
+      </div>
+    </div>
+  </div>
+
+  <h1 style="margin: 20px 0 0 15px">Search results:</h1>
+  <h2
+    style="margin: 20px 0 0 10px"
+    *ngIf="hasSearched && allItems && allItems.length === 0"
+  >
+    No results
+  </h2>
+
+  <div
+    *ngIf="allItems && allItems.length > 0"
+    style="padding: 0rem 0rem 0rem 0rem"
+  >
+    <div style="min-height: 500px">
+      <table class="metadata-table">
+        <thead>
+          <tr>
+            <th
+              *ngFor="let col of displayedColumns"
+              [style.width]="getColumnWidth(col)"
+            >
+              {{ col }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let item of allItems; let i = index"
+            [class.odd]="i % 2 === 1"
+            [class.even]="i % 2 === 0"
+          >
+            <ng-container *ngFor="let col of displayedColumns">
+              <!-- 📁 Name -->
+              <td *ngIf="col === 'Name'" [style.width]="getColumnWidth(col)">
+                <span
+                  style="cursor: pointer"
+                  [routerLink]="
+                    item.directory_id
+                      ? ['/document-management/directory', item.directory_id]
+                      : ['/document-management/document', item.document_id]
+                  "
+                >
+                  {{ item.directory_id ? "📁" : "📄" }}
+                  <span [innerHTML]="item.name"></span>
+                </span>
+              </td>
+
+              <!-- 🕓 Date Created -->
+              <td
+                *ngIf="col === 'Date Created'"
+                [style.width]="getColumnWidth(col)"
+              >
+                {{ item.created_at | date : "short" }}
+              </td>
+
+              <!-- 🏷️ Tags -->
+              <td *ngIf="col === 'Tags'" [style.width]="getColumnWidth(col)">
+                <div class="tags">
+                  <span *ngFor="let tag of item.tags" class="tag">{{
+                    tag
+                  }}</span>
+                </div>
+              </td>
+
+              <!-- 🧠 Custom Metadata vrednosti -->
+              <td
+                *ngIf="hasMetadataColumn(col)"
+                [style.width]="getColumnWidth(col)"
+                [style.color]="getMetadataValueColor(item, col)"
+              >
+                {{ getMetadataValue(item, col) }}
+              </td>
+
+              <td *ngIf="col === 'Summary'" [style.width]="getColumnWidth(col)">
+                <span
+                  [innerHTML]="item.summary ? item.summary + '...' : '-'"
+                ></span>
+              </td>
+
+              <!-- 🔢 Score -->
+              <td *ngIf="col === 'Score'" [style.width]="getColumnWidth(col)">
+                {{ item.score | number : "1.2-2" }}
+              </td>
+
+              <!-- ⚙️ Actions -->
+              <td
+                *ngIf="col === 'Actions'"
+                class="actions-cell"
+                [style.width]="getColumnWidth(col)"
+              >
+                <mat-icon>settings</mat-icon>
+                <mat-icon>share</mat-icon>
+              </td>
+            </ng-container>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination" *ngIf="allItems && allItems.length < totalCount">
+      <button (click)="prevPage()" [disabled]="currentPage === 1">
+        <mat-icon>navigate_before</mat-icon> Prev
+      </button>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+      <button (click)="nextPage()" [disabled]="currentPage === totalPages">
+        Next <mat-icon>navigate_next</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay -->
+<div class="modal-overlay" *ngIf="isModalOpen">
+  <div class="modal">
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>Generate Search Report</h2>
+      <span class="close-button" (click)="closeModal()">×</span>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="reportTitle">Report Title</label>
+        <input
+          id="reportTitle"
+          type="text"
+          [(ngModel)]="reportTitle"
+          placeholder="Enter report title..."
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="topN">Consider top N results</label>
+        <input
+          id="topN"
+          type="number"
+          min="1"
+          [(ngModel)]="topN"
+          placeholder="e.g. 10"
+        />
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="cancel-btn" (click)="closeModal()">Cancel</button>
+      <button class="generate-btn" (click)="generateReport()">Generate</button>
+    </div>
+  </div>
+</div>
