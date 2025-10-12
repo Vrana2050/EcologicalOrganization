@@ -163,20 +163,20 @@ public class InfluxDBConnectionClass {
 
         // 🔹 Flux upit
         String flux = String.format("""
-            from(bucket: "iis_bucket")
-              |> range(start: %s, stop: %s)
-              |> filter(fn: (r) => r._measurement == "statuses")
-              |> filter(fn: (r) => r._field == "novoStanjeId")
-              |> filter(fn: (r) => %s)
-              |> filter(fn: (r) => r._value != -1)
-              |> sort(columns: ["_time"])
-              |> elapsed(unit: 1s)
-              |> filter(fn: (r) => exists r.elapsed)
-              |> group(columns: ["_value"], mode: "by")
-              |> mean(column: "elapsed")
-              |> rename(columns: {_value: "statusId", elapsed: "avg_duration_seconds"})
-              |> yield(name: "avg_duration_per_status")
-            """, start, stop, idFilter);
+    from(bucket: "iis_bucket")
+      |> range(start: %s, stop: %s)
+      |> filter(fn: (r) => r._measurement == "statuses")
+      |> filter(fn: (r) => %s)
+      |> pivot(rowKey:["_time"], columnKey:["_field"], valueColumn:"_value")
+      |> sort(columns: ["_time"])
+      |> elapsed(unit: 1s)
+      |> filter(fn: (r) => exists r.elapsed)
+      |> filter(fn: (r) => r.novoStanjeId != -1)
+      |> group(columns: ["prethodnoStanjeId"], mode: "by")
+      |> mean(column: "elapsed")
+      |> rename(columns: {prethodnoStanjeId: "statusId", elapsed: "avg_duration_seconds"})
+      |> yield(name: "avg_duration_per_status")
+    """, start, stop, idFilter);
 
         // 🧩 Query execution
         QueryApi queryApi = influxDBClient.getQueryApi();
@@ -225,15 +225,19 @@ public class InfluxDBConnectionClass {
     from(bucket: "iis_bucket")
       |> range(start: %s, stop: %s)
       |> filter(fn: (r) => r._measurement == "statuses")
-      |> filter(fn: (r) => r._field == "novoStanjeId")
       |> filter(fn: (r) => r.projekatId == "%s")
+      |> pivot(rowKey:["_time"], columnKey:["_field"], valueColumn:"_value")
       |> sort(columns: ["_time"])
       |> elapsed(unit: 1s)
       |> filter(fn: (r) => exists r.elapsed)
-      |> filter(fn: (r) => r._value == %d and r._value != -1)
-      |> group()
+      |> filter(fn: (r) => r.prethodnoStanjeId == %d and r.novoStanjeId != -1)
+      |> group(columns: ["projekatId", "prethodnoStanjeId"])
       |> sum(column: "elapsed")
-      |> rename(columns: {elapsed: "total_duration_seconds"})
+      |> map(fn: (r) => ({
+            projekatId: r.projekatId,
+            statusId: r.prethodnoStanjeId,
+            total_duration_seconds: r.elapsed
+         }))
       |> yield(name: "total_duration_for_status")
     """, start, stop, projekatId, statusId);
 
@@ -369,17 +373,16 @@ public class InfluxDBConnectionClass {
 
         // 🔹 Flux upit — ograničen na jednog korisnika
         String flux = String.format("""
-        from(bucket: "iis_bucket")
-          |> range(start: %s, stop: %s)
-          |> filter(fn: (r) => r._measurement == "statuses")
-          |> filter(fn: (r) => r._field == "novoStanjeId")
-          |> filter(fn: (r) => r.korisnikId == "%s")
-          |> group(columns: ["korisnikId", "dokumentId"])
-          |> distinct(column: "dokumentId")
-          |> group(columns: ["korisnikId"])
-          |> keep(columns: ["korisnikId", "dokumentId"])
-          |> sort(columns: ["dokumentId"])
-        """, start, stop, korisnikId);
+    from(bucket: "iis_bucket")
+      |> range(start: %s, stop: %s)
+      |> filter(fn: (r) => r._measurement == "statuses")
+      |> filter(fn: (r) => r.korisnikId == "%s")
+      |> group(columns: ["korisnikId", "dokumentId"])
+      |> distinct(column: "dokumentId")
+      |> keep(columns: ["korisnikId", "dokumentId"])
+      |> sort(columns: ["dokumentId"])
+      |> yield(name: "user_documents")
+    """, start, stop, korisnikId);
 
         QueryApi queryApi = influxDBClient.getQueryApi();
         List<FluxTable> tables = queryApi.query(flux);
@@ -420,22 +423,22 @@ public class InfluxDBConnectionClass {
         from(bucket: "iis_bucket")
           |> range(start: %s, stop: %s)
           |> filter(fn: (r) => r._measurement == "statuses")
-          |> filter(fn: (r) => r._field == "novoStanjeId")
           |> filter(fn: (r) => r.korisnikId == "%s")
           |> filter(fn: (r) => r.dokumentId == "%s")
-          |> filter(fn: (r) => r._value == %d)
+          |> pivot(rowKey:["_time"], columnKey:["_field"], valueColumn:"_value")
           |> sort(columns: ["_time"])
           |> elapsed(unit: 1s)
           |> filter(fn: (r) => exists r.elapsed)
-          |> group(columns: ["korisnikId", "dokumentId", "_value"])
-          |> sum(column: "elapsed")
-          |> map(fn: (r) => ({ 
+          |> filter(fn: (r) => r.prethodnoStanjeId == %d)
+          |> map(fn: (r) => ({
                 korisnikId: r.korisnikId,
                 dokumentId: r.dokumentId,
-                statusId: r._value,
+                statusId: r.prethodnoStanjeId,
                 days_spent: float(v: r.elapsed) / 86400.0
-              }))
-          |> yield(name: "days_spent_on_doc_status")
+             }))
+          |> group(columns: ["korisnikId", "dokumentId", "statusId"])
+          |> sum(column: "days_spent")
+          |> yield(name: "days_spent_for_status")
         """, start, stop, korisnikId, dokumentId, statusId);
 
         // 📊 Izvrši upit

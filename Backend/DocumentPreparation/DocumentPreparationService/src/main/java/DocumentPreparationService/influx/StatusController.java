@@ -53,7 +53,7 @@ public class StatusController {
         return ResponseEntity.ok(statusService.getNumberOfStatusChangesByUser(korisnikId,projekatId,dateRangeDto));
     }
     @PostMapping("/user/documents")
-    public ResponseEntity<UserDocuments> getAllDocumentsByUser(@RequestParam String korisnikId,@RequestParam String projekatId,@RequestBody DateRangeDto dateRangeDto) {
+    public ResponseEntity<UserDocuments> getAllDocumentsByUser(@RequestParam String korisnikId,@RequestBody DateRangeDto dateRangeDto) {
         return ResponseEntity.ok(statusService.getAllDocumentsByUser(korisnikId,dateRangeDto));
     }
     @PostMapping("/user/status/duration")
