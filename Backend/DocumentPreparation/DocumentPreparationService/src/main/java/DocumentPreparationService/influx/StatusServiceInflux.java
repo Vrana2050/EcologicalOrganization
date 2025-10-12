@@ -79,4 +79,17 @@ public class StatusServiceInflux {
         return reportDto;
 
     }
+
+    public UserChangesDto getNumberOfStatusChangesByUser(String korisnikId, String projekatId, DateRangeDto dateRangeDto) {
+        return repository.getNumberOfStatusChangesByUser(korisnikId,projekatId,dateRangeDto);
+    }
+
+    public UserDocuments getAllDocumentsByUser(String korisnikId, DateRangeDto dateRangeDto) {
+        return repository.getAllDocumentsByUser(korisnikId,dateRangeDto);
+
+    }
+
+    public UserStatusDurationDto getStatusDuration(String korisnikId, String dokumentId,Long statusId, DateRangeDto dateRangeDto) {
+        return repository.getStatusDuration(korisnikId,dokumentId,statusId,dateRangeDto);
+    }
 }

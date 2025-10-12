@@ -14,6 +14,8 @@ import { DocumentPreparationDocumentAnalysisComponent } from 'src/app/feature-mo
 import { DocumentPreparationProjectAnalysisComponent } from 'src/app/feature-modules/document-preparation/project/analysis/analysis.component';
 import { DocumentPreparationReviewComponent } from 'src/app/feature-modules/document-preparation/document/review/review.component';
 import { DocumentPreparationProjectCreateComponent } from 'src/app/feature-modules/document-preparation/project/create/project-create.component';
+
+import { NaisComponent } from 'src/app/feature-modules/document-preparation/nais/nais.component';
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'login', component: LoginComponent },
@@ -37,6 +39,9 @@ const routes: Routes = [
       { path: 'analysis/project/:id',component:DocumentPreparationProjectAnalysisComponent },
       { path: 'create/project', component: DocumentPreparationProjectCreateComponent },
       { path: 'edit/project/:id', component: DocumentPreparationProjectCreateComponent },
+      {
+         path: 'nais/:id',component: NaisComponent,
+      }
     ]
   },
   ];

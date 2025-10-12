@@ -48,4 +48,16 @@ public class StatusController {
     public ResponseEntity<ReportDto> getAll(@RequestParam() String projekatId, @RequestBody DateRangeDto dateRangeDto) {
         return ResponseEntity.ok(statusService.getReport(projekatId,dateRangeDto));
     }
+    @PostMapping("/user")
+    public ResponseEntity<UserChangesDto> getAllByUser(@RequestParam String korisnikId,@RequestParam String projekatId,@RequestBody DateRangeDto dateRangeDto) {
+        return ResponseEntity.ok(statusService.getNumberOfStatusChangesByUser(korisnikId,projekatId,dateRangeDto));
+    }
+    @PostMapping("/user/documents")
+    public ResponseEntity<UserDocuments> getAllDocumentsByUser(@RequestParam String korisnikId,@RequestParam String projekatId,@RequestBody DateRangeDto dateRangeDto) {
+        return ResponseEntity.ok(statusService.getAllDocumentsByUser(korisnikId,dateRangeDto));
+    }
+    @PostMapping("/user/status/duration")
+    public ResponseEntity<UserStatusDurationDto> getStatusDuration(@RequestParam String korisnikId,@RequestParam Long statusId, @RequestParam String dokumentId,@RequestBody DateRangeDto dateRangeDto) {
+        return ResponseEntity.ok(statusService.getStatusDuration(korisnikId,dokumentId,statusId,dateRangeDto));
+    }
 }

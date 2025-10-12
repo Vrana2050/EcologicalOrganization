@@ -18,57 +18,64 @@ public class SeederService {
     private final Random random = new Random();
 
 
-    public void seedStatuses(int count) {
+    public void seedStatuses(int brojDokumenata) {
         List<StatusLog> logs = new ArrayList<>();
         Instant now = Instant.now();
         Random random = new Random();
 
-        // simulacija više projekata
+        // više projekata
         String[] projectIds = {"1001", "1002", "1003"};
 
-        // definisani statusi u workflowu (npr. 1000–1005)
-        List<Long> possibleStatuses = List.of(1000L, 1001L, 1002L, 1003L, 1004L, 1005L);
+        // definisan workflow (od početka do kraja)
+        List<Long> workflowStatuses = List.of(1000L, 1001L, 1002L, 1003L, 1004L, 1005L, -1L);
 
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < brojDokumenata; i++) {
+
+            // svaki dokument pripada tačno jednom projektu
             String projekatId = projectIds[random.nextInt(projectIds.length)];
-            String dokumentId = String.valueOf(2000 + random.nextInt(100));
+            String dokumentId = String.valueOf(2000 + i);
 
-            // broj promena statusa za ovaj dokument
-            int transitions = 1 + random.nextInt(6); // 2–7 promena
-            long currentStatus = possibleStatuses.get(random.nextInt(possibleStatuses.size()));
+            // koliko će koraka preći (uvek barem 3 statusa)
+            int maxTransitions = 3 + random.nextInt(workflowStatuses.size() - 2);
 
-            for (int t = 0; t < transitions; t++) {
-                // vreme unazad po slučajnom intervalu
-                Instant datum = now
-                        .minus(random.nextInt(30), ChronoUnit.DAYS)
-                        .minus(random.nextInt(24), ChronoUnit.HOURS)
-                        .minus(random.nextInt(60), ChronoUnit.MINUTES);
+            // početak workflowa
+            Instant vreme = now.minus(random.nextInt(30), ChronoUnit.DAYS);
 
-                long prethodnoStanje = currentStatus;
+            for (int s = 0; s < maxTransitions; s++) {
+                String korisnikId = String.valueOf(2001 + random.nextInt(50));
 
-                // ponekad ide napred, ponekad nazad
-                int nextIndex = Math.min(possibleStatuses.indexOf(prethodnoStanje) + 1, possibleStatuses.size() - 1);
-                currentStatus = possibleStatuses.get(nextIndex);
+                Long prethodnoStanje = workflowStatuses.get(s);
+                Long novoStanje = workflowStatuses.get(s + 1);
 
-                // mali broj dokumenata stigne u finalno stanje
-                Double r = random.nextDouble(10);
-                if (r < 1) {
-                    System.out.println("-1");
-                    logs.add(new StatusLog(datum, dokumentId, projekatId, prethodnoStanje, -1L));
-                    break; // prestani da praviš dalje logove za ovaj dokument
-                } else {
-                    logs.add(new StatusLog(datum, dokumentId, projekatId, prethodnoStanje, currentStatus));
-                }
+                // povećaj vreme za 1–3 dana
+                vreme = vreme.plus(random.nextInt(3) + 1, ChronoUnit.DAYS)
+                        .plus(random.nextInt(12), ChronoUnit.HOURS);
+
+                // dodaj log
+                logs.add(new StatusLog(
+                        vreme,
+                        dokumentId,
+                        projekatId,
+                        prethodnoStanje,
+                        novoStanje,
+                        korisnikId
+                ));
+
+                // ako smo došli do završnog statusa (-1), prekini
+                if (novoStanje == -1L)
+                    break;
             }
         }
 
-        // opcionalno sortiraj po datumu radi realističnijeg izgleda
+        // ovde pozoveš servis za upis u Influx ili repozitorijum
+        logs.forEach(l -> System.out.println(l));
+
+    // opcionalno sortiraj po datumu radi realističnijeg izgleda
         logs.sort(Comparator.comparing(StatusLog::getDatum));
 
         logs.forEach(repository::save);
 
-        System.out.println("✅ Generated " + logs.size() + " status logs for " +
-                count + " random document transitions.");
+        System.out.println("✅ Generated " + logs.size() );
     }
 
 }

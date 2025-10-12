@@ -1,0 +1,38 @@
+<div style="width:80%; margin:auto; text-align:center; margin-bottom:20px;">
+<form [formGroup]="dateRangeForm" (ngSubmit)="onSubmit()" style="text-align:center; margin:20px auto;">
+  <label for="startDate">Od datuma:</label>
+  <input
+    class="due-date-input"
+    type="date"
+    id="startDate"
+    formControlName="startDate"
+  />
+
+  <label for="endDate" style="margin-left:10px;">Do datuma:</label>
+  <input
+    class="due-date-input"
+    type="date"
+    id="endDate"
+    formControlName="endDate"
+  />
+
+  <button type="submit" style="margin-left:20px;">🔄 Prikaži izveštaj</button>
+</form>
+
+<!-- 📊 Grafikon -->
+<div style="display:block; width:80%; margin:auto;" *ngIf="barChartData">
+  <canvas baseChart
+    [data]="barChartData"
+    [options]="barChartOptions"
+    [type]="barChartType">
+  </canvas>
+
+  <div *ngIf="maxStatusInfo" class="max-status-info"
+       style="text-align:center; margin-top:16px; font-size:16px;">
+    <strong>Status {{ maxStatusInfo.statusId }}</strong>
+    je imao najveće ukupno trajanje:
+    <span style="color:#FF5252; font-weight:600;">
+      {{ (maxStatusInfo.timeSpent / 86400) | number:'1.2-2' }} dana
+    </span>
+  </div>
+</div>

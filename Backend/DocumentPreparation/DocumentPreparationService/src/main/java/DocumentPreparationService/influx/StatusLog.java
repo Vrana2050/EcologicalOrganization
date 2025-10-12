@@ -28,13 +28,16 @@ public class StatusLog {
     private Long prethodnoStanjeId;
     @Column
     private Long novoStanjeId;
+    @Column(tag = true)
+    private String korisnikId;
 
-    public StatusLog(Instant datum,String dokumentId,String projekatId,Long prethodnoStanjeId,Long novoStanjeId) {
+    public StatusLog(Instant datum,String dokumentId,String projekatId,Long prethodnoStanjeId,Long novoStanjeId,String korisnikId) {
         this.dokumentId = dokumentId;
         this.projekatId = projekatId;
         this.prethodnoStanjeId = prethodnoStanjeId;
         this.novoStanjeId = novoStanjeId;
         this.datum = datum;
+        this.korisnikId = korisnikId;
     }
     public StatusLog() {}
 }

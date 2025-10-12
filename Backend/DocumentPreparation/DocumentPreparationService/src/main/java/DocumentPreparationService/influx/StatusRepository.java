@@ -65,4 +65,25 @@ public class StatusRepository {
         influxDBClient.close();
         return finishedDocumentIds;
     }
+
+    public UserChangesDto getNumberOfStatusChangesByUser(String korisnikId, String projekatId, DateRangeDto dateRangeDto) {
+        InfluxDBClient influxDBClient = inConn.buildConnection();
+        UserChangesDto userChanges = inConn.getNumberOfStatusChangesByUser(influxDBClient,korisnikId,projekatId,dateRangeDto);
+        influxDBClient.close();
+        return userChanges;
+    }
+
+    public UserDocuments getAllDocumentsByUser(String korisnikId, DateRangeDto dateRangeDto) {
+        InfluxDBClient influxDBClient = inConn.buildConnection();
+        UserDocuments userDocuments = inConn.getAllDocumentsByUser(influxDBClient,korisnikId,dateRangeDto);
+        influxDBClient.close();
+        return userDocuments;
+    }
+
+    public UserStatusDurationDto getStatusDuration(String korisnikId, String dokumentId,Long statusId, DateRangeDto dateRangeDto) {
+        InfluxDBClient influxDBClient = inConn.buildConnection();
+        UserStatusDurationDto statusDuration = inConn.getStatusDuration(influxDBClient,korisnikId,dokumentId,statusId,dateRangeDto);
+        influxDBClient.close();
+        return statusDuration;
+    }
 }

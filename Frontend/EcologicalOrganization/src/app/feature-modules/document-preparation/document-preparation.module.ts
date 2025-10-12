@@ -28,6 +28,12 @@ import { DocumentPreparationWorkflowGraphComponent } from './shared/workflow-gra
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ProjectNotificationInterceptor } from './interceptor/notification-interceptor';
 import { DeletePopupComponent } from './shared/delete-popup/delete-popup.component';
+import { NaisComponent } from './nais/nais.component';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatButtonModule } from '@angular/material/button';
 
 
 
@@ -58,8 +64,14 @@ import { DeletePopupComponent } from './shared/delete-popup/delete-popup.compone
     DocumentPreparationExistingWorkflowWindowComponent,
     DocumentPreparationWorkflowGraphComponent,
     DeletePopupComponent,
+    NaisComponent,
   ],
   imports: [
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatNativeDateModule,
+    MatButtonModule,
     CommonModule,
     AppRoutingModule,
     NgChartsModule,
