@@ -36,7 +36,7 @@ class CustomMetadatas(Base):
     description: Mapped[Optional[str]] = mapped_column(VARCHAR(500))
 
     custom_metadata_rules: Mapped[list['CustomMetadataRules']] = relationship('CustomMetadataRules', back_populates='custom_metadata')
-    custom_metadata_values: Mapped[list['CustomMetadataValues']] = relationship('CustomMetadataValues', back_populates='custom_metadata')
+    custom_metadata_values: Mapped[list['CustomMetadataValues']] = relationship('CustomMetadataValues', back_populates='custom_metadata', passive_deletes=True)
 
 
 class PermissionValues(Base):
@@ -81,7 +81,7 @@ class Tags(Base):
     name: Mapped[str] = mapped_column(VARCHAR(255), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(VARCHAR(500))
 
-    tag_assignments: Mapped[list['TagAssignments']] = relationship('TagAssignments', back_populates='tag')
+    tag_assignments: Mapped[list['TagAssignments']] = relationship('TagAssignments', back_populates='tag', passive_deletes=True)
 
 
 class UserGroups(Base):
@@ -96,7 +96,7 @@ class UserGroups(Base):
     description: Mapped[Optional[str]] = mapped_column(VARCHAR(500))
 
     group_members: Mapped[list['GroupMembers']] = relationship('GroupMembers', back_populates='group')
-    permissions: Mapped[list['Permissions']] = relationship('Permissions', back_populates='group')
+    permissions: Mapped[list['Permissions']] = relationship('Permissions', back_populates='group', passive_deletes=True)
 
 
 class Directories(Base):
@@ -118,13 +118,13 @@ class Directories(Base):
     retention_id: Mapped[Optional[int]] = mapped_column(Integer)
 
     parent_directory: Mapped[Optional['Directories']] = relationship('Directories', remote_side=[id], back_populates='parent_directory_reverse')
-    parent_directory_reverse: Mapped[list['Directories']] = relationship('Directories', remote_side=[parent_directory_id], back_populates='parent_directory')
+    parent_directory_reverse: Mapped[list['Directories']] = relationship('Directories', remote_side=[parent_directory_id], back_populates='parent_directory', passive_deletes=True)
     retention: Mapped[Optional['Retentions']] = relationship('Retentions', back_populates='directories')
     custom_metadata_rules: Mapped[list['CustomMetadataRules']] = relationship('CustomMetadataRules', back_populates='directory')
-    documents: Mapped[list['Documents']] = relationship('Documents', back_populates='parent_directory')
-    custom_metadata_values: Mapped[list['CustomMetadataValues']] = relationship('CustomMetadataValues', back_populates='directory')
-    permissions: Mapped[list['Permissions']] = relationship('Permissions', back_populates='directory')
-    tag_assignments: Mapped[list['TagAssignments']] = relationship('TagAssignments', back_populates='directory')
+    documents: Mapped[list['Documents']] = relationship('Documents', back_populates='parent_directory', passive_deletes=True)
+    custom_metadata_values: Mapped[list['CustomMetadataValues']] = relationship('CustomMetadataValues', back_populates='directory', passive_deletes=True)
+    permissions: Mapped[list['Permissions']] = relationship('Permissions', back_populates='directory', passive_deletes=True)
+    tag_assignments: Mapped[list['TagAssignments']] = relationship('TagAssignments', back_populates='directory', passive_deletes=True)
 
 
 class GroupMembers(Base):
@@ -183,10 +183,10 @@ class Documents(Base):
 
     parent_directory: Mapped['Directories'] = relationship('Directories', back_populates='documents')
     retention: Mapped[Optional['Retentions']] = relationship('Retentions', back_populates='documents')
-    custom_metadata_values: Mapped[list['CustomMetadataValues']] = relationship('CustomMetadataValues', back_populates='document')
-    document_files: Mapped[list['DocumentFiles']] = relationship('DocumentFiles', back_populates='document')
-    permissions: Mapped[list['Permissions']] = relationship('Permissions', back_populates='document')
-    tag_assignments: Mapped[list['TagAssignments']] = relationship('TagAssignments', back_populates='document')
+    custom_metadata_values: Mapped[list['CustomMetadataValues']] = relationship('CustomMetadataValues', back_populates='document',  passive_deletes=True)
+    document_files: Mapped[list['DocumentFiles']] = relationship('DocumentFiles', back_populates='document',  passive_deletes=True)
+    permissions: Mapped[list['Permissions']] = relationship('Permissions', back_populates='document',  passive_deletes=True)
+    tag_assignments: Mapped[list['TagAssignments']] = relationship('TagAssignments', back_populates='document',  passive_deletes=True)
 
 
 class CustomMetadataValues(Base):
@@ -289,4 +289,4 @@ class TagAssignments(Base):
 
     directory: Mapped[Optional['Directories']] = relationship('Directories', back_populates='tag_assignments')
     document: Mapped[Optional['Documents']] = relationship('Documents', back_populates='tag_assignments')
-    tag: Mapped['Tags'] = relationship('Tags', back_populates='tag_assignments')
+    tag: Mapped['Tags'] = relationship('Tags', back_populates='tag_assignments', passive_deletes=True)

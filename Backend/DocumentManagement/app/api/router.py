@@ -5,6 +5,7 @@ from .routes.documents.document import router as document_router
 from .routes.documents.tags import router as tags_router
 from .routes.documents.metadata import router as metadata_router
 from .routes.documents.permissions import router as permission_router
+from .routes.documents.search import router as search_router
 
 router = APIRouter()
 
@@ -14,3 +15,4 @@ router.include_router(document_router, prefix="/document")
 router.include_router(tags_router, prefix="/tag")
 router.include_router(metadata_router, prefix="/metadata")
 router.include_router(permission_router, prefix="/permission")
+router.include_router(search_router, prefix="/search")

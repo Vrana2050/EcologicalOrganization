@@ -16,11 +16,12 @@ from app.infra.mappers.metadata import (
 
 from app.core.exceptions import http_401, http_404, http_400
 from app.use_cases.metadata import MetadataService
+from app.use_cases.elastic_search_client import maintenance as es_maintenance_service
 
 router = APIRouter(tags=["Metadata"])
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("", status_code=status.HTTP_201_CREATED)
 async def create(new_metadata: CreateMetadataDTO,
                  user=Depends(get_user_headers),
                  service: MetadataService = Depends(get_metadata_service)):
@@ -33,12 +34,12 @@ async def create(new_metadata: CreateMetadataDTO,
     service.create_metadata(create_metadata_dto_to_domain(new_metadata))
 
 
-@router.get("/", response_model=List[MetadataDTO])
+@router.get("", response_model=List[MetadataDTO])
 async def get_all(user=Depends(get_user_headers),
                   service: MetadataService = Depends(get_metadata_service)):
 
-    if user.role not in ["MANAGER"]:
-        raise http_401("Not authorized to view metadata")
+    # if user.role not in ["MANAGER"]:
+    #     raise http_401("Not authorized to view metadata")
 
     metadata = service.get_all_metadata()
     return [metadata_domain_to_dto(m) for m in metadata] if metadata else []
@@ -59,7 +60,7 @@ async def get_by_id(metadata_id: int,
     return metadata_domain_to_dto(metadata)
 
 
-@router.put("/", response_model=MetadataDTO)
+@router.put("", status_code=status.HTTP_200_OK)
 async def update(metadata: MetadataDTO,
                  user=Depends(get_user_headers),
                  service: MetadataService = Depends(get_metadata_service)):
@@ -71,7 +72,7 @@ async def update(metadata: MetadataDTO,
     if not updated:
         raise http_404("Metadata not found")
 
-    return metadata_domain_to_dto(updated)
+    es_maintenance_service.nullify_metadata(updated.id, updated.metadata_type)
 
 
 @router.delete("/{metadata_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -86,4 +87,4 @@ async def delete(metadata_id: int,
     if not deleted:
         raise http_404("Metadata not found")
 
-    return None
+    es_maintenance_service.delete_metadata(metadata_id)

@@ -5,7 +5,8 @@ from app.domain.permissions import Permission, PermissionValue
 from app.infra.mappers.permissions import permission_to_db, permission_from_db, permission_value_to_db, \
     permission_value_from_db
 from app.infra.tables import Permissions, PermissionValues
-
+from sqlalchemy import text
+from sqlalchemy import or_
 
 class PermissionRepository:
 
@@ -75,10 +76,95 @@ class PermissionRepository:
         return permission_from_db(self.db.query(Permissions).filter(Permissions.document_id == directory_id,
                                                                     Permissions.user_id == user_id).first())
 
-    def get_permission_for_document_and_group(self, group_id, document_id) -> Permission:
-        return permission_from_db(self.db.query(Permissions).filter(Permissions.document_id == document_id,
-                                                                    Permissions.group_id == group_id).first())
+    def get_permission_for_document_and_group(self, group_id, document_id) -> Permission | None:
+        perm =  self.db.query(Permissions).filter(Permissions.document_id == document_id,
+                                                                    Permissions.group_id == group_id).first()
+        if not perm:
+            return None
+        return permission_from_db(perm)
 
+
+    def get_highest_permission_for_directory(self, directory_id, user_id):
+        sql = text("""
+                    WITH ugroups AS (
+                        SELECT gm.group_id
+                        FROM group_members gm
+                        WHERE gm.user_id = :user_id
+                    ),
+                    ranked_permissions AS (
+                        SELECT 
+                            p.directory_id, 
+                            pv.access_type,
+                            CASE pv.access_type
+                                WHEN 'EDITOR'  THEN 3
+                                WHEN 'VIEWER'  THEN 2
+                                WHEN 'PREVIEW' THEN 1
+                            END AS access_rank
+                        FROM permissions p
+                        JOIN permission_values pv ON pv.id = p.permission_value_id
+                        WHERE p.directory_id = :directory_id
+                          AND (
+                                p.user_id = :user_id
+                             OR p.group_id IN (SELECT group_id FROM ugroups)
+                          )
+                    )
+                    SELECT 
+                        rp.directory_id, d.name,
+                        CASE MAX(rp.access_rank)
+                            WHEN 3 THEN 'EDITOR'
+                            WHEN 2 THEN 'VIEWER'
+                            WHEN 1 THEN 'PREVIEW'
+                        END AS access_type
+                    FROM ranked_permissions rp JOIN directories d ON d.id = rp.directory_id
+                    GROUP BY rp.directory_id, d.name
+                   """)
+        result = self.db.execute(sql, {"user_id": user_id, "directory_id": directory_id})
+        return result.mappings().first()
+
+    def has_permission_for_directory(self, directory_id, user_id) -> bool:
+        sql = text("""
+                    WITH ugroups AS (SELECT gm.group_id
+                                     FROM group_members gm
+                                     WHERE gm.user_id = :user_id
+                    )
+                    SELECT id
+                    FROM permissions
+                    WHERE (group_id IN (SELECT group_id FROM ugroups)
+                    OR user_id = :user_id)
+                    AND directory_id = :directory_id
+                   """)
+        result = self.db.execute(sql, {"user_id": user_id, "directory_id": directory_id})
+        return bool(result.first())
+
+    def get_all_user_directory_permissions(self, user_id: int, user_group_ids: list[int]) -> list[int]:
+        dir_ids = (
+            self.db.query(Permissions.directory_id)
+            .filter(
+                or_(
+                    Permissions.user_id == user_id,
+                    Permissions.group_id.in_(user_group_ids)
+                ),
+                Permissions.directory_id.isnot(None)
+            )
+            .distinct()
+            .all()
+        )
+        return [dir_id[0] for dir_id in dir_ids]
+
+    def get_all_user_document_permissions(self, user_id, user_group_ids) -> list[int]:
+        dir_ids = (
+            self.db.query(Permissions.document_id)
+            .filter(
+                or_(
+                    Permissions.user_id == user_id,
+                    Permissions.group_id.in_(user_group_ids)
+                ),
+                Permissions.document_id.isnot(None)
+            )
+            .distinct()
+            .all()
+        )
+        return [dir_id[0] for dir_id in dir_ids]
 
 
 class PermissionValueRepository:
@@ -102,3 +188,4 @@ class PermissionValueRepository:
         self.db.refresh(db_obj)
 
         return permission_value_from_db(db_obj)
+

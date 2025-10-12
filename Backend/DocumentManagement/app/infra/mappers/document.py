@@ -1,7 +1,8 @@
 from app.domain.document import DocumentStatus, RetentionType, Document, DocumentFile
+from app.infra.mappers.metadata import custom_metadata_value_from_db
 from app.infra.mappers.permissions import permission_from_db
+from app.infra.mappers.tags import tag_db_to_domain
 from app.infra.tables import Documents, DocumentFiles
-
 
 def document_from_db(db_document: Documents) -> Document:
     return Document(
@@ -17,8 +18,28 @@ def document_from_db(db_document: Documents) -> Document:
         retention_id=db_document.retention_id,
         retention_expires=db_document.retention_expires,
         document_files=[document_file_from_db(f) for f in db_document.document_files],
-        permissions=[permission_from_db(p) for p in db_document.permissions]
+        permissions=[permission_from_db(p) for p in db_document.permissions],
+        custom_metadata_values=[custom_metadata_value_from_db(mv) for mv in db_document.custom_metadata_values],
+        tags=[tag_db_to_domain(ta.tag) for ta in db_document.tag_assignments]
     )
+
+#
+# def document_from_db(db_document: Documents) -> Document:
+#     return Document(
+#         id=db_document.id,
+#         created_at=db_document.created_at,
+#         creator_id=db_document.creator_id,
+#         name=db_document.name,
+#         last_modified=db_document.last_modified,
+#         parent_directory_id=db_document.parent_directory_id,
+#         active_version=db_document.active_version,
+#         retention_type=RetentionType(db_document.retention_type),
+#         status=DocumentStatus(db_document.status),
+#         retention_id=db_document.retention_id,
+#         retention_expires=db_document.retention_expires,
+#         document_files=[document_file_from_db(f) for f in db_document.document_files],
+#         permissions=[permission_from_db(p) for p in db_document.permissions]
+#     )
 
 def document_file_from_db(db_file: DocumentFiles) -> DocumentFile:
     return DocumentFile(

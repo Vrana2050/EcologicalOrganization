@@ -65,10 +65,14 @@ def get_document_service(
     directory_service: DirectoryService = Depends(get_directory_service),
     permission_service: PermissionService = Depends(get_permission_service),
     user_group_service: UserGroupService = Depends(get_user_group_service),
+    tag_service: TagService = Depends(get_tag_service),
+    metadata_service: MetadataService = Depends(get_metadata_service)
 ) -> DocumentService:
     return DocumentService(
         DocumentRepository(db),
         directory_service,
         permission_service,
-        user_group_service
+        user_group_service,
+        tag_service,
+        metadata_service
     )

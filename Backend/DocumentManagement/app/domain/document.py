@@ -6,8 +6,10 @@ from enum import Enum
 from typing import Optional, List
 
 from app.constants import STORAGE_ROOT
+from app.domain.metadata import CustomMetadataValue
 from app.domain.permissions import Permission
 from app.domain.retention import RetentionType
+from app.domain.tags import TagAssignment, Tag
 
 
 # --- ENUMS ---
@@ -54,10 +56,9 @@ class Document:
     retention_expires: Optional[datetime] = None
 
     # retention: Optional[Retention] = None
-    # custom_metadata_values: List[CustomMetadataValue] = field(default_factory=list)
+    custom_metadata_values: List[CustomMetadataValue] = field(default_factory=list)
     document_files: List[DocumentFile] = field(default_factory=list)
     permissions: List[Permission] = field(default_factory=list)
-    # tag_assignments: List[TagAssignment] = field(default_factory=list)
-    # tags: List[Tag] = field(default_factory=list)
+    tags: List[Tag] = field(default_factory=list)
 
 

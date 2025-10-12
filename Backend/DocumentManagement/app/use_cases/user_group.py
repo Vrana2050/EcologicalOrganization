@@ -1,7 +1,7 @@
 from app.core.exceptions import http_409, http_404, http_400
 from app.domain.user_group import UserGroup
 from app.infra.repo.user_groups import UserGroupRepository
-from .auth import get_user_by_email, get_user_by_id
+from .auth import get_user_by_email, get_user_by_id, get_users_by_ids
 from ..api.dtos.user_group import UserGroupReadDTO, GroupMemberDTO
 
 
@@ -18,9 +18,9 @@ class UserGroupService:
         if not group:
             raise http_404("Group not found")
         group_with_members = UserGroupReadDTO(id=group.id, name=group.name, description=group.description)
-        for m_id in group.members:
-            user = get_user_by_id(m_id)
-            group_with_members.members.append(GroupMemberDTO(id=user.id, email=user.email))
+        users = get_users_by_ids(group.members)
+        for user_id, user_email in users.items():
+            group_with_members.members.append(GroupMemberDTO(id=user_id, email=user_email))
 
         return group_with_members
 
@@ -67,3 +67,14 @@ class UserGroupService:
 
     def get_groups_for_user(self, user_id: int) -> list[UserGroup]:
         return self.user_group_repo.get_groups_for_user(user_id)
+
+    def get_groups_by_ids(self, group_ids):
+        return self.user_group_repo.get_groups_by_ids(group_ids)
+
+    def delete_group(self, group_id: int) -> None:
+        if not self.get_user_group_by_id(group_id):
+            raise http_404(f"User group '{group_id}' does not exist")
+        return self.user_group_repo.delete(group_id)
+
+    def get_group_ids_for_user(self, user_id) -> list[int]:
+        return self.user_group_repo.get_group_ids_for_user(user_id)

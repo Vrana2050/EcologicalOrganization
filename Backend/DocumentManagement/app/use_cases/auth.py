@@ -4,9 +4,11 @@ import requests
 
 from app.core.exceptions import http_404
 
-AUTH_URL_EMAIL = "http://localhost:8081/auth/user-by-email/DM"
-AUTH_URL_ID = "http://localhost:8081/auth/user-by-id/DM"
-AUTH_URL_MANAGERS = "http://localhost:8081/auth/managers/DM"
+USER_MANAGEMENT_URL = "http://localhost:8081/auth"
+AUTH_URL_EMAIL = f"{USER_MANAGEMENT_URL}/user-by-email/DM"
+AUTH_URL_ID = f"{USER_MANAGEMENT_URL}/user-by-id/DM"
+AUTH_URL_MANAGERS = f"{USER_MANAGEMENT_URL}/managers/DM"
+AUTH_USERS_BY_IDS = f"{USER_MANAGEMENT_URL}/users-by-ids"
 
 @dataclass
 class User:
@@ -25,6 +27,18 @@ def get_user_by_id(user_id: int) -> User:
     user_data = response.json()
     return User(**user_data)
 
+def get_users_by_ids(user_ids: list[int]) -> dict[int, str]:
+    response = requests.post(
+        AUTH_USERS_BY_IDS,
+        json={"user_ids": user_ids}
+    )
+
+    if response.status_code != 200:
+        raise Exception(f"Auth service error: {response.status_code}")
+
+    return response.json()
+
+
 
 def get_user_by_email(user_email: str) -> User:
     response = requests.get(f"{AUTH_URL_EMAIL}/{user_email}")
@@ -35,6 +49,8 @@ def get_user_by_email(user_email: str) -> User:
 
     user_data = response.json()
     return User(**user_data)
+
+
 
 def get_all_managers() -> list[int]:
     response = requests.get(AUTH_URL_MANAGERS)

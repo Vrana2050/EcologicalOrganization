@@ -11,3 +11,10 @@ class MetadataDTO(BaseModel):
     name: str
     metadata_type: str
     description: Optional[str] = None
+
+
+class MetadataValueCreateDTO(BaseModel):
+    metadata_id: int
+    value: Optional[str] = None
+    directory_id: Optional[int] = None
+    document_id: Optional[int] = None

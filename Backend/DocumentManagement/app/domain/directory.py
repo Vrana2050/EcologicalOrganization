@@ -8,6 +8,7 @@ from app.domain.document import Document
 from app.domain.metadata import CustomMetadataRule, CustomMetadataValue
 from app.domain.permissions import Permission
 from app.domain.retention import RetentionType, Retention
+from app.domain.tags import Tag
 
 
 class DirectoryType(str, Enum):
@@ -28,12 +29,12 @@ class Directory:
     retention_id: Optional[int] = None
 
     subdirectories: List[Directory] = field(default_factory=list)
+    documents: List[Document] = field(default_factory=list)
+    custom_metadata_values: List[CustomMetadataValue] = field(default_factory=list)
+    permissions: List[Permission] = field(default_factory=list)
+    tags: List[Tag] = field(default_factory=list)
     #retention: Optional[Retention] = None
     #custom_metadata_rules: List[CustomMetadataRule] = field(default_factory=list)
-    documents: List[Document] = field(default_factory=list)
-    #custom_metadata_values: List[CustomMetadataValue] = field(default_factory=list)
-    permissions: List[Permission] = field(default_factory=list)
-    #tag_assignments: List[TagAssignment] = field(default_factory=list)
 
 
     def is_section(self):

@@ -1,4 +1,5 @@
 from typing import List
+from xmlrpc.client import Boolean
 
 from app.core.exceptions import *
 from app.domain.directory import Directory
@@ -55,6 +56,8 @@ class PermissionService:
     def get_permission_for_document_and_group(self, group_id, document_id):
         return self.permission_repo.get_permission_for_document_and_group(group_id, document_id)
 
+    def get_highest_permission_for_directory(self, directory_id, user_id):
+        return self.permission_repo.get_highest_permission_for_directory(directory_id, user_id)
     #
     # def save(self, dto: PermissionCreateDTO, creator_id: int) -> None:
     #
@@ -129,6 +132,14 @@ class PermissionService:
                     continue
         return False
 
+    def has_permission_for_directory(self, directory_id, user_id) -> Boolean:
+        return self.permission_repo.has_permission_for_directory(directory_id, user_id)
+
+    def get_all_user_directory_permissions(self, user_id, user_group_ids) -> list[int]:
+        return self.permission_repo.get_all_user_directory_permissions(user_id, user_group_ids)
+
+    def get_all_user_document_permissions(self, user_id, user_group_ids) -> list[int]:
+        return self.permission_repo.get_all_user_document_permissions(user_id, user_group_ids)
 
 
 

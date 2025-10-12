@@ -60,3 +60,20 @@ class UserGroupRepository:
         )
 
         return [user_group_db_to_domain(group) for group in groups]
+
+    def get_groups_by_ids(self, group_ids):
+        groups = self.db.query(UserGroups).filter(UserGroups.id.in_(group_ids)).all()
+
+        return [user_group_db_to_domain(group) for group in groups]
+
+    def delete(self, group_id):
+        self.db.delete(self.db.query(UserGroups).filter(UserGroups.id == group_id).first())
+        self.db.commit()
+
+    def get_group_ids_for_user(self, user_id: int) -> list[int]:
+        group_ids = (
+            self.db.query(GroupMembers.group_id)
+            .filter(GroupMembers.user_id == user_id)
+            .all()
+        )
+        return [group_id[0] for group_id in group_ids]

@@ -39,3 +39,12 @@ class TagService:
 
     def assign_tag_to_directory(self, tag_id: int, directory_id: int) -> TagAssignment:
         return self.tag_repo.assign_tag_to_directory(tag_id, directory_id)
+
+    def remove_tag_from_document(self, tag_id, document_id) -> bool:
+        return self.tag_repo.remove_tag_from_document(tag_id, document_id)
+
+    def remove_all_tags_from_document(self, document_id):
+        return self.tag_repo.remove_all_tags_from_document(document_id)
+
+    def remove_all_tags_from_directory(self, directory_id):
+        return self.tag_repo.remove_all_tags_from_directory(directory_id)

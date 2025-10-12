@@ -1,6 +1,8 @@
 from app.domain.directory import Directory, DirectoryType, RetentionType
 from app.infra.mappers.document import document_from_db
+from app.infra.mappers.metadata import custom_metadata_value_from_db
 from app.infra.mappers.permissions import permission_from_db
+from app.infra.mappers.tags import tag_db_to_domain
 from app.infra.tables import Directories
 from app.api.dtos.directory import CreateDirectoryDTO
 from datetime import datetime, UTC
@@ -35,7 +37,9 @@ def directory_from_db(db_dir: Directories) -> Directory:
 
         subdirectories=[db_to_domain(sd) for sd in db_dir.parent_directory_reverse],
         documents=[document_from_db(doc) for doc in db_dir.documents],
-        permissions=[permission_from_db(p) for p in db_dir.permissions]
+        permissions=[permission_from_db(p) for p in db_dir.permissions],
+        tags=[tag_db_to_domain(ta.tag) for ta in db_dir.tag_assignments],
+        custom_metadata_values=[custom_metadata_value_from_db(mv) for mv in db_dir.custom_metadata_values],
     )
 
 

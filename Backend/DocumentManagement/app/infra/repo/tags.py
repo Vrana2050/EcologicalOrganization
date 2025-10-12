@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from app.domain.tags import TagAssignment
 from app.infra.mappers.tags import tag_db_to_domain, tag_domain_to_db, tag_assignment_domain_to_db, \
     tag_assignment_db_to_domain
-from app.infra.tables import Tags
+from app.infra.tables import Tags, TagAssignments
 
 
 @dataclass
@@ -33,7 +33,7 @@ class TagRepository:
     def save(self, tag: Tag) -> Tag:
         db_tag = tag_domain_to_db(tag)
         self.db.add(db_tag)
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(db_tag)
         return tag_db_to_domain(db_tag)
 
@@ -59,18 +59,42 @@ class TagRepository:
         return True
 
     def assign_tag_to_document(self, tag_id: int, document_id: int) -> TagAssignment:
-        assignment = TagAssignment(id=0, tag_id=tag_id, document_id=document_id)
+        assignment = TagAssignment(id=None, tag_id=tag_id, document_id=document_id)
         db_assignment = tag_assignment_domain_to_db(assignment)
         self.db.add(db_assignment)
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(db_assignment)
         return tag_assignment_db_to_domain(db_assignment)
 
     def assign_tag_to_directory(self, tag_id: int, directory_id: int) -> TagAssignment:
-        assignment = TagAssignment(id=0, tag_id=tag_id, directory_id=directory_id)
+        assignment = TagAssignment(id=None, tag_id=tag_id, directory_id=directory_id)
         db_assignment = tag_assignment_domain_to_db(assignment)
         self.db.add(db_assignment)
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(db_assignment)
         return tag_assignment_db_to_domain(db_assignment)
+
+    def remove_tag_from_document(self, tag_id, document_id):
+        db_tag = self.db.query(TagAssignments).filter(TagAssignments.tag_id == tag_id,
+                                                      TagAssignments.document_id == document_id).first()
+        if not db_tag:
+            return False
+
+        self.db.delete(db_tag)
+        self.db.commit()
+        return True
+
+    def remove_all_tags_from_document(self, document_id: int):
+        (
+            self.db.query(TagAssignments)
+            .filter(TagAssignments.document_id == document_id)
+            .delete(synchronize_session=False)
+        )
+
+    def remove_all_tags_from_directory(self, directory_id):
+        (
+            self.db.query(TagAssignments)
+            .filter(TagAssignments.directory_id == directory_id)
+            .delete(synchronize_session=False)
+        )
 

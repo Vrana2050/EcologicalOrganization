@@ -274,6 +274,15 @@ async def get_user_by_id(user_id: int, subsystem: str, db: db_dependency):
     return ReadUser(id=user.id, email=user.email, role=role.role)
 
 
+class UserIdsRequest(BaseModel):
+    user_ids: List[int]
+
+@router.post('/users-by-ids')
+async def get_user_by_id(request: UserIdsRequest, db: db_dependency):
+    users = db.query(Users).filter(Users.id.in_(request.user_ids)).all()
+    return {user.id: user.email for user in users}
+
+
 class Managers(BaseModel):
     manager_ids: List[int]
 

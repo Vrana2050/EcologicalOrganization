@@ -57,3 +57,11 @@ async def add_member_to_user_group(group_id: int,
         raise http_401("Only managers can handle user groups")
 
     user_group_service.remove_member(group_id, member_id)
+
+@router.delete('/{group_id}', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user_group(group_id: int,
+                            user=Depends(get_user_headers),
+                            user_group_service: UserGroupService = Depends(get_user_group_service)):
+    if user.role != "MANAGER":
+        raise http_401("Only managers can handle user groups")
+    user_group_service.delete_group(group_id)
