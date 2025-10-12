@@ -57,9 +57,7 @@ public class StatusServiceInflux {
     public ReportDto getReport(String projekatId,DateRangeDto dateRangeDto) {
 
         List<Long> dokumentIds =  repository.getDokumentsOnProject(projekatId);
-        System.out.println("dokumentIds = " + dokumentIds);
         List<Long> finishedDokumentIds = repository.getAllFinishedDocuments(projekatId,dokumentIds);
-        System.out.println("finishedDokumentIds = " + finishedDokumentIds);
             ReportDto reportDto = new ReportDto();
             List<StatusAvg> statuses = repository.getStatusAvgs(projekatId,dateRangeDto,finishedDokumentIds);
             StatusAvg maxStatusAvg = statuses.get(0);
