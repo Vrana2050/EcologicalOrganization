@@ -70,14 +70,14 @@
 
   <div class="wa-stack">
     <div>
-      <label class="wa-label" for="giTextarea">Globalne instrukcije</label>
+      <label class="wa-label" for="giTextarea">Opis zahteva za dokument</label>
       <textarea
         id="giTextarea"
         class="wa-input"
         [ngModel]="globalInstruction"
         (ngModelChange)="onGlobalInstructionInput($event)"
         rows="4"
-        placeholder="Npr: Koristi stručan i koncizan ton…"
+        placeholder="Npr: Dokument treba da sadrži pregled zakonskih obaveza, primere dobre prakse i preporuke za škole. Koristi jasan i stručan ton jer će dokument biti predstavljen lokalnoj samoupravi."
       ></textarea>
     </div>
 

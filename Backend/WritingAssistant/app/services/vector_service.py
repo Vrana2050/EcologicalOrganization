@@ -43,7 +43,8 @@ class VectorService:
                 summary_text=props.get("summary_text"),
                 created_at=props.get("created_at"),
             )
-            out.append((dv, float(r.get("distance") if r.get("distance") is not None else 1.0)))
+            dist = r.get("distance")
+            out.append((dv, float(dist) if dist is not None else float("inf")))
         return out
 
     def search_chunks_by_vector(

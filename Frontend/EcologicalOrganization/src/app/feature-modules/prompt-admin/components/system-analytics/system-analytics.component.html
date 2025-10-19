@@ -28,7 +28,7 @@
       <select
         id="docTypeSelect"
         class="wa-input small sa-doc-type-select"
-        [disabled]="!docTypes?.length"
+        [disabled]="!docTypes.length"
         [ngModel]="selectedDocTypeId"
         (ngModelChange)="onDocTypeChanged($event)"
       >

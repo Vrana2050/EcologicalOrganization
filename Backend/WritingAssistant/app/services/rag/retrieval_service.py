@@ -62,9 +62,8 @@ class RetrievalService:
         docs_sorted = sorted(docs, key=lambda t: float(t[1]))  
         picked: List[Tuple[DocumentVector, float]] = []
         for dv, dist in docs_sorted:
-            if len(picked) < self.cfg.top_m_docs:
-                if dist <= self.cfg.max_doc_distance or not picked:
-                    picked.append((dv, dist))
+            if len(picked) < self.cfg.top_m_docs and dist <= self.cfg.max_doc_distance:
+                picked.append((dv, dist))
         hits: List[DocHit] = [
             DocHit(document_id=dv.id, title=dv.title, distance=float(dist))
             for dv, dist in picked
