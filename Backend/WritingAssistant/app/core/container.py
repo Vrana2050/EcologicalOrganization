@@ -140,6 +140,7 @@ class Container(containers.DeclarativeContainer):
         repository=prompt_repository,
         doc_type_service=document_type_service,
         pah_repository=prompt_active_history_repository,
+        pv_repository=prompt_version_repository,
     )
 
     prompt_version_service = providers.Factory(

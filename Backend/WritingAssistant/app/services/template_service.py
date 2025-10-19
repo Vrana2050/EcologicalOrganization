@@ -14,7 +14,7 @@ from app.model.template_section import TemplateSection
 from app.services.template_parsers.registry import pick_parser
 from app.core.exceptions import ValidationError
 from typing import Optional
-
+from app.core.exceptions import ValidationError, AuthError, NotFoundError
 STORAGE_DIR = Path("app/storage/templates")
 
 
@@ -116,3 +116,14 @@ class TemplateService(BaseService):
             document_type_name=None,
             updated_at=tpl.updated_at,
         )
+
+    def remove_by_id(self, template_id: int, user_id: int):
+        tpl = self.repo.read_by_id(template_id)
+        if not tpl:
+            raise NotFoundError(detail="Template not found")
+
+        if getattr(tpl, "created_by", None) != user_id:
+            raise AuthError(detail="Forbidden")
+
+        self.repo.delete_by_id(template_id)
+        return

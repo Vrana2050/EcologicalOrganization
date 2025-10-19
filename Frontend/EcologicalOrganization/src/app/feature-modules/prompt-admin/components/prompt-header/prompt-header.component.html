@@ -54,7 +54,7 @@
             (ngModelChange)="onDocTypeChanged($event)"
           >
             <option *ngFor="let dt of documentTypes" [value]="dt.id">
-              {{ dt.name === "Default" ? "" : dt.name }}
+              {{ dt.name }}
             </option>
           </select>
         </ng-container>

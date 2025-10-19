@@ -11,6 +11,8 @@ from app.services.base_service import BaseService
 from app.services.document_type_service import DocumentTypeService
 from app.model.prompt import Prompt
 from app.core.exceptions import ConflictError
+from app.repository.prompt_version_repository import PromptVersionRepository  
+
 
 from typing import Optional
 
@@ -21,11 +23,13 @@ class PromptService(BaseService):
         repository: PromptRepository,
         doc_type_service: DocumentTypeService,
         pah_repository: PromptActiveHistoryRepository,
+        pv_repository: PromptVersionRepository,
     ):
         super().__init__(repository)
         self.prompt_repo = repository
         self.doc_type_service = doc_type_service
         self.pah_repository = pah_repository
+        self.pv_repo = pv_repository  
 
     def add(self, schema: CreatePrompt, user_id: int) -> PromptOut:
         self.doc_type_service.get(schema.document_type_id)
@@ -51,7 +55,7 @@ class PromptService(BaseService):
         term = (searchTerm or "").strip()
 
         if term:
-            result = self.prompt_repo.search_by_term(term=term, page=page, per_page=per_page)  # ⬅️ NOVO
+            result = self.prompt_repo.search_by_term(term=term, page=page, per_page=per_page)  
         else:
             query = PromptQuery(page=page, per_page=per_page, deleted=0)
             result = self.prompt_repo.read_by_options(query, eager=False)
@@ -101,15 +105,19 @@ class PromptService(BaseService):
 
     def remove(self, prompt_id: int) -> None:
         prompt = self.prompt_repo.read_by_id(prompt_id, eagers=[Prompt.prompt_version])
-        active_version = self.pah_repository.get_active_prompt_version(prompt.document_type_id)
 
-        if active_version and any(pv.id == active_version.id for pv in prompt.prompt_version):
-            raise ConflictError(
-                detail="Ne možeš obrisati prompt dok je neka njegova verzija aktivna. "
-                       "Postavi drugi prompt kao aktivan i pokušaj ponovo."
-            )
+        dt = self.doc_type_service.get_including_deleted(prompt.document_type_id)
 
+        if dt and dt.name.strip().lower() == "default":
+            active_version = self.pah_repository.get_active_prompt_version(dt.id)
+            if active_version and active_version.prompt_id == prompt.id:
+                raise ConflictError(
+                    detail="Ne možeš obrisati aktivan prompt koji pripada podrazumevanom (Default) tipu dokumenta."
+                )
+
+        self.pv_repo.soft_delete_by_prompt(prompt_id)
         self.prompt_repo.delete_by_id(prompt_id)
+
 
     def update_title(self, prompt_id: int, title: str, user_id: int) -> PromptOut:
         prompt = self.prompt_repo.read_by_id(prompt_id)

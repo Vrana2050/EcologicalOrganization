@@ -1,3 +1,4 @@
+// components/templates-sidebar/templates-sidebar.component.ts
 import {
   Component,
   EventEmitter,
@@ -7,6 +8,7 @@ import {
   ViewChild,
   ElementRef,
   OnDestroy,
+  HostListener,
 } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
@@ -33,9 +35,13 @@ export class TemplatesSidebarComponent implements OnInit, OnDestroy {
   totalCount = 0;
   hasMore = false;
 
+  // search
   searchTerm = '';
   private search$ = new Subject<string>();
   private searchSub?: Subscription;
+
+  menuOpenId: number | null = null;
+  deletingId: number | null = null;
 
   bottomHintVisible = false;
   private loadMoreDelayTimer: any = null;
@@ -78,6 +84,18 @@ export class TemplatesSidebarComponent implements OnInit, OnDestroy {
     this.clearLoadMoreTimers();
   }
 
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.menu-wrap')) {
+      this.menuOpenId = null;
+    }
+  }
+
+  toggleMenu(id: number): void {
+    this.menuOpenId = this.menuOpenId === id ? null : id;
+  }
+
   private loadTemplates(search?: string, append = false): void {
     this.loading = !append;
     if (!append) this.page = 1;
@@ -88,6 +106,7 @@ export class TemplatesSidebarComponent implements OnInit, OnDestroy {
         this.templates = append ? [...this.templates, ...res.items] : res.items;
 
         this.promotePrazanFirst();
+        this.normalizeDocumentTypeNames();
 
         this.loading = false;
         this.loadingMore = false;
@@ -113,6 +132,7 @@ export class TemplatesSidebarComponent implements OnInit, OnDestroy {
           this.templates = [...this.templates, ...res.items];
 
           this.promotePrazanFirst();
+          this.normalizeDocumentTypeNames();
 
           this.totalCount = res.meta.totalCount;
           this.loadingMore = false;
@@ -137,11 +157,24 @@ export class TemplatesSidebarComponent implements OnInit, OnDestroy {
     }
   }
 
+  // helper: Normalizacija naziva tipa dokumenta
+  private normalizeDocumentTypeNames(): void {
+    this.templates = this.templates.map((t) => {
+      const raw = (t.documentTypeName ?? '').trim().toLowerCase();
+      if (raw === 'default' || raw === 'ostali') {
+        return { ...t, documentTypeName: 'Opšti' };
+      }
+      return t;
+    });
+  }
+
   onHide(): void {
     this.hide.emit();
   }
 
   onSelectTemplate(t: Template): void {
+    if (this.menuOpenId === t.id) return;
+
     this.creating = true;
     this.chatSessionService.create(t.id).subscribe({
       next: (session) => {
@@ -152,6 +185,29 @@ export class TemplatesSidebarComponent implements OnInit, OnDestroy {
       error: (err) => {
         console.error('Error creating chat session:', err);
         this.creating = false;
+      },
+    });
+  }
+
+  onDeleteTemplate(t: Template): void {
+    if (this.deletingId) return; // već brišemo nešto
+    this.deletingId = t.id;
+    this.menuOpenId = null;
+
+    this.templateService.delete(t.id).subscribe({
+      next: () => {
+        this.templates = this.templates.filter((x) => x.id !== t.id);
+        this.promotePrazanFirst();
+
+        if (this.hasMore && this.templates.length < this.totalCount) {
+          this.loadMore();
+        }
+
+        this.deletingId = null;
+      },
+      error: (err) => {
+        console.error('Error deleting template:', err);
+        this.deletingId = null;
       },
     });
   }
@@ -222,6 +278,7 @@ export class TemplatesSidebarComponent implements OnInit, OnDestroy {
     const dt = this.documentTypes.find((d) => d.id === tpl.documentTypeId);
     tpl.documentTypeName = dt ? dt.name : '';
     this.templates = [tpl, ...this.templates];
+    this.normalizeDocumentTypeNames();
     this.promotePrazanFirst();
   }
 }

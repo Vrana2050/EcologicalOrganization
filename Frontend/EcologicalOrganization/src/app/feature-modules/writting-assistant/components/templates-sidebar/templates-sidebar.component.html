@@ -45,17 +45,28 @@
     (scroll)="onScroll($event)"
     [class.disabled]="loading && !loadingMore"
   >
-    <button
-      class="t-card"
-      type="button"
+    <div
+      class="t-item"
       *ngFor="let t of templates"
+      [class.disabled]="creating && t.id === deletingId"
       (click)="onSelectTemplate(t)"
     >
-      <div class="t-name">{{ t.name }}</div>
-      <div class="t-desc">
-        {{ t.documentTypeName || "Dokument tip #" + t.documentTypeId }}
+      <div class="t-meta">
+        <div class="t-name">{{ t.name }}</div>
+        <div class="t-desc">
+          {{ t.documentTypeName || "Dokument tip #" + t.documentTypeId }}
+        </div>
       </div>
-    </button>
+
+      <div class="menu-wrap" (click)="$event.stopPropagation()">
+        <button class="menu-btn" (click)="toggleMenu(t.id)">⋮</button>
+        <div class="menu" *ngIf="menuOpenId === t.id">
+          <button class="menu-item danger" (click)="onDeleteTemplate(t)">
+            Obriši
+          </button>
+        </div>
+      </div>
+    </div>
 
     <div class="lazy-hint" *ngIf="bottomHintVisible && !loadingMore">
       <div class="shimmer-line"></div>

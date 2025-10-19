@@ -42,3 +42,14 @@ async def add_template(
         created_by=user_id,
         repo_folder_id=repo_folder_id,  
     )
+
+
+@router.delete("/{template_id}", status_code=204)
+@inject
+def delete_template(
+    template_id: int,
+    user_id: int = Depends(get_current_user_id),
+    service: TemplateService = Depends(Provide[Container.template_service]),
+):
+    service.remove_by_id(template_id, user_id)
+    return
