@@ -60,9 +60,15 @@
         (click)="onGenerate()"
         [disabled]="generating || loadingIter"
         [class.loading]="generating"
+        [attr.aria-busy]="generating"
         title="{{ generating ? 'Generisanje u toku…' : '' }}"
       >
-        ⚡ Generiši sadržaj sekcije
+        <span class="btn-content">
+          <span class="spinner" *ngIf="generating" aria-hidden="true"></span>
+          <span>{{
+            generating ? "Generisanje…" : "⚡ Generiši sadržaj sekcije"
+          }}</span>
+        </span>
       </button>
 
       <button class="wa-btn danger" (click)="onRemove()">Ukloni sekciju</button>
