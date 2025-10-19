@@ -3,10 +3,14 @@
     [prompts]="prompts"
     [selectedId]="showSystemAnalytics ? null : activePrompt?.id"
     [loading]="loading"
+    [loadingMore]="loadingMore"
+    [hasMore]="hasMore"
     (createNewPrompt)="onCreateNewPrompt()"
     (selectPrompt)="onSelectPrompt($event)"
     (deletePrompt)="onDeletePrompt($event)"
     (openSystemAnalytics)="onOpenSystemAnalytics()"
+    (search)="onSearch($event)"
+    (loadMore)="onLoadMore()"
   ></pa-prompts-sidebar>
 
   <pa-versions-sidebar

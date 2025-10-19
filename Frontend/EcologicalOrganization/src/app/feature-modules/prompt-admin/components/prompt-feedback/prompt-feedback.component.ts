@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FeedbackService } from '../../services/feedback.service';
 import { OutputFeedbackItem } from '../../models/feedback.model';
+import { CommonModule } from '@angular/common';
+import { AnalyticsOut } from '../../models/analytics.model';
 
 @Component({
   selector: 'xp-prompt-feedback',
@@ -12,6 +14,7 @@ export class PromptFeedbackComponent {
   @Input() page = 1;
   @Input() perPage = 5;
   @Input() total = 0;
+  @Input() data: AnalyticsOut | null = null;
 
   @Output() prev = new EventEmitter<void>();
   @Output() next = new EventEmitter<void>();

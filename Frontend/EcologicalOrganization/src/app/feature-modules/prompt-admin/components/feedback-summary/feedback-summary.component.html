@@ -3,11 +3,13 @@
     <div class="fs-left">
       <div class="fs-line">
         <div class="fs-label">Prosek:</div>
-        <div class="fs-stars" [style.--pct.%]="starPct(d.ratingAvg)">
-          <div class="stars-bg">★★★★★</div>
-          <div class="stars-fg" [style.width.%]="starPct(d.ratingAvg)">
-            ★★★★★
-          </div>
+        <div class="fs-stars-simple">
+          <span
+            *ngFor="let s of stars; let i = index"
+            class="star"
+            [class.on]="i < filled(d.ratingAvg)"
+            >★</span
+          >
         </div>
         <div class="fs-val num">
           <span class="fs-muted">({{ d.ratingCount }})</span>
@@ -20,11 +22,13 @@
         *ngIf="d.bayesScore !== null && d.bayesScore !== undefined"
       >
         <div class="fs-label">Ponderisan Bajesov prosek:</div>
-        <div class="fs-stars" [style.--pct.%]="starPct(d.bayesScore)">
-          <div class="stars-bg">★★★★★</div>
-          <div class="stars-fg" [style.width.%]="starPct(d.bayesScore)">
-            ★★★★★
-          </div>
+        <div class="fs-stars-simple">
+          <span
+            *ngFor="let s of stars; let i = index"
+            class="star"
+            [class.on]="i < filled(d.bayesScore)"
+            >★</span
+          >
         </div>
         <div class="fs-val num">
           {{ d.bayesScore | number : "1.2-2" }}
@@ -33,11 +37,13 @@
 
       <div class="fs-line">
         <div class="fs-label">Medijana:</div>
-        <div class="fs-stars" [style.--pct.%]="starPct(d.ratingMedian)">
-          <div class="stars-bg">★★★★★</div>
-          <div class="stars-fg" [style.width.%]="starPct(d.ratingMedian)">
-            ★★★★★
-          </div>
+        <div class="fs-stars-simple">
+          <span
+            *ngFor="let s of stars; let i = index"
+            class="star"
+            [class.on]="i < filled(d.ratingMedian)"
+            >★</span
+          >
         </div>
         <div class="fs-val num">
           {{ d.ratingMedian | number : "1.2-2" }}

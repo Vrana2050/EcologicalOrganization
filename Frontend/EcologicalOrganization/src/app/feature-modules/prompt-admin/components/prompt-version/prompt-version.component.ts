@@ -10,6 +10,7 @@ import {
 import { PromptVersion } from '../../models/prompt-version.model';
 import { ChatSessionService } from 'src/app/feature-modules/writting-assistant/services/chat-session.service';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'xp-prompt-version',

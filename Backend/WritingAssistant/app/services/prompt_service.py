@@ -12,6 +12,8 @@ from app.services.document_type_service import DocumentTypeService
 from app.model.prompt import Prompt
 from app.core.exceptions import ConflictError
 
+from typing import Optional
+
 
 class PromptService(BaseService):
     def __init__(
@@ -44,10 +46,16 @@ class PromptService(BaseService):
             created_at=prompt.created_at,
             updated_at=prompt.updated_at,
         )
+        
+    def list_with_active_versions(self, page: int, per_page: int, searchTerm: Optional[str] = None) -> PromptWithActiveVersionPageOut:
+        term = (searchTerm or "").strip()
 
-    def list_with_active_versions(self, page: int, per_page: int) -> PromptWithActiveVersionPageOut:
-        query = PromptQuery(page=page, per_page=per_page, deleted=0)
-        result = self.prompt_repo.read_by_options(query, eager=False)
+        if term:
+            result = self.prompt_repo.search_by_term(term=term, page=page, per_page=per_page)  # ⬅️ NOVO
+        else:
+            query = PromptQuery(page=page, per_page=per_page, deleted=0)
+            result = self.prompt_repo.read_by_options(query, eager=False)
+
         prompts = result["founds"]
 
         doc_type_ids = {p.document_type_id for p in prompts}

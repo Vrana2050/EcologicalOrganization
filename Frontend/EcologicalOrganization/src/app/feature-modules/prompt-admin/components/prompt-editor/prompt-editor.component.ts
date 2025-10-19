@@ -12,6 +12,7 @@ import { DocumentType } from '../../models/document-type.model';
 import { DocumentTypeService } from '../../services/document-type.service';
 import { ChatSessionService } from 'src/app/feature-modules/writting-assistant/services/chat-session.service';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'pa-prompt-editor',

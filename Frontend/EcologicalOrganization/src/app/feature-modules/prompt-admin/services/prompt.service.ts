@@ -10,45 +10,43 @@ export class PromptService {
 
   constructor(private http: HttpClient) {}
 
-  list(page = 1, perPage = 20): Observable<PromptPage> {
-    return this.http
-      .get<any>(this.promptsUrl, {
-        params: { page, per_page: perPage },
-      })
-      .pipe(
-        map(
-          (raw): PromptPage => ({
-            items: (raw.items || []).map(
-              (it: any): Prompt => ({
-                id: it.id,
-                title: it.title,
-                documentTypeId: it.document_type_id,
-                isActive: !!it.is_active,
-                activeVersion: it.active_version
-                  ? {
-                      id: it.active_version.id,
-                      promptId: it.active_version.prompt_id,
-                      name: it.active_version.name ?? null,
-                      description: it.active_version.description ?? null,
-                      promptText: it.active_version.prompt_text ?? null,
-                      isActive: !!it.active_version.is_active,
-                      createdAt: it.active_version.created_at ?? null,
-                      updatedAt: it.active_version.updated_at ?? null,
-                    }
-                  : null,
-                updatedAt: it.updated_at ?? null,
-              })
-            ),
-            meta: {
-              page: raw.meta.page,
-              perPage: raw.meta.per_page,
-              totalCount: raw.meta.total_count,
-            },
-          })
-        )
-      );
-  }
+  list(page = 1, perPage = 20, searchTerm?: string): Observable<PromptPage> {
+    const params: any = { page, per_page: perPage };
+    if ((searchTerm ?? '').trim()) params.searchTerm = searchTerm!.trim();
 
+    return this.http.get<any>(this.promptsUrl, { params }).pipe(
+      map(
+        (raw): PromptPage => ({
+          items: (raw.items || []).map(
+            (it: any): Prompt => ({
+              id: it.id,
+              title: it.title,
+              documentTypeId: it.document_type_id,
+              isActive: !!it.is_active,
+              activeVersion: it.active_version
+                ? {
+                    id: it.active_version.id,
+                    promptId: it.active_version.prompt_id,
+                    name: it.active_version.name ?? null,
+                    description: it.active_version.description ?? null,
+                    promptText: it.active_version.prompt_text ?? null,
+                    isActive: !!it.active_version.is_active,
+                    createdAt: it.active_version.created_at ?? null,
+                    updatedAt: it.active_version.updated_at ?? null,
+                  }
+                : null,
+              updatedAt: it.updated_at ?? null,
+            })
+          ),
+          meta: {
+            page: raw.meta.page,
+            perPage: raw.meta.per_page,
+            totalCount: raw.meta.total_count,
+          },
+        })
+      )
+    );
+  }
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.promptsUrl}/${id}`);
   }

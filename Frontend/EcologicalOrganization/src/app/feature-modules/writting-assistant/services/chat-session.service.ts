@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http'; // ⬅️ HttpParams umesto HttpHeaders
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map, catchError, of } from 'rxjs';
 import { ChatSession, ChatSessionPage } from '../models/chat-session.model';
 import {
@@ -7,7 +7,6 @@ import {
   SessionSectionWithLatest,
 } from '../models/session-section.model';
 import { Router } from '@angular/router';
-// import { TokenStorage } from 'src/app/infrastructure/auth/jwt/token.service'; // ⬅️ nije korišćeno – obriši
 import { environment } from 'src/env/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -16,7 +15,6 @@ export class ChatSessionService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  // ⬅️ dodato searchTerm
   list(
     page = 1,
     perPage = 20,

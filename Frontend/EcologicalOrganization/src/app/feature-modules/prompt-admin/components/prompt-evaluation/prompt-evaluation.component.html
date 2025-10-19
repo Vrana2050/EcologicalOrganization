@@ -45,6 +45,7 @@
 
     <ng-container *ngIf="sectionTab === 'feedback'">
       <xp-prompt-feedback
+        [data]="data"
         [items]="fbItems"
         [page]="fbPage"
         [perPage]="fbPerPage"

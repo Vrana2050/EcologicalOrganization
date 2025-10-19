@@ -20,6 +20,12 @@ import {
 export class PromptAdminPageComponent implements OnInit {
   prompts: Prompt[] = [];
   loading = true;
+  loadingMore = false;
+  hasMore = false;
+  totalCount = 0;
+  page = 1;
+  perPage = 20;
+  currentSearchTerm?: string;
 
   activePrompt: Prompt | null = null;
 
@@ -59,24 +65,60 @@ export class PromptAdminPageComponent implements OnInit {
     this.versions = [];
   }
 
-  loadPrompts(): void {
-    this.loading = true;
-    this.promptService.list().subscribe({
-      next: (page) => {
-        this.prompts = page.items;
-        this.loading = false;
+  loadPrompts(searchTerm?: string, append = false): void {
+    this.loading = !append;
+    if (!append) this.page = 1;
 
-        if (!this.activePrompt && this.prompts.length > 0) {
+    this.promptService.list(this.page, this.perPage, searchTerm).subscribe({
+      next: (page) => {
+        this.totalCount = page.meta.totalCount;
+        this.prompts = append ? [...this.prompts, ...page.items] : page.items;
+        this.loading = false;
+        this.loadingMore = false;
+        this.hasMore = this.prompts.length < this.totalCount;
+
+        if (
+          !append &&
+          !this.activePrompt &&
+          this.prompts.length > 0 &&
+          !this.showSystemAnalytics
+        ) {
           const active = this.prompts.find((p) => p.isActive);
-          const toOpen = active ?? this.prompts[0] ?? '';
-          this.openPrompt(toOpen.id);
+          const toOpen = active ?? this.prompts[0] ?? null;
+          if (toOpen) this.openPrompt(toOpen.id);
         }
       },
       error: (err) => {
         console.error('Error loading prompts:', err);
         this.loading = false;
+        this.loadingMore = false;
       },
     });
+  }
+
+  onSearch(term?: string) {
+    this.currentSearchTerm = (term ?? '').trim() || undefined;
+    this.loadPrompts(this.currentSearchTerm, false);
+  }
+
+  onLoadMore() {
+    if (!this.hasMore || this.loadingMore) return;
+    this.loadingMore = true;
+    this.page += 1;
+
+    this.promptService
+      .list(this.page, this.perPage, this.currentSearchTerm)
+      .subscribe({
+        next: (res) => {
+          this.prompts = [...this.prompts, ...res.items];
+          this.loadingMore = false;
+          this.totalCount = res.meta.totalCount;
+          this.hasMore = this.prompts.length < this.totalCount;
+        },
+        error: () => {
+          this.loadingMore = false;
+        },
+      });
   }
 
   loadVersions(promptId: number): void {

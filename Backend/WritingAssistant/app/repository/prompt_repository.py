@@ -46,3 +46,31 @@ class PromptRepository(BaseRepository):
             )
             s.commit()
             return s.query(Prompt).filter(Prompt.id == id).first()
+        
+    def search_by_term(self, term: str, page: int = 1, per_page: int = 20) -> dict:
+
+        with self.session_factory() as s:
+            q = (
+                s.query(Prompt)
+                .filter(
+                    Prompt.deleted == 0,
+                    func.lower(Prompt.title).like(f"%{term.lower()}%")
+                )
+            )
+
+            total_count = q.count()
+
+            order_col = getattr(Prompt, "updated_at", getattr(Prompt, "id"))
+            q = q.order_by(order_col.desc())
+
+            rows = q.limit(per_page).offset((page - 1) * per_page).all()
+
+            return {
+                "founds": rows,
+                "search_options": {
+                    "page": page,
+                    "per_page": per_page,
+                    "ordering": "-updated_at",
+                    "total_count": total_count,
+                },
+            }

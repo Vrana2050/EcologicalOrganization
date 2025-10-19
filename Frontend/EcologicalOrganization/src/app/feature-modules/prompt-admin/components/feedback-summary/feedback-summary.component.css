@@ -53,6 +53,7 @@
     line-height: 20px;
     font-size: 18px;
     letter-spacing: 2px;
+    display: inline-block;
   }
   .stars-bg {
     color: #d1d5db;
@@ -60,11 +61,13 @@
   }
   .stars-fg {
     position: absolute;
-    inset: 0 auto 0 0;
+    left: 0;
+    top: 0;
+    height: 100%;
     overflow: hidden;
     color: #2563eb;
     white-space: nowrap;
-    user-select: none;
+    display: block;
   }
 
   .fs-right {
@@ -110,7 +113,20 @@
       grid-template-columns: 1fr;
     }
     .fs-line {
-      grid-template-columns: 150px 120px 1fr;
+      grid-template-columns: 150px 100px 1fr;
     }
   }
+}
+
+.fs-stars-simple {
+  font-size: 18px;
+  letter-spacing: 2px;
+  line-height: 20px;
+  user-select: none;
+}
+.fs-stars-simple .star {
+  color: #d1d5db;
+}
+.fs-stars-simple .star.on {
+  color: #2563eb;
 }

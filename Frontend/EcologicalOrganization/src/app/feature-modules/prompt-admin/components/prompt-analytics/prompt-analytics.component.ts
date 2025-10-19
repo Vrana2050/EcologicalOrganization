@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { AnalyticsOut } from '../../models/analytics.model';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'xp-prompt-analytics',

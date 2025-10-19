@@ -49,7 +49,7 @@ export class WritingAssistantPageComponent implements OnInit {
     this.userSub = this.authService.user$.subscribe(
       (u) => (this.currentUser = u)
     );
-    this.loadConversations(); // inicijalno bez filtera
+    this.loadConversations();
     this.loadDocumentTypes();
 
     this.route.paramMap
@@ -81,7 +81,7 @@ export class WritingAssistantPageComponent implements OnInit {
             ? [...this.conversations, ...res.items]
             : res.items;
           this.loading = false;
-          this.loadingMore = false; // indikator za učitavanje sledeće strane
+          this.loadingMore = false;
           this.hasMore = this.conversations.length < this.totalCount;
         },
         error: () => {
@@ -91,14 +91,12 @@ export class WritingAssistantPageComponent implements OnInit {
       });
   }
 
-  // ⬇️ poziva se iz sidebar-a: (search)="onSearch($event)"
   onSearch(term?: string) {
     this.currentSearchTerm = (term ?? '').trim() || undefined;
-    this.lastSearchTerm = this.currentSearchTerm; // zadržavamo i staro polje
-    this.loadConversations(this.currentSearchTerm, false); // reset (bez append)
+    this.lastSearchTerm = this.currentSearchTerm;
+    this.loadConversations(this.currentSearchTerm, false);
   }
 
-  // ⬇️ poziva se iz sidebar-a: (loadMore)="onLoadMore()"
   onLoadMore() {
     if (!this.hasMore || this.loadingMore) return;
     this.loadingMore = true;

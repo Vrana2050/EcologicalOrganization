@@ -38,10 +38,11 @@ def delete_prompt(
 def list_prompts(
     page: int = 1,
     per_page: int = 20,
+    searchTerm: str | None = None,
     service: PromptService = Depends(Provide[Container.prompt_service]),
     _: int = Depends(require_admin),  
 ):
-    return service.list_with_active_versions(page=page, per_page=per_page)
+    return service.list_with_active_versions(page=page, per_page=per_page, searchTerm=searchTerm)
 
 
 @router.patch("/{prompt_id}/title", response_model=PromptOut)

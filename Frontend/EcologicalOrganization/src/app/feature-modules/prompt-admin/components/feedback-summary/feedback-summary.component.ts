@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { AnalyticsOut } from '../../models/analytics.model';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'xp-feedback-summary',
@@ -28,5 +29,12 @@ export class FeedbackSummaryComponent {
       ...i,
       pct: (i.count / max) * 100,
     }));
+  }
+
+  stars = [1, 2, 3, 4, 5];
+
+  filled(val: number | null | undefined): number {
+    const v = typeof val === 'number' ? Math.max(0, Math.min(5, val)) : 0;
+    return Math.round(v);
   }
 }

@@ -8,6 +8,7 @@ import {
   OutputFeedbackItem,
   OutputFeedbackPage,
 } from '../../models/feedback.model';
+import { CommonModule } from '@angular/common';
 
 type ScopeMode = 'prompt' | 'version';
 type SectionTab = 'feedback' | 'analytics';
