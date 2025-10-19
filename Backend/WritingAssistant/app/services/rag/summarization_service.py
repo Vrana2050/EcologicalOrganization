@@ -1,9 +1,9 @@
 from __future__ import annotations
 from app.services.llm_service import LLMService
 
-_SUMMARY_PROMPT = """Sažmi sledeći dokument na srpskom u 150–250 reči.
+_SUMMARY_PROMPT = """Sažmi sledeći dokument na srpskom u 100–150 reči.
 - Uklopi ključne brojke, datume, nazive sekcija i ciljeve.
-- Bez uvodnog small talka, samo čist sažetak.
+- Bez uvodnog small talka, samo čist sažetak. U jednom paragrafu opisi sve, nemoj da stavljas brojeve, bullete, cist prepircan sadrzaj dokumenta.
 
 DOKUMENT:
 <<<

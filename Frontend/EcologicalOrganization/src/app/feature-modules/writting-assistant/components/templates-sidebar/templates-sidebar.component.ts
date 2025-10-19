@@ -1,4 +1,16 @@
-import { Component, EventEmitter, OnInit, Output, Input } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  OnInit,
+  Output,
+  Input,
+  ViewChild,
+  ElementRef,
+  OnDestroy,
+} from '@angular/core';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
+
 import { TemplateService } from '../../services/template.service';
 import { Template } from '../../models/template.model';
 import { ChatSessionService } from '../../services/chat-session.service';
@@ -10,10 +22,28 @@ import { DocumentType } from 'src/app/feature-modules/prompt-admin/models/docume
   templateUrl: './templates-sidebar.component.html',
   styleUrls: ['./templates-sidebar.component.css'],
 })
-export class TemplatesSidebarComponent implements OnInit {
+export class TemplatesSidebarComponent implements OnInit, OnDestroy {
   templates: Template[] = [];
   loading = true;
+  loadingMore = false;
   creating = false;
+
+  page = 1;
+  perPage = 20;
+  totalCount = 0;
+  hasMore = false;
+
+  searchTerm = '';
+  private search$ = new Subject<string>();
+  private searchSub?: Subscription;
+
+  bottomHintVisible = false;
+  private loadMoreDelayTimer: any = null;
+  private hintDelayTimer: any = null;
+
+  @ViewChild('tplSearchInputRef')
+  tplSearchInputRef!: ElementRef<HTMLInputElement>;
+  @ViewChild('tplScrollRef') tplScrollRef!: ElementRef<HTMLDivElement>;
 
   @Output() hide = new EventEmitter<void>();
   @Output() created = new EventEmitter<ChatSession>();
@@ -28,16 +58,83 @@ export class TemplatesSidebarComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.templateService.list().subscribe({
-      next: (page) => {
-        this.templates = page.items;
+    this.loadTemplates();
+
+    this.searchSub = this.search$
+      .pipe(
+        map((v) => (v ?? '').trim()),
+        debounceTime(300),
+        distinctUntilChanged()
+      )
+      .subscribe((term) => {
+        this.scrollToTop();
+        this.page = 1;
+        this.loadTemplates(term || undefined, false);
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.searchSub?.unsubscribe();
+    this.clearLoadMoreTimers();
+  }
+
+  private loadTemplates(search?: string, append = false): void {
+    this.loading = !append;
+    if (!append) this.page = 1;
+
+    this.templateService.list(this.page, this.perPage, search).subscribe({
+      next: (res) => {
+        this.totalCount = res.meta.totalCount;
+        this.templates = append ? [...this.templates, ...res.items] : res.items;
+
+        this.promotePrazanFirst();
+
         this.loading = false;
+        this.loadingMore = false;
+        this.hasMore = this.templates.length < this.totalCount;
       },
       error: (err) => {
         console.error('Error loading templates:', err);
         this.loading = false;
+        this.loadingMore = false;
       },
     });
+  }
+
+  private loadMore(): void {
+    if (!this.hasMore || this.loading || this.loadingMore) return;
+    this.loadingMore = true;
+    this.page += 1;
+
+    this.templateService
+      .list(this.page, this.perPage, this.currentSearch)
+      .subscribe({
+        next: (res) => {
+          this.templates = [...this.templates, ...res.items];
+
+          this.promotePrazanFirst();
+
+          this.totalCount = res.meta.totalCount;
+          this.loadingMore = false;
+          this.hasMore = this.templates.length < this.totalCount;
+        },
+        error: () => (this.loadingMore = false),
+      });
+  }
+
+  get currentSearch(): string | undefined {
+    const t = (this.searchTerm ?? '').trim();
+    return t ? t : undefined;
+  }
+
+  private promotePrazanFirst(): void {
+    const isPrazan = (t: Template) =>
+      (t.name ?? '').trim().toLowerCase() === 'prazan';
+    const idx = this.templates.findIndex(isPrazan);
+    if (idx > 0) {
+      const [p] = this.templates.splice(idx, 1);
+      this.templates = [p, ...this.templates];
+    }
   }
 
   onHide(): void {
@@ -59,8 +156,63 @@ export class TemplatesSidebarComponent implements OnInit {
     });
   }
 
+  onSearchInput(val: string): void {
+    this.searchTerm = val;
+    this.search$.next(val);
+  }
+
+  clearSearch(): void {
+    if (!this.searchTerm) return;
+    this.searchTerm = '';
+    this.scrollToTop();
+    this.page = 1;
+    this.loadTemplates(undefined, false);
+  }
+
+  onScroll(evt: Event): void {
+    if (!this.hasMore || this.loading || this.loadingMore) return;
+    const el = evt.target as HTMLElement;
+    const threshold = 160;
+    const nearBottom =
+      el.scrollTop + el.clientHeight >= el.scrollHeight - threshold;
+
+    if (nearBottom) {
+      if (!this.hintDelayTimer && !this.bottomHintVisible) {
+        this.hintDelayTimer = setTimeout(() => {
+          this.bottomHintVisible = true;
+          this.hintDelayTimer = null;
+        }, 500);
+      }
+      if (!this.loadMoreDelayTimer) {
+        this.loadMoreDelayTimer = setTimeout(() => {
+          this.clearLoadMoreTimers();
+          this.bottomHintVisible = false;
+          this.loadMore();
+        }, 500);
+      }
+    } else {
+      this.bottomHintVisible = false;
+      this.clearLoadMoreTimers();
+    }
+  }
+
+  private clearLoadMoreTimers(): void {
+    if (this.loadMoreDelayTimer) {
+      clearTimeout(this.loadMoreDelayTimer);
+      this.loadMoreDelayTimer = null;
+    }
+    if (this.hintDelayTimer) {
+      clearTimeout(this.hintDelayTimer);
+      this.hintDelayTimer = null;
+    }
+  }
+
+  private scrollToTop(): void {
+    const el = this.tplScrollRef?.nativeElement;
+    if (el) el.scrollTop = 0;
+  }
+
   openCreateModal() {
-    console.log('open');
     this.showCreateModal = true;
   }
   onModalClose() {
@@ -70,5 +222,6 @@ export class TemplatesSidebarComponent implements OnInit {
     const dt = this.documentTypes.find((d) => d.id === tpl.documentTypeId);
     tpl.documentTypeName = dt ? dt.name : '';
     this.templates = [tpl, ...this.templates];
+    this.promotePrazanFirst();
   }
 }

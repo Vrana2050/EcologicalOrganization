@@ -27,19 +27,26 @@ class TemplateService(BaseService):
         self.file_repo = file_repository
         self.session_factory = session_factory
 
-    def list(self, page: int = 1, per_page: int = 20) -> TemplatePageOut:
-        query = TemplateQuery(page=page, per_page=per_page, deleted=0, ordering="-updated_at")
-        result = self.repo.read_by_options(query, eagers=[Template.document_type])
+    def list(self, page: int = 1, per_page: int = 20, searchTerm: str | None = None) -> TemplatePageOut:
+        term = (searchTerm or "").strip()
+
+        if term:
+            result = self.repo.search_by_term(term=term, page=page, per_page=per_page)
+        else:
+            query = TemplateQuery(page=page, per_page=per_page, deleted=0, ordering="-updated_at")
+            result = self.repo.read_by_options(query, eagers=[Template.document_type])
+
         items = [
             TemplateOut(
                 id=t.id,
                 name=t.name,
                 document_type_id=t.document_type_id,
-                document_type_name=t.document_type.name if t.document_type else None,
+                document_type_name=t.document_type.name if getattr(t, "document_type", None) else None,
                 updated_at=t.updated_at,
             )
             for t in result["founds"]
         ]
+
         return TemplatePageOut(
             items=items,
             meta=PaginationMeta(
@@ -48,7 +55,6 @@ class TemplateService(BaseService):
                 total_count=result["search_options"]["total_count"],
             ),
         )
-
     def add_from_upload(
         self,
         *,

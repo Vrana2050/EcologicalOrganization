@@ -1,3 +1,4 @@
+// services/template.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
@@ -10,34 +11,32 @@ export class TemplateService {
 
   constructor(private http: HttpClient) {}
 
-  list(page = 1, perPage = 20): Observable<TemplatePage> {
-    return this.http
-      .get<any>(this.baseUrl, {
-        params: { page, per_page: perPage },
-      })
-      .pipe(
-        map((raw) => ({
-          items: raw.items.map(
-            (t: any): Template => ({
-              id: t.id,
-              name: t.name,
-              documentTypeId: t.document_type_id,
-              updatedAt: t.updated_at,
-              documentTypeName: t.document_type_name,
-            })
-          ),
-          meta: {
-            page: raw.meta.page,
-            perPage: raw.meta.per_page,
-            totalCount: raw.meta.total_count,
-          },
-        }))
-      );
+  list(page = 1, perPage = 20, searchTerm?: string): Observable<TemplatePage> {
+    const params: any = { page, per_page: perPage };
+    if ((searchTerm ?? '').trim()) params.searchTerm = searchTerm!.trim();
+
+    return this.http.get<any>(this.baseUrl, { params }).pipe(
+      map((raw) => ({
+        items: raw.items.map(
+          (t: any): Template => ({
+            id: t.id,
+            name: t.name,
+            documentTypeId: t.document_type_id,
+            updatedAt: t.updated_at,
+            documentTypeName: t.document_type_name,
+          })
+        ),
+        meta: {
+          page: raw.meta.page,
+          perPage: raw.meta.per_page,
+          totalCount: raw.meta.total_count,
+        },
+      }))
+    );
   }
 
   create(formData: FormData): Observable<Template> {
     formData.append('repo_folder_id', '3');
-
     return this.http.post<any>(this.baseUrl, formData).pipe(
       map(
         (t: any): Template => ({

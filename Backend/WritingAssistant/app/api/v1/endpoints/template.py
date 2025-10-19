@@ -16,9 +16,10 @@ def list_templates(
     page: int = 1,
     per_page: int = 20,
     _: int = Depends(get_current_user_id),
+    searchTerm: str | None = None,
     service: TemplateService = Depends(Provide[Container.template_service]),
 ):
-    return service.list(page=page, per_page=per_page)
+    return service.list(page=page, per_page=per_page, searchTerm=searchTerm)
 
 
 @router.post("", response_model=TemplateOut, status_code=status.HTTP_201_CREATED)

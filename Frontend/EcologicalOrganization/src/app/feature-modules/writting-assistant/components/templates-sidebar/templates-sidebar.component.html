@@ -17,9 +17,34 @@
     </button>
   </div>
 
-  <div *ngIf="loading" class="loading">Učitavanje…</div>
+  <div class="tpl-search">
+    <input
+      #tplSearchInputRef
+      class="wa-input small"
+      type="text"
+      [ngModel]="searchTerm"
+      (ngModelChange)="onSearchInput($event)"
+      placeholder="Unesi naziv ili tip dokumenta"
+      autocomplete="off"
+    />
+    <button
+      class="wa-btn small ghost"
+      type="button"
+      (click)="clearSearch()"
+      title="Obriši"
+    >
+      ✕
+    </button>
+  </div>
 
-  <div class="template-list" *ngIf="!loading">
+  <div *ngIf="loading && !loadingMore" class="loading">Učitavanje…</div>
+
+  <div
+    #tplScrollRef
+    class="template-list"
+    (scroll)="onScroll($event)"
+    [class.disabled]="loading && !loadingMore"
+  >
     <button
       class="t-card"
       type="button"
@@ -31,6 +56,15 @@
         {{ t.documentTypeName || "Dokument tip #" + t.documentTypeId }}
       </div>
     </button>
+
+    <div class="lazy-hint" *ngIf="bottomHintVisible && !loadingMore">
+      <div class="shimmer-line"></div>
+    </div>
+
+    <div class="infinite-loader" *ngIf="loadingMore">
+      <span class="spinner" aria-hidden="true"></span>
+      <span>Učitavanje još…</span>
+    </div>
   </div>
 </aside>
 
@@ -39,5 +73,4 @@
   [documentTypes]="documentTypes"
   (close)="onModalClose()"
   (created)="onTemplateCreated($event)"
->
-</xp-add-new-template>
+></xp-add-new-template>
