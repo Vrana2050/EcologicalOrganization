@@ -151,7 +151,6 @@ class DocumentReportPDF:
           </head>
           <body>
             <h1>{escape(title_osisan)}</h1>
-            <div class="meta">Generisano: {gen_at}</div>
             {sec_html}
             <div class="footer">© EcoLink 2025</div>
           </body>

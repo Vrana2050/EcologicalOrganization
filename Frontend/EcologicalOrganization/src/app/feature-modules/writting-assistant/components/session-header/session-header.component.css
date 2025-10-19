@@ -3,6 +3,7 @@
   border: 1px solid var(--wa-line);
   border-radius: 14px;
   padding: 16px;
+  padding-right: 40px;
 }
 
 .wa-header-top {

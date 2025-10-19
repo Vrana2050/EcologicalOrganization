@@ -6,6 +6,9 @@ import { ChatSessionService } from '../../services/chat-session.service';
 import { SessionOverview } from '../../models/session-section.model';
 import { DocumentTypeService } from 'src/app/feature-modules/prompt-admin/services/document-type.service';
 import { DocumentType } from 'src/app/feature-modules/prompt-admin/models/document-type.model';
+import { AuthService } from 'src/app/infrastructure/auth/auth.service';
+import { User } from 'src/app/infrastructure/auth/model/user.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'xp-writing-assistant-page',
@@ -15,6 +18,8 @@ import { DocumentType } from 'src/app/feature-modules/prompt-admin/models/docume
 export class WritingAssistantPageComponent implements OnInit {
   conversations: ChatSession[] = [];
   documentTypes: DocumentType[] = [];
+  currentUser: User | null = null;
+  private userSub?: Subscription;
   loading = true;
 
   showTemplatesSidebar = false;
@@ -23,15 +28,28 @@ export class WritingAssistantPageComponent implements OnInit {
   activeSession: ChatSession | null = null;
   sessionOverview: SessionOverview | null = null;
 
+  private lastSearchTerm?: string;
+
+  page = 1;
+  perPage = 20;
+  totalCount = 0;
+  loadingMore = false;
+  hasMore = false;
+  currentSearchTerm?: string;
+
   constructor(
     private chatSessionService: ChatSessionService,
     private documentTypeService: DocumentTypeService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    this.loadConversations();
+    this.userSub = this.authService.user$.subscribe(
+      (u) => (this.currentUser = u)
+    );
+    this.loadConversations(); // inicijalno bez filtera
     this.loadDocumentTypes();
 
     this.route.paramMap
@@ -44,27 +62,61 @@ export class WritingAssistantPageComponent implements OnInit {
       .subscribe((id) => this.openSession(id));
   }
 
-  loadConversations(): void {
-    this.loading = true;
-    this.chatSessionService.list().subscribe({
-      next: (page) => {
-        this.conversations = page.items;
-        this.loading = false;
+  ngOnDestroy(): void {
+    this.userSub?.unsubscribe();
+  }
 
-        if (this.activeSession?.id) {
-          const full = this.conversations.find(
-            (c) => c.id === this.activeSession!.id
-          );
-          if (full && full !== this.activeSession) {
-            this.activeSession = { ...this.activeSession, ...full };
-          }
-        }
-      },
-      error: (err) => {
-        console.error('Error loading conversations:', err);
-        this.loading = false;
-      },
-    });
+  loadConversations(searchTerm?: string, append = false): void {
+    this.loading = !append;
+    if (!append) {
+      this.page = 1;
+    }
+
+    this.chatSessionService
+      .list(this.page, this.perPage, searchTerm)
+      .subscribe({
+        next: (res) => {
+          this.totalCount = res.meta.totalCount;
+          this.conversations = append
+            ? [...this.conversations, ...res.items]
+            : res.items;
+          this.loading = false;
+          this.loadingMore = false; // indikator za učitavanje sledeće strane
+          this.hasMore = this.conversations.length < this.totalCount;
+        },
+        error: () => {
+          this.loading = false;
+          this.loadingMore = false;
+        },
+      });
+  }
+
+  // ⬇️ poziva se iz sidebar-a: (search)="onSearch($event)"
+  onSearch(term?: string) {
+    this.currentSearchTerm = (term ?? '').trim() || undefined;
+    this.lastSearchTerm = this.currentSearchTerm; // zadržavamo i staro polje
+    this.loadConversations(this.currentSearchTerm, false); // reset (bez append)
+  }
+
+  // ⬇️ poziva se iz sidebar-a: (loadMore)="onLoadMore()"
+  onLoadMore() {
+    if (!this.hasMore || this.loadingMore) return;
+    this.loadingMore = true;
+    this.page += 1;
+
+    this.chatSessionService
+      .list(this.page, this.perPage, this.currentSearchTerm)
+      .subscribe({
+        next: (res) => {
+          this.conversations = [...this.conversations, ...res.items];
+          this.loadingMore = false;
+          this.totalCount = res.meta.totalCount;
+          this.hasMore = this.conversations.length < this.totalCount;
+        },
+        error: () => {
+          this.loadingMore = false;
+        },
+      });
   }
 
   loadDocumentTypes(): void {

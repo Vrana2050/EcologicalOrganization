@@ -4,6 +4,7 @@ import {
   Input,
   Output,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from '@angular/core';
 import {
   SessionOverview,
@@ -23,13 +24,16 @@ import {
 export class PreviewDocumentComponent {
   @Input() title: string = '';
   @Input() overview!: SessionOverview;
-  @Input() sessionId!: number; // ⬅️ NOVO
+  @Input() sessionId!: number;
 
   @Output() close = new EventEmitter<void>();
 
-  downloading = false; // (opciono) UI state
+  downloading = false;
 
-  constructor(private docReport: DocumentReportService) {}
+  constructor(
+    private docReport: DocumentReportService,
+    private cdRef: ChangeDetectorRef
+  ) {}
 
   get sections(): SessionSectionWithLatest[] {
     const arr = this.overview?.sections ?? [];
@@ -44,7 +48,7 @@ export class PreviewDocumentComponent {
   trackById = (_: number, s: SessionSectionWithLatest) => s.id;
 
   downloadPdf(): void {
-    if (!this.sessionId || !this.overview) return;
+    if (!this.sessionId || !this.overview || this.downloading) return;
 
     const selections: SectionSelection[] = (this.overview.sections || [])
       .filter((s) => !!s.id)
@@ -55,7 +59,7 @@ export class PreviewDocumentComponent {
 
     const effectiveTitle = this.title || this.overview.title || 'Dokument';
     this.downloading = true;
-
+    this.cdRef.markForCheck();
     this.docReport
       .downloadSessionPreviewPdf(this.sessionId, effectiveTitle, selections)
       .subscribe({
@@ -66,12 +70,15 @@ export class PreviewDocumentComponent {
           a.download = (effectiveTitle || 'dokument') + '.pdf';
           a.click();
           window.URL.revokeObjectURL(url);
+
           this.downloading = false;
+          this.cdRef.markForCheck();
         },
         error: (err) => {
           console.error('Greška pri generisanju PDF-a', err);
           alert('Greška pri generisanju PDF-a.');
           this.downloading = false;
+          this.cdRef.markForCheck();
         },
       });
   }

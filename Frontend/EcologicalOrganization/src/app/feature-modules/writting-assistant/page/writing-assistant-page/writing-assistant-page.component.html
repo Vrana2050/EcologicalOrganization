@@ -1,10 +1,16 @@
 <div class="app" [class.show-templates]="showTemplatesSidebar">
   <wa-conversations-sidebar
+    [user]="currentUser"
     [conversations]="conversations"
+    [loading]="loading"
+    [loadingMore]="loadingMore"
+    [hasMore]="hasMore"
     [selectedId]="activeSession?.id"
     (createNew)="openTemplates()"
     (selectConversation)="onSelectConversation($event)"
     (deleteConversation)="onDeleteConversation($event)"
+    (search)="onSearch($event)"
+    (loadMore)="onLoadMore()"
   ></wa-conversations-sidebar>
 
   <wa-templates-sidebar

@@ -118,21 +118,31 @@ class ChatSessionService(BaseService):
 
         deleted_obj = self.chat_session_repository.delete_by_id(chat_session_id)
         return ChatSessionOut.model_validate(deleted_obj)
-
+    
     def list(
-        self, page: int = 1, per_page: int = 20, user_id: int = None
+        self,
+        page: int = 1,
+        per_page: int = 20,
+        user_id: int | None = None,
+        searchTerm: str | None = None,
     ) -> ChatSessionPageOut:
-        query = ChatSessionQuery(
-            created_by=user_id,
-            page=page,
-            per_page=per_page,
-            deleted=0,
-            ordering="-updated_at",
-        )
-        result = self.chat_session_repository.read_by_options(query)
+        term = (searchTerm or "").strip()
+
+        if term:
+            result = self.chat_session_repository.search_by_term(
+                user_id=user_id, term=term, page=page, per_page=per_page
+            )
+        else:
+            query = ChatSessionQuery(
+                created_by=user_id,
+                page=page,
+                per_page=per_page,
+                deleted=0,
+                ordering="-updated_at",
+            )
+            result = self.chat_session_repository.read_by_options(query)
 
         items = [ChatSessionOut.model_validate(s) for s in result["founds"]]
-
         return ChatSessionPageOut(
             items=items,
             meta=PaginationMeta(

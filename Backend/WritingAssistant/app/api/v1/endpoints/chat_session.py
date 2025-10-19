@@ -31,9 +31,10 @@ def list_chat_session(
     page: int = 1,
     per_page: int = 20,
     service: ChatSessionService = Depends(Provide[Container.chat_session_service]),
+    searchTerm: str | None = None,
     user_id: int = Depends(get_current_user_id),
 ):
-    return service.list(page=page, per_page=per_page, user_id=user_id)
+    return service.list(page=page, per_page=per_page, user_id=user_id, searchTerm=searchTerm)
 
 
 @router.get("/{session_id}/overview", response_model=SessionOverviewOut)

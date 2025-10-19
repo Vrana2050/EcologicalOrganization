@@ -1,43 +1,94 @@
 <aside class="sidebar">
-  <div class="brand">
+  <div class="brand brand-link" (click)="goToWritingAssistant()">
     <div class="dot"></div>
     <h1>Asistirano pisanje</h1>
   </div>
 
-  <button class="wa-btn primary" (click)="onCreateNew()">
+  <div class="quick-links" *ngIf="isAdmin">
+    <a href="/dashboard" class="quick-link">Admin panel ↗</a>
+  </div>
+
+  <button class="wa-btn primary padded-btn" (click)="onCreateNew()">
     + Kreiraj novi dokument
   </button>
 
-  <div class="section-title">Konverzacije</div>
-
-  <div *ngIf="loading">Učitavanje...</div>
-
-  <div class="list" *ngIf="!loading">
-    <div
-      class="item"
-      *ngFor="let c of conversations"
-      [class.selected]="c.id === selectedId"
+  <div class="section-head">
+    <div class="section-title">Konverzacije</div>
+    <button
+      class="search-toggle"
+      (click)="toggleSearch()"
+      [attr.aria-expanded]="showSearch"
+      aria-controls="convSearch"
     >
-      <div class="avatar" (click)="onSelectConversation(c)">
-        {{ "💬" }}
+      🔎 Pretraži
+    </button>
+  </div>
+
+  <div class="search-wrap" *ngIf="showSearch">
+    <input
+      #searchInputRef
+      id="convSearch"
+      class="wa-input small search-input"
+      type="text"
+      [ngModel]="searchTerm"
+      (ngModelChange)="onSearchInput($event)"
+      placeholder="Pretraži konverzacije…"
+      autocomplete="off"
+    />
+    <button
+      class="wa-btn small ghost"
+      type="button"
+      (click)="clearSearch()"
+      aria-label="Obriši i zatvori pretragu"
+      title="Obriši"
+    >
+      ✕
+    </button>
+  </div>
+
+  <div #scrollAreaRef class="scroll-area" (scroll)="onScroll($event)">
+    <div *ngIf="loading" class="initial-loading">Učitavanje...</div>
+
+    <div class="list" *ngIf="!loading">
+      <div
+        class="item"
+        *ngFor="let c of conversations"
+        [class.selected]="c.id === selectedId"
+      >
+        <div class="avatar" (click)="onSelectConversation(c)">💬</div>
+
+        <div class="meta" (click)="onSelectConversation(c)">
+          <div class="title">
+            {{ c.title || "(bez naslova)" }}
+            <span class="chip test" *ngIf="c.isTestSession">TEST</span>
+          </div>
+          <div class="sub">
+            {{ c.updatedAt ? (c.updatedAt | date : "short") : "" }}
+          </div>
+        </div>
+
+        <div class="menu-wrap" (click)="$event.stopPropagation()">
+          <button class="menu-btn" (click)="toggleMenu(c.id)">⋮</button>
+          <div class="menu" *ngIf="menuOpenId === c.id">
+            <button class="menu-item" (click)="onDelete(c)">Obriši</button>
+          </div>
+        </div>
       </div>
 
-      <div class="meta" (click)="onSelectConversation(c)">
-        <div class="title">
-          {{ c.title || "(bez naslova)" }}
-          <span class="chip test" *ngIf="c.isTestSession">TEST</span>
-        </div>
-        <div class="sub">
-          {{ c.updatedAt ? (c.updatedAt | date : "short") : "" }}
-        </div>
+      <div class="lazy-hint" *ngIf="bottomHintVisible && !loadingMore">
+        <div class="shimmer-line"></div>
       </div>
 
-      <div class="menu-wrap" (click)="$event.stopPropagation()">
-        <button class="menu-btn" (click)="toggleMenu(c.id)">⋮</button>
-        <div class="menu" *ngIf="menuOpenId === c.id">
-          <button class="menu-item" (click)="onDelete(c)">Obriši</button>
-        </div>
+      <div class="infinite-loader" *ngIf="loadingMore">
+        <span class="spinner" aria-hidden="true"></span>
+        <span>Učitavanje još…</span>
       </div>
     </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <button class="wa-btn full" type="button" (click)="onLogout()">
+      ⎋ Odjavi se
+    </button>
   </div>
 </aside>

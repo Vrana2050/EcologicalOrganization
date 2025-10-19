@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http'; // ⬅️ HttpParams umesto HttpHeaders
 import { Observable, map, catchError, of } from 'rxjs';
 import { ChatSession, ChatSessionPage } from '../models/chat-session.model';
 import {
@@ -7,46 +7,52 @@ import {
   SessionSectionWithLatest,
 } from '../models/session-section.model';
 import { Router } from '@angular/router';
-import { TokenStorage } from 'src/app/infrastructure/auth/jwt/token.service';
-
+// import { TokenStorage } from 'src/app/infrastructure/auth/jwt/token.service'; // ⬅️ nije korišćeno – obriši
 import { environment } from 'src/env/environment';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class ChatSessionService {
   private readonly baseUrl = `${environment.apiHost}writing-assistant/chat-session`;
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  list(page = 1, perPage = 20): Observable<ChatSessionPage> {
-    return this.http
-      .get<any>(this.baseUrl, {
-        params: { page, per_page: perPage },
-      })
-      .pipe(
-        map(
-          (raw): ChatSessionPage => ({
-            items: (raw.items || []).map(
-              (it: any): ChatSession => ({
-                id: it.id,
-                templateId: it.template_id,
-                documentTypeId: it.document_type_id ?? null,
-                createdBy: it.created_by,
-                title: it.title,
-                updatedAt: it.updated_at,
-                isTestSession: it.is_test_session === 1,
-                promptVersionId: it.test_prompt_version_id ?? null,
-              })
-            ),
-            meta: {
-              page: raw.meta.page,
-              perPage: raw.meta.per_page,
-              totalCount: raw.meta.total_count,
-            },
-          })
-        )
-      );
+  // ⬅️ dodato searchTerm
+  list(
+    page = 1,
+    perPage = 20,
+    searchTerm?: string
+  ): Observable<ChatSessionPage> {
+    let params = new HttpParams()
+      .set('page', String(page))
+      .set('per_page', String(perPage));
+
+    if ((searchTerm ?? '').trim()) {
+      params = params.set('searchTerm', (searchTerm as string).trim());
+    }
+
+    return this.http.get<any>(this.baseUrl, { params }).pipe(
+      map(
+        (raw): ChatSessionPage => ({
+          items: (raw.items || []).map(
+            (it: any): ChatSession => ({
+              id: it.id,
+              templateId: it.template_id,
+              documentTypeId: it.document_type_id ?? null,
+              createdBy: it.created_by,
+              title: it.title,
+              updatedAt: it.updated_at,
+              isTestSession: it.is_test_session === 1,
+              promptVersionId: it.test_prompt_version_id ?? null,
+            })
+          ),
+          meta: {
+            page: raw.meta.page,
+            perPage: raw.meta.per_page,
+            totalCount: raw.meta.total_count,
+          },
+        })
+      )
+    );
   }
 
   create(templateId: number, title?: string): Observable<ChatSession> {
