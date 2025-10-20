@@ -1,4 +1,3 @@
-// components/templates-sidebar/templates-sidebar.component.ts
 import {
   Component,
   EventEmitter,
@@ -35,7 +34,6 @@ export class TemplatesSidebarComponent implements OnInit, OnDestroy {
   totalCount = 0;
   hasMore = false;
 
-  // search
   searchTerm = '';
   private search$ = new Subject<string>();
   private searchSub?: Subscription;
@@ -157,7 +155,6 @@ export class TemplatesSidebarComponent implements OnInit, OnDestroy {
     }
   }
 
-  // helper: Normalizacija naziva tipa dokumenta
   private normalizeDocumentTypeNames(): void {
     this.templates = this.templates.map((t) => {
       const raw = (t.documentTypeName ?? '').trim().toLowerCase();
@@ -190,7 +187,7 @@ export class TemplatesSidebarComponent implements OnInit, OnDestroy {
   }
 
   onDeleteTemplate(t: Template): void {
-    if (this.deletingId) return; // već brišemo nešto
+    if (this.deletingId) return;
     this.deletingId = t.id;
     this.menuOpenId = null;
 
