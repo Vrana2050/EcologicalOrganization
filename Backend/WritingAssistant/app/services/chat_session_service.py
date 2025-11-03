@@ -49,7 +49,7 @@ class ChatSessionService(BaseService):
             eagers=[Template.template_section],
         )
         schema.document_type_id = tmpl.document_type_id
-        schema.title = schema.title or f"Konverzacija {now.strftime('%Y-%m-%d %H:%M:%S')}"
+        schema.title = schema.title or f"Novi Dokument {now.strftime('%Y-%m-%d %H:%M:%S')}"
         schema.deleted = 0
         schema.created_at = now
         schema.updated_at = now

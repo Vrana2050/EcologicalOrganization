@@ -20,11 +20,11 @@
   <div class="tpl-search">
     <input
       #tplSearchInputRef
-      class="wa-input small"
+      class="wa-input"
       type="text"
       [ngModel]="searchTerm"
       (ngModelChange)="onSearchInput($event)"
-      placeholder="Unesi naziv ili tip dokumenta"
+      placeholder="Pretraži po nazivu ili tipu dokumenta"
       autocomplete="off"
     />
     <button

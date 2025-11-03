@@ -90,12 +90,14 @@
 
   <div class="pa-field">
     <textarea
+      #promptTextArea
       class="wa-input mono"
       rows="10"
       [disabled]="isDisabled"
       [(ngModel)]="promptTextDraft"
       (ngModelChange)="onTextChange()"
-      placeholder="Ovde unesi tekst prompta…"
+      (input)="autoGrow($event)"
+      placeholder="Tekst prompta…"
     ></textarea>
   </div>
 

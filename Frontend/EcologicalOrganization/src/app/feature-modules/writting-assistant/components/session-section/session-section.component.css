@@ -57,6 +57,7 @@ textarea.wa-input.wa-result {
   resize: none;
   overflow: hidden;
   box-sizing: border-box;
+  padding-bottom: 20px;
 }
 
 .wa-title-wrap {

@@ -6,6 +6,9 @@ import {
   OnChanges,
   SimpleChanges,
   OnDestroy,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
 } from '@angular/core';
 import { PromptVersion } from '../../models/prompt-version.model';
 import { ChatSessionService } from 'src/app/feature-modules/writting-assistant/services/chat-session.service';
@@ -20,7 +23,9 @@ import { CommonModule } from '@angular/common';
     './prompt-version.component.css',
   ],
 })
-export class PromptVersionComponent implements OnChanges, OnDestroy {
+export class PromptVersionComponent
+  implements OnChanges, OnDestroy, AfterViewInit
+{
   constructor(
     private chatSessionService: ChatSessionService,
     private router: Router
@@ -39,13 +44,15 @@ export class PromptVersionComponent implements OnChanges, OnDestroy {
   }>();
   @Output() setActive = new EventEmitter<number>();
   @Output() deletePromptVersion = new EventEmitter<number>();
-
   @Output() saveNewVersion = new EventEmitter<{
     promptId: number;
     name: string;
     description: string;
     promptText: string;
   }>();
+  @Output() goToTest = new EventEmitter<number>();
+
+  @ViewChild('promptTextArea') promptTextArea!: ElementRef<HTMLTextAreaElement>;
 
   nameDraft = '';
   descriptionDraft = '';
@@ -73,8 +80,13 @@ export class PromptVersionComponent implements OnChanges, OnDestroy {
         this.statusTypeBasic = null;
         this.statusMessageText = null;
         this.statusTypeText = null;
+        setTimeout(() => this.autoGrowFromRef(), 0);
       }
     }
+  }
+
+  ngAfterViewInit(): void {
+    setTimeout(() => this.autoGrowFromRef(), 0);
   }
 
   ngOnDestroy(): void {
@@ -110,6 +122,7 @@ export class PromptVersionComponent implements OnChanges, OnDestroy {
   }
 
   onTextChange(): void {
+    this.autoGrowFromRef();
     if (!this.version) return;
     if (this.isNew) return;
     const changed =
@@ -149,7 +162,6 @@ export class PromptVersionComponent implements OnChanges, OnDestroy {
 
   onSaveNewVersion(): void {
     if (!this.version) return;
-
     this.saveNewVersion.emit({
       promptId: this.version.promptId,
       name: (this.nameDraft || '').trim(),
@@ -166,6 +178,11 @@ export class PromptVersionComponent implements OnChanges, OnDestroy {
   onDeletePromptVersion(): void {
     if (!this.version || this.isNew) return;
     this.deletePromptVersion.emit(this.version.id);
+  }
+
+  onGoToTestPage(): void {
+    if (!this.version || this.isNew) return;
+    this.goToTest.emit(this.version.id);
   }
 
   private startBasicHideTimer(): void {
@@ -202,11 +219,18 @@ export class PromptVersionComponent implements OnChanges, OnDestroy {
     }
   }
 
-  @Output() goToTest = new EventEmitter<number>();
+  /** mora biti public jer se koristi u template-u */
+  autoGrow(evt?: Event): void {
+    const el =
+      (evt?.target as HTMLTextAreaElement) ??
+      this.promptTextArea?.nativeElement;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.overflowY = 'hidden';
+    el.style.height = el.scrollHeight + 'px';
+  }
 
-  onGoToTestPage(): void {
-    if (!this.version || this.isNew) return;
-
-    this.goToTest.emit(this.version.id);
+  private autoGrowFromRef(): void {
+    if (this.promptTextArea?.nativeElement) this.autoGrow();
   }
 }

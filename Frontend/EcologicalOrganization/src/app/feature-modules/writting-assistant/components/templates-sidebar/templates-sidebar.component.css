@@ -81,9 +81,10 @@
 
 .tpl-search {
   display: flex;
-  gap: 8px;
-  padding: 0 0 4px 0;
+  gap: 4px;
+  padding: 0 0 3px 0;
   align-items: center;
+  font-size: 9px;
 }
 
 .template-list {
